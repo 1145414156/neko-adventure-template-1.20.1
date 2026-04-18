@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "neko-adventure:block/start_room_block"
+    }
+  }
+}

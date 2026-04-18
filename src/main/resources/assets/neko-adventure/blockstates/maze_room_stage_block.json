@@ -1,0 +1,7 @@
+{
+    "variants": {
+        "maze_stage=0": { "model": "neko-adventure:block/maze_room_stage_block0" },
+        "maze_stage=1": { "model": "neko-adventure:block/maze_room_stage_block1" },
+        "maze_stage=2": { "model": "neko-adventure:block/maze_room_stage_block2" }
+    }
+}

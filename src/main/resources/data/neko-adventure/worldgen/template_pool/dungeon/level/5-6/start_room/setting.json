@@ -1,0 +1,100 @@
+{
+  "name": "neko-adventure:dungeon/level/5-6/start_room/setting",
+  "fallback": "minecraft:empty",
+  "elements": [
+    {
+      "weight": 1,
+      "element": {
+        "location": "neko-adventure:dungeon/level/5-6/start_room/start1",
+        "processors": "minecraft:empty",
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element"
+      }
+    },
+    {
+      "weight": 1,
+      "element": {
+        "location": "neko-adventure:dungeon/level/5-6/start_room/start2",
+        "processors": "minecraft:empty",
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element"
+      }
+    },{
+      "weight": 1,
+      "element": {
+        "location": "neko-adventure:dungeon/level/5-6/start_room/start3",
+        "processors": "minecraft:empty",
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element"
+      }
+    },
+    {
+      "weight": 1,
+      "element": {
+        "location": "neko-adventure:dungeon/level/5-6/start_room/start4",
+        "processors": "minecraft:empty",
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element"
+      }
+    },
+    {
+      "weight": 1,
+      "element": {
+        "location": "neko-adventure:dungeon/level/5-6/start_room/start5",
+        "processors": "minecraft:empty",
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element"
+      }
+    }
+  ,
+    {
+      "weight": 1,
+      "element": {
+        "location": "neko-adventure:dungeon/level/5-6/start_room/start6",
+        "processors": "minecraft:empty",
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element"
+      }
+    }
+  ,
+    {
+      "weight": 1,
+      "element": {
+        "location": "neko-adventure:dungeon/level/5-6/start_room/start7",
+        "processors": "minecraft:empty",
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element"
+      }
+    }
+  ,
+    {
+      "weight": 1,
+      "element": {
+        "location": "neko-adventure:dungeon/level/5-6/start_room/start8",
+        "processors": "minecraft:empty",
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element"
+      }
+    }
+  ,
+    {
+      "weight": 1,
+      "element": {
+        "location": "neko-adventure:dungeon/level/5-6/start_room/start9",
+        "processors": "minecraft:empty",
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element"
+      }
+    }
+  ,
+    {
+      "weight": 1,
+      "element": {
+        "location": "neko-adventure:dungeon/level/5-6/start_room/start10",
+        "processors": "minecraft:empty",
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element"
+      }
+    }
+  ]
+}

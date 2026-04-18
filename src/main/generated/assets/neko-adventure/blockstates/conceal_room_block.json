@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "neko-adventure:block/conceal_room_block"
+    }
+  }
+}

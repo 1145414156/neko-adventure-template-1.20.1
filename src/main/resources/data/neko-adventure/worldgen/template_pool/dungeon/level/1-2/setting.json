@@ -1,0 +1,55 @@
+{
+  "name": "neko-adventure:dungeon/level/1-2/setting",
+  "fallback": "minecraft:empty",
+  "elements": [
+    {
+      "weight": 20,
+      "element": {
+        "location": "neko-adventure:dungeon/level/1-2/template1",
+        "processors": "minecraft:empty",
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element"
+      }
+    }
+  ,
+    {
+      "weight": 20,
+      "element": {
+        "location": "neko-adventure:dungeon/level/1-2/template2",
+        "processors": "minecraft:empty",
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element"
+      }
+    }
+    ,
+    {
+      "weight": 30,
+      "element": {
+        "location": "neko-adventure:dungeon/level/1-2/template3",
+        "processors": "minecraft:empty",
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element"
+      }
+    }
+    ,
+    {
+      "weight": 10,
+      "element": {
+        "location": "neko-adventure:dungeon/level/1-2/template4",
+        "processors": "minecraft:empty",
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element"
+      }
+    }
+  ,
+    {
+      "weight": 5,
+      "element": {
+        "location": "neko-adventure:dungeon/level/1-2/template5",
+        "processors": "minecraft:empty",
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element"
+      }
+    }
+  ]
+}

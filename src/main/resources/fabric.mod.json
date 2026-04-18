@@ -1,0 +1,41 @@
+{
+	"schemaVersion": 1,
+	"id": "neko-adventure",
+	"version": "0.0.1",
+	"name": "Neko Adventure",
+	"description": "This is a story about a cat searching for its owner. Additionally, please excuse my poor coding skills TAT",
+	"authors": [
+		"Infinitly_"
+	],
+	"contact": {
+		"homepage": "https://fabricmc.net/",
+		"sources": "https://github.com/FabricMC/fabric-example-mod"
+	},
+	"license": "CC0-1.0",
+	"icon": "assets/neko-adventure/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"com.nekoadventure.NekoAdventure"
+		],
+		"client": [
+			"com.nekoadventure.NekoAdventureClient"
+		],
+		"fabric-datagen": [
+			"com.nekoadventure.NekoAdventureDataGenerator"
+		]
+	},
+	"mixins": [
+		"neko-adventure.mixins.json",
+		{
+			"config": "neko-adventure.client.mixins.json",
+			"environment": "client"
+		}
+	],
+	"depends": {
+		"fabricloader": ">=0.14.21",
+		"fabric-api": "*",
+		"minecraft": "~1.20.1",
+		"java": ">=17"
+	}
+}

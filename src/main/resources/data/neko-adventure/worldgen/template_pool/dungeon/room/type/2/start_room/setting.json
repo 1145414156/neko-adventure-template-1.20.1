@@ -1,0 +1,15 @@
+{
+  "name": "neko-adventure:dungeon/room/type/2/start_room/setting",
+  "fallback": "minecraft:empty",
+  "elements": [
+    {
+      "weight": 1,
+      "element": {
+        "location": "neko-adventure:dungeon/room/type/2/start_room/start1",
+        "processors": "minecraft:empty",
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element"
+      }
+    }
+  ]
+}

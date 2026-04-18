@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "neko-adventure:block/food_room_block"
+    }
+  }
+}

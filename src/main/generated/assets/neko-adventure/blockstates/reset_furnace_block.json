@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "neko-adventure:block/reset_furnace_block"
+    }
+  }
+}

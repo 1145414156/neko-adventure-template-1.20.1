@@ -1,0 +1,15 @@
+{
+  "type": "neko-adventure:dungeon",
+  "generator": {
+    "type": "minecraft:flat",
+    "settings": {
+      "biome": "neko-adventure:void",
+      "layers": [],
+      "features": false,
+      "lakes": false,
+      "structures": {
+        "structures": {}
+      }
+    }
+  }
+}

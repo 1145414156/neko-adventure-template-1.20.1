@@ -1,0 +1,14 @@
+{
+  "replace": false,
+  "values": [
+    "neko-adventure:broken_soul",
+    "neko-adventure:pureness_soul",
+    "neko-adventure:bloodstained_cross",
+    "neko-adventure:soul_jar",
+    "neko-adventure:strange_potion",
+    "neko-adventure:spiriting_away",
+    "neko-adventure:enchanted_golden_apple_slice",
+    "neko-adventure:night_vision",
+    "neko-adventure:strength_potion_injector"
+  ]
+}

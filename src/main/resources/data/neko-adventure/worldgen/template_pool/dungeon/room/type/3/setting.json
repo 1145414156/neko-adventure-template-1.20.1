@@ -1,0 +1,255 @@
+{
+  "name": "neko-adventure:dungeon/room/type/3/setting",
+  "fallback": "minecraft:empty",
+  "elements": [
+    {
+      "weight": 1,
+      "element": {
+        "location": "neko-adventure:dungeon/room/type/3/dr1",
+        "processors": "minecraft:empty",
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element"
+      }
+    }
+  ,
+    {
+      "weight": 1,
+      "element": {
+        "location": "neko-adventure:dungeon/room/type/3/dr2",
+        "processors": "minecraft:empty",
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element"
+      }
+    }
+  ,
+    {
+      "weight": 1,
+      "element": {
+        "location": "neko-adventure:dungeon/room/type/3/dr3",
+        "processors": "minecraft:empty",
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element"
+      }
+    }
+  ,
+    {
+      "weight": 1,
+      "element": {
+        "location": "neko-adventure:dungeon/room/type/3/dr4",
+        "processors": "minecraft:empty",
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element"
+      }
+    }
+  ,
+    {
+      "weight": 1,
+      "element": {
+        "location": "neko-adventure:dungeon/room/type/3/dr5",
+        "processors": "minecraft:empty",
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element"
+      }
+    }
+  ,
+    {
+      "weight": 1,
+      "element": {
+        "location": "neko-adventure:dungeon/room/type/3/dr_cr1",
+        "processors": "minecraft:empty",
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element"
+      }
+    }
+  ,
+    {
+      "weight": 1,
+      "element": {
+        "location": "neko-adventure:dungeon/room/type/3/dr_cr2",
+        "processors": "minecraft:empty",
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element"
+      }
+    }
+  ,
+    {
+      "weight": 1,
+      "element": {
+        "location": "neko-adventure:dungeon/room/type/3/dr_cr3",
+        "processors": "minecraft:empty",
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element"
+      }
+    }
+  ,
+    {
+      "weight": 1,
+      "element": {
+        "location": "neko-adventure:dungeon/room/type/3/dr_cr4",
+        "processors": "minecraft:empty",
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element"
+      }
+    }
+  ,
+    {
+      "weight": 1,
+      "element": {
+        "location": "neko-adventure:dungeon/room/type/3/dr_cr5",
+        "processors": "minecraft:empty",
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element"
+      }
+    }
+  ,
+    {
+      "weight": 1,
+      "element": {
+        "location": "neko-adventure:dungeon/room/type/3/dr_gr1",
+        "processors": "minecraft:empty",
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element"
+      }
+    }
+  ,
+    {
+      "weight": 1,
+      "element": {
+        "location": "neko-adventure:dungeon/room/type/3/dr_gr2",
+        "processors": "minecraft:empty",
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element"
+      }
+    }
+  ,
+    {
+      "weight": 1,
+      "element": {
+        "location": "neko-adventure:dungeon/room/type/3/dr_gr3",
+        "processors": "minecraft:empty",
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element"
+      }
+    }
+  ,
+    {
+      "weight": 1,
+      "element": {
+        "location": "neko-adventure:dungeon/room/type/3/dr_gr4",
+        "processors": "minecraft:empty",
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element"
+      }
+    }
+  ,
+    {
+      "weight": 1,
+      "element": {
+        "location": "neko-adventure:dungeon/room/type/3/dr_gr5",
+        "processors": "minecraft:empty",
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element"
+      }
+    }
+  ,
+    {
+      "weight": 1,
+      "element": {
+        "location": "neko-adventure:dungeon/room/type/3/dr_cr_dr_gr_br1",
+        "processors": "minecraft:empty",
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element"
+      }
+    }
+  ,
+    {
+      "weight": 1,
+      "element": {
+        "location": "neko-adventure:dungeon/room/type/3/dr_cr_dr_gr_br2",
+        "processors": "minecraft:empty",
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element"
+      }
+    }
+  ,
+    {
+      "weight": 1,
+      "element": {
+        "location": "neko-adventure:dungeon/room/type/3/dr_cr_dr_gr_br3",
+        "processors": "minecraft:empty",
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element"
+      }
+    }
+  ,
+    {
+      "weight": 1,
+      "element": {
+        "location": "neko-adventure:dungeon/room/type/3/dr_cr_dr_gr_br4",
+        "processors": "minecraft:empty",
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element"
+      }
+    }
+  ,
+    {
+      "weight": 1,
+      "element": {
+        "location": "neko-adventure:dungeon/room/type/3/dr_cr_dr_gr_br5",
+        "processors": "minecraft:empty",
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element"
+      }
+    }
+  ,
+    {
+      "weight": 1,
+      "element": {
+        "location": "neko-adventure:dungeon/room/type/3/dr_cr_dr_gr_br_nr1",
+        "processors": "minecraft:empty",
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element"
+      }
+    }
+  ,
+    {
+      "weight": 1,
+      "element": {
+        "location": "neko-adventure:dungeon/room/type/3/dr_cr_dr_gr_br_nr2",
+        "processors": "minecraft:empty",
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element"
+      }
+    }
+  ,
+    {
+      "weight": 1,
+      "element": {
+        "location": "neko-adventure:dungeon/room/type/3/dr_cr_dr_gr_br_nr3",
+        "processors": "minecraft:empty",
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element"
+      }
+    }
+  ,
+    {
+      "weight": 1,
+      "element": {
+        "location": "neko-adventure:dungeon/room/type/3/dr_cr_dr_gr_br_nr4",
+        "processors": "minecraft:empty",
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element"
+      }
+    }
+  ,
+    {
+      "weight": 1,
+      "element": {
+        "location": "neko-adventure:dungeon/room/type/3/dr_cr_dr_gr_br_nr5",
+        "processors": "minecraft:empty",
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element"
+      }
+    }
+  ]
+}

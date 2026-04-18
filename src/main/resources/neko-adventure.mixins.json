@@ -1,0 +1,20 @@
+{
+  "required": true,
+  "package": "com.nekoadventure.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "mixins": [
+    "itemApart.EnderPearlEntityMixin",
+    "itemApart.MixinMilkBucketItem",
+    "itemApart.PlayerEntityMixin",
+    "itemApart.ServerPlayerEntityMixin",
+    "itemApart.ServerPlayerInteractionManagerMixin",
+    "itemApart.NekoPacckageSlotMixin",
+    "mazeApart.ZombieEntityMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "overwrites": {
+    "requireAnnotations": true
+	}
+}

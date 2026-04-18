@@ -1,0 +1,33 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_all_pool_item": {
+      "conditions": {
+        "items": [
+          {
+            "tag": "neko-adventure:all_item_pool"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "neko-adventure:binding_soul_substance_from_pool"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_all_pool_item",
+      "has_the_recipe"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "neko-adventure:binding_soul_substance_from_pool"
+    ]
+  },
+  "sends_telemetry_event": false
+}

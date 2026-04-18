@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "neko-adventure:block/item_base_block"
+    }
+  }
+}

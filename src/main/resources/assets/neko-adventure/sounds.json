@@ -1,0 +1,89 @@
+{
+  "electricity_run_through": {
+    "subtitle": "sounds.neko_adventure.electricity_run_through",
+    "sounds": [
+      "neko-adventure:attack/electricity_run_through"
+    ]
+  },
+  "brimstone_attack": {
+    "subtitle": "sounds.neko_adventure.brimstone_attack",
+    "sounds": [
+      "neko-adventure:attack/brimstone_attack"
+    ]
+  },
+  "brimstone_fierce_attack": {
+    "subtitle": "sounds.neko_adventure.brimstone_fierce_attack",
+    "sounds": [
+      "neko-adventure:attack/brimstone_fierce_attack"
+    ]
+  },
+  "lance_attack": {
+    "subtitle": "sounds.neko_adventure.lance_attack",
+    "sounds": [
+      "neko-adventure:attack/lance_attack"
+    ]
+  },
+  "parry_attack": {
+    "subtitle": "sounds.neko_adventure.parry_attack",
+    "sounds": [
+      "neko-adventure:attack/parry_attack"
+    ]
+  },
+
+
+  "grand_knight_ambient":{
+    "subtitle": "sounds.neko_adventure.grand_knight_ambient",
+    "sounds": [
+      "neko-adventure:mob/grand_knight_ambient1",
+      "neko-adventure:mob/grand_knight_ambient2",
+      "neko-adventure:mob/grand_knight_ambient3"
+    ]
+  },
+  "grand_knight_walk":{
+    "subtitle": "sounds.neko_adventure.grand_knight_walk",
+    "sounds": [
+      "neko-adventure:mob/grand_knight_walk1",
+      "neko-adventure:mob/grand_knight_walk2"
+    ]
+  },
+  "grand_knight_sword_attack":{
+    "subtitle": "sounds.neko_adventure.grand_knight_sword_attack",
+    "sounds": [
+      "neko-adventure:mob/grand_knight_sword_attack1",
+      "neko-adventure:mob/grand_knight_sword_attack2"
+    ]
+  },
+  "grand_knight_rapid_attack":{
+    "subtitle": "sounds.neko_adventure.grand_knight_rapid_attack",
+    "sounds": [
+      "neko-adventure:mob/grand_knight_rapid_attack"
+    ]
+  },
+  "grand_knight_delay_bullet":{
+    "subtitle": "sounds.neko_adventure.grand_knight_delay_bullet",
+    "sounds": [
+      "neko-adventure:mob/grand_knight_delay_bullet"
+    ]
+  },
+  "grand_knight_earth_quaker":{
+    "subtitle": "sounds.neko_adventure.grand_knight_earth_quaker",
+    "sounds": [
+      "neko-adventure:mob/grand_knight_earth_quaker"
+    ]
+  },
+  "grand_knight_hurt":{
+    "subtitle": "sounds.neko_adventure.grand_knight_hurt",
+    "sounds": [
+      "neko-adventure:mob/grand_knight_hurt1",
+      "neko-adventure:mob/grand_knight_hurt2",
+      "neko-adventure:mob/grand_knight_hurt3"
+    ]
+  },
+  "grand_knight_death":{
+    "subtitle": "sounds.neko_adventure.grand_knight_death",
+    "sounds": [
+      "neko-adventure:mob/grand_knight_death"
+    ]
+  }
+
+}
