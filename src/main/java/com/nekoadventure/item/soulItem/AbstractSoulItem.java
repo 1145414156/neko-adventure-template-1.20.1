@@ -18,11 +18,11 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 
-//这个是所有魂石类道具的全部基础
+//这个是所有魂石类道具的全部基础类
 //魂石具有以下特性：
 //1.默认耐久为0，需要充能满才能使用
 //2.只能使用一次（除非有特别说明）
-//3.通过打怪充能（除非有特别说明）
+//3.通过清理房间完成的时候充能一次（除非有特别说明）
 //做个比喻：类似于以撒的结合里面的卡牌+药丸+主动道具的结合体（主要是减少一点点设定，方便新玩家入坑吧....）
 public abstract class AbstractSoulItem extends Item {
     Text text;

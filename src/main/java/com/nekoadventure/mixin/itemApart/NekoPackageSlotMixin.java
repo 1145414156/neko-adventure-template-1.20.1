@@ -12,12 +12,12 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+//纸盒无法放入除玩家背包(含盔甲栏/副手)以外的任何容器（箱子、潜影盒、末影箱等）
 @Mixin(Slot.class)
-public class NekoPacckageSlotMixin {
+public class NekoPackageSlotMixin {
     @Shadow
     @Final
     public Inventory inventory;
-    //纸盒无法放入除玩家背包(含盔甲栏/副手)以外的任何容器（箱子、潜影盒、末影箱等）
     @Inject(method = "canInsert", at = @At("HEAD"), cancellable = true)
     private void preventNekoPackageInsert(ItemStack stack, CallbackInfoReturnable<Boolean> cir) {
         if (!(this.inventory instanceof PlayerInventory) && stack.getItem() instanceof NekoPackageItem) {

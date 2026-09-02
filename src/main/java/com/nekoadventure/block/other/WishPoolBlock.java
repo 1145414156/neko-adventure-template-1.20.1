@@ -33,12 +33,12 @@ public class WishPoolBlock extends Block {
         ItemStack heldItem = player.getStackInHand(hand);
         if (heldItem.getItem() == ModItems.COIN) {
             heldItem.decrement(1);
-            int roll = world.random.nextInt(100); // 0-99
+            int roll = world.random.nextInt(100);
 
             if (roll < 50) {
                 world.addBlockBreakParticles(pos, state);
             } else if (roll < 80) {
-                // 30%概率：随机（大概）杂物
+                // 30%概率：随机杂物（大概）
                 giveRandomJunkItem(world, player);
             } else if (roll < 90) {
                 // 10%概率：随机原版矿物

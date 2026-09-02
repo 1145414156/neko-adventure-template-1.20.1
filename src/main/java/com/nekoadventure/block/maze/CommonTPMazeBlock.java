@@ -36,12 +36,9 @@ public class CommonTPMazeBlock extends Block {
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
         if (!world.isClient && player instanceof ServerPlayerEntity serverPlayer) {
-            // 1. 检查触发玩家是否拥有 NEED_ITEM（入场券）
             if (!hasItemInInventory(serverPlayer, NEED_ITEM)) {
                 return ActionResult.FAIL;
             }
-
-            // 2. 检查触发玩家背包有空位（后续循环会检查所有玩家，这里提前检查避免遗漏）
             if (findSlot(serverPlayer) == null) {
                 serverPlayer.sendMessage(Text.of("请保证背包内有一格空位！"), true);
                 return ActionResult.FAIL;
@@ -51,7 +48,6 @@ public class CommonTPMazeBlock extends Block {
             if (server == null) {
                 return ActionResult.FAIL;
             }
-
             List<ServerPlayerEntity> allPlayers = server.getPlayerManager().getPlayerList();
             for (ServerPlayerEntity p : allPlayers) {
                 BlockPos pPos = p.getBlockPos();

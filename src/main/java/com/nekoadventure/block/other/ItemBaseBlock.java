@@ -24,7 +24,7 @@ public class ItemBaseBlock extends Block implements BlockEntityProvider {
     public static final BooleanProperty INDEPENDENCE = BooleanProperty.of("independence");
     public ItemBaseBlock(Settings settings) {
         super(settings);
-        //默认放置为连锁状态
+        //默认放置为连锁状态（拿出一个物品，全部物品都会被删除）
         setDefaultState(getStateManager().getDefaultState().with(INDEPENDENCE, false));
     }
 
@@ -52,19 +52,12 @@ public class ItemBaseBlock extends Block implements BlockEntityProvider {
 
             if (heldItem.isEmpty()) {
                 if (!storedItem.isEmpty()) {
-                    // 从方块实体获取动态需要的硬币数量
                     int requiredCoins = itemBaseBlockEntity.getRequiredCoins();
-
-                    // 检查玩家是否有足够的硬币
                     if (!hasEnoughCoins(player, requiredCoins)) {
                         player.sendMessage(Text.literal("§c你需要 " + requiredCoins + " 个金币"), true);
                         return ActionResult.FAIL;
                     }
-
-                    // 扣除硬币
                     removeCoins(player, requiredCoins);
-
-                    // 取出物品
                     player.setStackInHand(hand, storedItem.copy());
                     itemBaseBlockEntity.setItem(ItemStack.EMPTY);
                     itemBaseBlockEntity.markDirty();
@@ -119,8 +112,6 @@ public class ItemBaseBlock extends Block implements BlockEntityProvider {
                 }
             }
         }
-
-        // 更新玩家物品栏
         player.getInventory().markDirty();
     }
 

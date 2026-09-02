@@ -14,6 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Comparator;
 import java.util.List;
 
+//全部攻击方法的移动方法
 public class AttackTypes {
     public enum AttackType {
         BULLET,

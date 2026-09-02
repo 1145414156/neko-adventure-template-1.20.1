@@ -3,13 +3,12 @@
 	"id": "neko-adventure",
 	"version": "0.0.1",
 	"name": "Neko Adventure",
-	"description": "This is a story about a cat searching for its owner. Additionally, please excuse my poor coding skills TAT",
+	"description": "This is an adventure module that allows you to have a brand-new experience, enabling you to quickly feel the joy of exploration!",
 	"authors": [
 		"Infinitly_"
 	],
 	"contact": {
-		"homepage": "https://fabricmc.net/",
-		"sources": "https://github.com/FabricMC/fabric-example-mod"
+
 	},
 	"license": "CC0-1.0",
 	"icon": "assets/neko-adventure/icon.png",

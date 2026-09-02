@@ -7,6 +7,7 @@ import java.util.function.BooleanSupplier;
  * 因为main代码不能直接引用client端的类，所以由client端入口注入真正的实现
  * 在非客户端环境（如专用服务器）下默认返回false
  */
+
 public final class ShiftKeyHelper {
     private static BooleanSupplier shiftDownSupplier = () -> false;
 

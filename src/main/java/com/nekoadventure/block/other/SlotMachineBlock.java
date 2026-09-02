@@ -45,21 +45,21 @@ public class SlotMachineBlock extends Block implements BlockEntityProvider {
                 world.addBlockBreakParticles(pos, state);
             }
            else if (roll < 80-useCount) {
-                // 20%概率：生成1金币
-                giveCoins(player, 1);
-                player.sendMessage(Text.literal("§a你获得了 1 枚金币！"), true);
-            } else if (roll < 85-useCount) {
-                // 5%概率：生成2金币
+                // 20%概率：生成2金币
                 giveCoins(player, 2);
                 player.sendMessage(Text.literal("§a你获得了 2 枚金币！"), true);
+            } else if (roll < 85-useCount) {
+                // 5%概率：生成4金币
+                giveCoins(player, 4);
+                player.sendMessage(Text.literal("§a你获得了 4 枚金币！"), true);
             } else if (roll<90-useCount){
-                // 5%概率：生成3金币
+                // 5%概率：生成6金币
                 giveCoins(player, 3);
-                player.sendMessage(Text.literal("§a你获得了 3 枚金币！"), true);
+                player.sendMessage(Text.literal("§a你获得了 6 枚金币！"), true);
             }
            else if (roll<91-useCount){
-                // 1%概率：随机生成1~5金币
-               giveCoins(player, world.random.nextInt(5));
+                // 1%概率：随机生成7~10金币
+               giveCoins(player, world.random.nextInt(3)+8);
                 player.sendMessage(Text.literal("§a你获得了 §c-error- §a枚金币！"), true);
             }
             else {
@@ -67,8 +67,6 @@ public class SlotMachineBlock extends Block implements BlockEntityProvider {
                 world.addBlockBreakParticles(pos, state);
                 player.sendMessage(Text.literal("§c老虎机故障爆炸了！"), true);
             }
-
-            // 增加使用次数
             incrementUseCount(world, pos);
 
             return ActionResult.SUCCESS;
@@ -80,16 +78,12 @@ public class SlotMachineBlock extends Block implements BlockEntityProvider {
     private void giveCoins(PlayerEntity player, int count) {
         player.getInventory().offerOrDrop(new ItemStack(ModItems.COIN, count));
     }
-
-    // 获取方块的使用次数（存储在方块实体中）
     private int getUseCount(World world, BlockPos pos) {
         if (world.getBlockEntity(pos) instanceof SlotMachineBlockEntity blockEntity) {
             return blockEntity.getUseCount();
         }
         return 0;
     }
-
-    // 增加使用次数
     private void incrementUseCount(World world, BlockPos pos) {
         if (world.getBlockEntity(pos) instanceof SlotMachineBlockEntity blockEntity) {
             blockEntity.incrementUseCount();

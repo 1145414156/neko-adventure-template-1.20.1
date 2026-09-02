@@ -73,9 +73,9 @@ public class ShopRoomBlock extends AbstractRoomBlock {
             BlockEntity itemBase = world.getBlockEntity(base);
             if (itemBase instanceof ItemBaseBlockEntity itemBaseBlockEntity) {
                 if (itemBaseBlockEntity.getItem().getItem() instanceof AbstractNekoItem) {
-                    itemBaseBlockEntity.setRequiredCoins(world.getRandom().nextInt(10)+11);
+                    itemBaseBlockEntity.setRequiredCoins(world.getRandom().nextInt(10)+7);
                 } else {
-                    itemBaseBlockEntity.setRequiredCoins(5);
+                    itemBaseBlockEntity.setRequiredCoins(3);
                 }
             }
         }

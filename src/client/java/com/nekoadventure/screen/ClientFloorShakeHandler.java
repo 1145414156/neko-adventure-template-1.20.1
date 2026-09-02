@@ -18,6 +18,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
 
+//该类由AI完成
 public class ClientFloorShakeHandler {
 
     /** 每 tick 上升/下落距离（格） */
@@ -41,7 +42,6 @@ public class ClientFloorShakeHandler {
         BouncingBlock(BlockPos pos, BlockState state, float minHeight, float maxHeight) {
             this.pos = pos;
             this.state = state;
-            // 保证 max >= min，防止服务端传入非法值
             float actualMin = Math.min(minHeight, maxHeight);
             float actualMax = Math.max(minHeight, maxHeight);
             this.maxHeight = actualMin + RANDOM.nextFloat() * (actualMax - actualMin);
@@ -58,7 +58,6 @@ public class ClientFloorShakeHandler {
                     client.execute(() -> startEffect(client, center, radius, minHeight, maxHeight));
                 });
         ClientTickEvents.END_CLIENT_TICK.register(client -> tick());
-        // 渲染时机：AFTER_ENTITIES 时实体顶点消费者还未被统一 draw，写入顶点后立即 draw() 即可上屏；
         WorldRenderEvents.AFTER_ENTITIES.register(ClientFloorShakeHandler::render);
     }
 
@@ -95,7 +94,6 @@ public class ClientFloorShakeHandler {
             blocks.remove(randomIndex);
         }
         BOUNCING_BLOCKS.addAll(blocks);
-        // 超出上限时只保留离中心最近的方块，优先保证中心区域的打击感
         if (BOUNCING_BLOCKS.size() > MAX_BLOCKS) {
             BOUNCING_BLOCKS.sort(Comparator.comparingDouble(rb -> rb.pos.getSquaredDistance(center)));
             BOUNCING_BLOCKS.subList(MAX_BLOCKS, BOUNCING_BLOCKS.size()).clear();
@@ -130,8 +128,6 @@ public class ClientFloorShakeHandler {
         if (world == null || camera == null) {
             return;
         }
-
-        // 绑定原版光照贴图
         client.gameRenderer.getLightmapTextureManager().enable();
 
         MatrixStack matrices = context.matrixStack();
@@ -153,19 +149,11 @@ public class ClientFloorShakeHandler {
 
             // 获取原版光照坐标
             int light = WorldRenderer.getLightmapCoordinates(world, state, rb.pos.up(1));
-
-            // ==== 设置最低光照保底，避免完全黑暗 ====
             int skyLight = (light >> 20) & 0xF;
             int blockLight = (light >> 4) & 0xF;
-
-            // 保证方块光至少为 8（可根据需求调整）
             if (blockLight < 8) {
                 blockLight = 8;
             }
-            // 可选：保证天空光至少为 0（通常地下为 0，无需强制）
-            // if (skyLight < 0) skyLight = 0;
-
-            // 重新打包
             light = (skyLight << 20) | (blockLight << 4);
 
             client.getBlockRenderManager().renderBlockAsEntity(
@@ -176,7 +164,6 @@ public class ClientFloorShakeHandler {
 
         vertexConsumers.draw();
 
-        // 解绑光照贴图（恢复默认状态）
         client.gameRenderer.getLightmapTextureManager().disable();
     }
 

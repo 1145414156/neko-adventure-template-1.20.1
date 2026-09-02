@@ -15,7 +15,7 @@ import net.minecraft.text.Text;
 import java.util.ArrayList;
 import java.util.List;
 
-//这个类我是直接丢给AI写的
+//这个类是client用来渲染nekoPackage的属性而制作的
 public class NekoPackageScreen implements HudRenderCallback {
     private static final int ITEMS_PER_ROW = 5;
     private static final int ITEM_SIZE = 16;

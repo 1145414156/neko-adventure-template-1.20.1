@@ -21,14 +21,14 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.List;
 
-/**
+/**制作这个类是为了:
  * 在 Tooltip 真正绘制前，把道具池图标组件追加到行列表末尾：
  * 这样图标会像普通文本行一样参与 Tooltip 的宽高计算与逐行排布，
  * 紧跟在"按下Shift键了解更多"文字行下方对齐绘制。
+ * 该类由AI完成
  */
 @Mixin(DrawContext.class)
 public abstract class DrawContextMixin {
-    // 同一帧内嵌套绘制 Tooltip 的深度（如 Tooltip 内的悬停详情），只在最外层追加图标
     @Unique
     private static int nekoTooltipDepth;
 

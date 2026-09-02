@@ -42,9 +42,11 @@ public class TPNextLevelBlock extends Block {
     public void onEntityLand(BlockView world, Entity entity) {
         super.onEntityLand(world, entity);
         if (entity instanceof PlayerEntity player){
-            World world1= (World) world;
-            world1.setBlockState(player.getBlockPos(), Blocks.AIR.getDefaultState());
-            apply(player, world1);
+            if (findNekoPackage(player)!=null) {
+                World world1= (World) world;
+                world1.setBlockState(player.getBlockPos(), Blocks.AIR.getDefaultState());
+                apply(player, world1);
+            }
         }
     }
 
@@ -66,14 +68,10 @@ public class TPNextLevelBlock extends Block {
                 }
 
                 ItemStack nekoPackage=findNekoPackage(player);
-                if (nekoPackage==null){
-                    player.sendMessage(Text.of("请装载nekoPackage后再尝试进入下一层！"),true);
-                    return;
-                }
                 if (!mazeBuilder.placeMaze(serverWorld)) {
                     ServerWorld overworld = Objects.requireNonNull(world.getServer()).getWorld(World.OVERWORLD);
-                    if (nekoPackage.getItem() instanceof NekoPackageItem nekoPackageItem){
-                        nekoPackageItem.setFinished(nekoPackage,2);
+                    if (nekoPackage != null && nekoPackage.getItem() instanceof NekoPackageItem nekoPackageItem) {
+                        nekoPackageItem.setFinished(nekoPackage, 2);
                     }
                     if (overworld != null) {
                         allPlayers = server.getPlayerManager().getPlayerList();

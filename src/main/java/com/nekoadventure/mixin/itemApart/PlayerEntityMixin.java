@@ -2,10 +2,9 @@ package com.nekoadventure.mixin.itemApart;
 
 import com.nekoadventure.item.nekoItem.attackTypeItem.AttackTypeItem;
 import com.nekoadventure.item.other.NekoPackageItem;
-import com.nekoadventure.network.PlayerBlackScreenState;
+import com.nekoadventure.other.mazeApart.PlayerBlackScreenState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.EntityAttributeInstance;
 import net.minecraft.entity.attribute.EntityAttributes;
@@ -37,7 +36,7 @@ public abstract class PlayerEntityMixin extends LivingEntity {
     @Inject(at = @At("RETURN"), method = "tick")
     private void onTick(CallbackInfo ci) {
         PlayerEntity player = (PlayerEntity) (Object) this;
-        boolean hasNekoPackAgeItem = isHasNekoPackAgeItem(player);
+        boolean hasNekoPackAgeItem = isHasNekoPackageItem(player);
         if (!hasNekoPackAgeItem) {
             EntityAttributeInstance damageAttr = player.getAttributeInstance(
                     EntityAttributes.GENERIC_ATTACK_DAMAGE
@@ -67,7 +66,7 @@ public abstract class PlayerEntityMixin extends LivingEntity {
     }
 
     @Unique
-    private boolean isHasNekoPackAgeItem(PlayerEntity player) {
+    private boolean isHasNekoPackageItem(PlayerEntity player) {
         PlayerInventory inventory= player.getInventory();
 
         boolean hasNekoPackAgeItem = false;
@@ -103,7 +102,7 @@ public abstract class PlayerEntityMixin extends LivingEntity {
 	private void disableAttack(Entity target, CallbackInfo info) {
         if (target instanceof LivingEntity) {
             PlayerEntity player = (PlayerEntity) (Object) this;
-            if (NekoPackageItem.getIsFinished(player.getOffHandStack())==2 && NekoPackageItem.getNekoItem(player.getOffHandStack(), false, 1)!=null) {
+            if (NekoPackageItem.getIsFinished(player.getOffHandStack())!=2 && NekoPackageItem.getNekoItem(player.getOffHandStack(), false, 1)!=null) {
                 if (player.getAttackCooldownProgress(0.0f) == 1) {
                     ArrayList specificItems = NekoPackageItem.getNekoItem(player.getOffHandStack(), false, 1);
                     for (int i = specificItems.size(); i >= 1; i--) {
@@ -125,21 +124,6 @@ public abstract class PlayerEntityMixin extends LivingEntity {
                         (player.getOffHandStack(), false, 4), player, 2)) {
                     cir.cancel();
             }
-        }
-    }
-
-    //纸盒无法被丢弃：Q键丢弃、拖出背包、死亡掉落等所有丢弃路径都会拦截
-    @Inject(method = "dropItem(Lnet/minecraft/item/ItemStack;Z)Lnet/minecraft/entity/ItemEntity;", at = @At("HEAD"), cancellable = true)
-    private void onDropItem(ItemStack stack, boolean throwRandomly, CallbackInfoReturnable<ItemEntity> cir) {
-        if (stack.getItem() instanceof NekoPackageItem) {
-            cir.setReturnValue(null);
-        }
-    }
-
-    @Inject(method = "dropItem(Lnet/minecraft/item/ItemStack;ZZ)Lnet/minecraft/entity/ItemEntity;", at = @At("HEAD"), cancellable = true)
-    private void onDropItemRetain(ItemStack stack, boolean throwRandomly, boolean retainOwnership, CallbackInfoReturnable<ItemEntity> cir) {
-        if (stack.getItem() instanceof NekoPackageItem) {
-            cir.setReturnValue(null);
         }
     }
 

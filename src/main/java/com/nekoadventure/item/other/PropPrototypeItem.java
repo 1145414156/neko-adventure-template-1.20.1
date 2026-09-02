@@ -28,18 +28,10 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 
 /**
- * 道具原型：一个可读取房间道具池并抽取道具的物品。
- * <p>
- * 使用逻辑（状态机，以 NBT 中是否已储存道具池来区分）：
- * <ul>
- *   <li>第一次使用（NBT 中无道具池）：扫描以玩家为中心的 7×7×7 范围，
- *       找到第一个 {@link AbstractRoomBlock}，读取其房间道具池，打乱后储存进 NBT。</li>
- *   <li>已储存道具池且副手为 {@link AbstractSoulPoolItem}：用该魂石的
- *       {@code getStoragePoolItems} 取出两边道具池都拥有的道具（交集）作为新的道具池，
- *       并消耗副手魂石。可反复用多个魂石逐步过滤，直到副手为空。</li>
- *   <li>已储存道具池且副手为空（或非魂石）：从当前道具池中随机抽取一个道具生成到世界，
- *       并将该道具从池中移除（不放回抽取）。</li>
- * </ul>
+ * 这个物品的效果为：
+ * 当储存道具池为空的时候：按下右键会读取附近的特殊方块并且储存其道具池
+ * 当拥有道具池的时候，副手为空按下右键时，将从储存的道具池中随机抽取一个道具
+ * 使用某些魂石可以筛选道具
  */
 public class PropPrototypeItem extends Item {
     // NBT 中储存道具池的键
@@ -88,7 +80,6 @@ public class PropPrototypeItem extends Item {
             return TypedActionResult.success(stack);
         }
 
-        // 副手为空（或非魂石池道具）：随机抽取一个道具生成，并将其从池中移除
         if (player.getMainHandStack().getItem().equals(this)&&player.getOffHandStack().isEmpty() ) {
             Item drawn = pool.get(world.getRandom().nextInt(pool.size()));
             pool.remove(drawn);
@@ -104,7 +95,7 @@ public class PropPrototypeItem extends Item {
 
     /**
      * 用魂石池道具过滤当前道具池，取两边都拥有的道具（交集）。
-     * 魂石的 {@code getStoragePoolItems} 定义了它从输入池中保留哪些道具。
+     * 魂石中的方法定义了它从输入池中保留哪些道具。
      */
     private List<Item> filterPoolBySoul(List<Item> pool, AbstractSoulPoolItem soulPoolItem, PlayerEntity player) {
         List<Item> currentNekoItems = new ArrayList<>();
@@ -144,7 +135,7 @@ public class PropPrototypeItem extends Item {
     }
 
     /**
-     * 在以玩家为中心的 7×7×7 范围内查找第一个 {@link AbstractRoomBlock}。
+     * 在以玩家为中心的 7×7×7 范围内查找第一个 AbstractRoomBlock
      */
     private AbstractRoomBlock findNearbyRoomBlock(ServerWorld world, PlayerEntity player) {
         BlockPos center = player.getBlockPos();
@@ -158,17 +149,11 @@ public class PropPrototypeItem extends Item {
         return null;
     }
 
-    /**
-     * 对外暴露读取储存道具池的能力（供客户端悬停预览等使用）。
-     * 键缺失或数据非法时返回空列表（防御性读取）。
-     */
     public List<Item> getPoolItems(ItemStack stack) {
         return readStoredPool(stack);
     }
 
-    /**
-     * 从 NBT 读取储存的道具池。键缺失或数据非法时返回空列表（防御性读取）。
-     */
+    //从 NBT 读取储存的道具池
     private List<Item> readStoredPool(ItemStack stack) {
         List<Item> result = new ArrayList<>();
         NbtCompound nbt = stack.getNbt();
@@ -185,9 +170,8 @@ public class PropPrototypeItem extends Item {
         return result;
     }
 
-    /**
-     * 将道具池以注册名（Identifier 字符串）列表的形式写入 NBT。
-     */
+    //将道具池以注册名（Identifier 字符串）列表的形式写入 NBT。
+
     private void writeStoredPool(ItemStack stack, List<Item> pool) {
         NbtCompound nbt = stack.getOrCreateNbt();
         NbtList list = new NbtList();

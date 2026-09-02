@@ -206,27 +206,26 @@ public class NekoPackageItem extends Item {
         if (damageAttr != null) {
             damageAttr.addTemporaryModifier(strengthModifier);
         }
-        //攻速值（*0.1）
+        //攻速值（*0.2）
         if (data.finalData[3]>12) {
             data.finalData[3]=12;
         }
         EntityAttributeModifier attackSpeedModifier = new EntityAttributeModifier(
                 UUID.fromString("550e8400-e29b-41d4-a716-446655440003"),
                 "Neko Package AttackSpeed",
-                data.finalData[3]*0.1,
+                data.finalData[3]*0.2,
                 EntityAttributeModifier.Operation.ADDITION
         );
         if (attackSpeedAttr != null) {
             attackSpeedAttr.addTemporaryModifier(attackSpeedModifier);
         }
         //射程值
-        if (data.finalData[4] > 24) {
-            data.finalData[4] = 24;//卡上限，防止一刀劈到三百米开外的人
+        if (data.finalData[4] > 32) {
+            data.finalData[4] = 32;//卡上限，防止一刀劈到三百米开外的人
         }
-        if (data.finalData[4] < 2) {
-            data.finalData[4] = 2;
+        if (data.finalData[4] < 4) {
+            data.finalData[4] = 4;
         }
-        // 计算完成，同步最终数据到持有者客户端（用于HUD渲染）
         if (player instanceof ServerPlayerEntity serverPlayer) {
             NekoPackageDataNetworking.sendToPlayer(serverPlayer, data.finalData);
         }

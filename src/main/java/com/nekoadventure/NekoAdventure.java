@@ -32,6 +32,6 @@ public class NekoAdventure implements ModInitializer {
 
 		ModEntities.initialize();
 
-		LOGGER.info("create by inf...");
+		LOGGER.info("哦耶哦耶启动啦，目前版本为:0.0.1");
 	}
 }

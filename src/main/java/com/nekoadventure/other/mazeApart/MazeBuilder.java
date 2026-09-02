@@ -1,5 +1,6 @@
 package com.nekoadventure.other.mazeApart;
 
+import com.nekoadventure.NekoAdventure;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
@@ -59,16 +60,18 @@ public class MazeBuilder {
 
     private Identifier getPoolPath(World world) {
         int levelData = getLevelData(world);
-        String DATA_NAMESPACE = "neko-adventure";
+        String DATA_NAMESPACE = NekoAdventure.MOD_ID;
+        RegistryKey<World> worldKey = world.getRegistryKey();
+        String dimensionPath = worldKey.getValue().getPath();
         //偶
         if (levelData % 2 == 0) {
             int levelData1 = levelData - 1;
-            return new Identifier(DATA_NAMESPACE, "dungeon/level/" + levelData1 + "-" + levelData + "/start_room/setting");
+            return new Identifier(DATA_NAMESPACE, dimensionPath+"/level/" + levelData1 + "-" + levelData + "/start_room/setting");
         }
         //奇
         else {
             int levelData1 = levelData + 1;
-            return new Identifier(DATA_NAMESPACE, "dungeon/level/" + levelData + "-" + levelData1 + "/start_room/setting");
+            return new Identifier(DATA_NAMESPACE, dimensionPath+"/level/" + levelData + "-" + levelData1 + "/start_room/setting");
         }
     }
 }

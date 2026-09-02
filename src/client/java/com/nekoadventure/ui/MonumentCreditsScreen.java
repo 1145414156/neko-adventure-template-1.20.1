@@ -10,7 +10,7 @@ import java.util.List;
 public class MonumentCreditsScreen extends Screen {
     private static final int PANEL_WIDTH = 260;
 
-    // TODO: 感谢名单内容（当前为示例，请自行修改）
+    //感谢人员名单（目前先这样做）
     private static final List<String> CREDITS = List.of(
             "目前版本：v0.0.1",
             "材质: 李云川YC/Old_Chen_/Infinitly_",
@@ -34,7 +34,7 @@ public class MonumentCreditsScreen extends Screen {
         panelHeight = 48 + CREDITS.size() * lineHeight + 28;
         int panelY = (height - panelHeight) / 2;
 
-        // 关闭按钮（面板底部居中）
+        // 关闭按钮
         this.addDrawableChild(ButtonWidget.builder(Text.literal("关闭"), button -> this.close())
                 .dimensions(width / 2 - 30, panelY + panelHeight - 24, 60, 20)
                 .build());

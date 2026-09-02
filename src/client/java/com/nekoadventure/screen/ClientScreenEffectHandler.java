@@ -5,7 +5,7 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 
-//突然发现好像直接写一个失明效果就挺好的，如果说后续玩家有意见的话我就把这段改成自定义的效果啦
+//突然发现好像直接写一个失明效果就挺好的，如果说后续玩家有意见的话我就把这段改成自定义的效果啦（反正接口做好了）
 public class ClientScreenEffectHandler {
     protected static boolean isScreenBlack = false;
 

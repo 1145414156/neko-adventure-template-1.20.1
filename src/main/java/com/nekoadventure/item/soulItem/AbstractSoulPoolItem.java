@@ -11,6 +11,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
+//这个是全部筛选道具池的魂石总类
 public abstract class AbstractSoulPoolItem extends AbstractSoulItem {
     public AbstractSoulPoolItem(Settings settings, int maxCharge) {
         super(settings, maxCharge);

@@ -1,8 +1,9 @@
-package com.nekoadventure.network;
+package com.nekoadventure.other.mazeApart;
 
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+//处理玩家黑屏状态
 public class PlayerBlackScreenState {
     public static final ConcurrentHashMap<UUID, Boolean> blackScreenPlayers = new ConcurrentHashMap<>();
 

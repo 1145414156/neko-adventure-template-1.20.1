@@ -29,14 +29,10 @@ public class RerollFurnaceBlock extends Block implements BlockEntityProvider {
         if (world.isClient) {
             return ActionResult.SUCCESS;
         }
-
-        // 获取手持物品
         ItemStack heldStack = player.getStackInHand(hand);
         if (!(heldStack.getItem() instanceof AbstractNekoItem)) {
             return ActionResult.FAIL;
         }
-
-        // 获取方块实体
         BlockEntity blockEntity = world.getBlockEntity(pos);
         if (!(blockEntity instanceof RerollFurnaceBlockEntity furnace)) {
             return ActionResult.FAIL;
@@ -62,14 +58,13 @@ public class RerollFurnaceBlock extends Block implements BlockEntityProvider {
                 }
                 furnace.addUseCount();
                 furnace.syncToClient();
-                player.sendMessage(Text.literal("成功！消耗了 " + requiredCoins + " 个金币，物品已重置。"), true);
+                player.sendMessage(Text.literal("成功！物品已重置"), true);
 
             }
             else {
-                // 失败：机器爆炸，物品和金币不变
                 world.addBlockBreakParticles(pos,state);
                 world.removeBlock(pos, false);
-                player.sendMessage(Text.literal("机器发生了爆炸！物品和金币没有被消耗。"), true);
+                player.sendMessage(Text.literal("机器发生了爆炸！"), true);
             }
         }
         return ActionResult.SUCCESS;

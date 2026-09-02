@@ -13,15 +13,11 @@ import java.util.List;
 
 //这个类是储存和处理关于地牢的所有数据(level,roomData)
 public class MazeDataManager extends PersistentState {
-
-
     private final List<MazePosNBTCompound> roomData = new ArrayList<>();
     private final List<MazePosNBTCompound> initialData = new ArrayList<>();
     private int level = 1;
-
     @Override
     public NbtCompound writeNbt(NbtCompound nbt) {
-        // 保存 initialData
         NbtList initialList = new NbtList();
         for (MazePosNBTCompound marker : initialData) {
             initialList.add(marker.toNbt());
@@ -44,15 +40,11 @@ public class MazeDataManager extends PersistentState {
         MazeDataManager data = new MazeDataManager();
 
         data.level = nbt.getInt("Level");
-
-        // 读取 initialData
         NbtList initialList = nbt.getList("initialData", NbtCompound.COMPOUND_TYPE);
         for (int i = 0; i < initialList.size(); i++) {
             MazePosNBTCompound marker = MazePosNBTCompound.fromNbt(initialList.getCompound(i));
             data.initialData.add(marker);
         }
-
-        // 读取 roomData
         NbtList roomList = nbt.getList("roomData", NbtCompound.COMPOUND_TYPE);
         for (int i = 0; i < roomList.size(); i++) {
             MazePosNBTCompound marker = MazePosNBTCompound.fromNbt(roomList.getCompound(i));
@@ -74,8 +66,6 @@ public class MazeDataManager extends PersistentState {
         }
         return null;
     }
-
-    // 存入房间数据到 initialData
     public void addToInitialData(MazePosNBTCompound marker) {
         initialData.add(marker);
         markDirty();
@@ -85,14 +75,12 @@ public class MazeDataManager extends PersistentState {
         markDirty();
     }
 
-    // 读取 initialData，顺便在每次读取数据的时候打乱
     public List<MazePosNBTCompound> getInitialData() {
         List<MazePosNBTCompound> arrayList = new ArrayList<>(initialData);
         Collections.shuffle(arrayList);
         return arrayList;
     }
 
-    // 读取 roomData
     public List<MazePosNBTCompound> getRoomData() {
         return new ArrayList<>(roomData);
     }
@@ -106,14 +94,11 @@ public class MazeDataManager extends PersistentState {
         roomData.clear();
         markDirty();
     }
-    // 清除所有数据
     public void clearAllData() {
         clearInitialData();
         clearRoomData();
         resetLevelData();
     }
-
-    // 读取楼层数据
     public int getLevelData() {
         return level;
     }

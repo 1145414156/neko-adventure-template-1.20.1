@@ -10,7 +10,6 @@ import java.util.List;
 
 //作为一行 Tooltip 组件平铺显示道具池中的所有图标
 //人话说就是物品图标
-
 public class PoolPreviewComponent implements TooltipComponent {
     public static final int ICON_SIZE = 16;
 

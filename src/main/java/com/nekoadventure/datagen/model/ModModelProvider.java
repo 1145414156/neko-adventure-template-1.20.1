@@ -157,10 +157,7 @@ public class ModModelProvider extends FabricModelProvider {
         itemModelGenerator.register(ModItems.GREEDY_SOUL,Models.GENERATED);
         itemModelGenerator.register(ModItems.RESET_SOUL,Models.GENERATED);
 
-
         itemModelGenerator.register(ModItems.BROKEN_SWORD,Models.GENERATED);
         itemModelGenerator.register(ModItems.BINDING_SOUL_SUBSTANCE,Models.GENERATED);
-
-        //复杂的物品模型
     }
 }

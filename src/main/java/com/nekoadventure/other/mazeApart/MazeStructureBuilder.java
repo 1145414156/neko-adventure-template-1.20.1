@@ -207,7 +207,7 @@ public class MazeStructureBuilder {
                         coinCount += itemStack.getCount();
                     }
                 }
-                if (coinCount <= 8) {
+                if (coinCount <= 10) {
                     if (Random.create().nextInt(100)+1<50-(coinCount-8)*5){
                     room = "gamble_room";
                     break;

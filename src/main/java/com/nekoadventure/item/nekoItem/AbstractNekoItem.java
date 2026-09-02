@@ -19,7 +19,6 @@ public abstract class AbstractNekoItem extends Item {
        \  /         \______\FunctionItem---->所有实际功能类道具入口
         v
     NumItem-->各种实际数值道具
-
     就是这么多啦，创这么多的类如果第一次看还是有点复杂的（对不起啦本人代码技术力有限），有更好的方法欢迎指导，感激不尽感激不尽qwq
      */
     public Text text;

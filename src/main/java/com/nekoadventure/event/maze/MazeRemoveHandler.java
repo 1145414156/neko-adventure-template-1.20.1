@@ -141,10 +141,6 @@ public class MazeRemoveHandler {
         for (Entity entity : entities) {
             entity.kill();
         }
-
-        System.out.println("清除范围: x=" + startX + "~" + endX +
-                ", y=" + startY + "~" + endY +
-                ", z=" + startZ + "~" + endZ);
     }
 
     private static boolean isMazeDimension(ServerWorld world) {
@@ -178,11 +174,14 @@ public class MazeRemoveHandler {
                 minX, minY, minZ,
                 maxX + 1.0, maxY + 1.0, maxZ + 1.0
         );
-        List<Entity> entities = world.getEntitiesByClass(Entity.class, box, entity -> true);
+        List<Entity> entities=world.getEntitiesByClass(
+                Entity.class,
+                box,
+                entity -> true
+
+        );
         for (Entity entity : entities) {
-            if (!(entity instanceof ServerPlayerEntity)) {
-                entity.kill();
-            }
+            entity.kill();
         }
     }
 }

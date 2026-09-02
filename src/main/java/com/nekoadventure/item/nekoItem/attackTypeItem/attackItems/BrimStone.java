@@ -22,6 +22,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Objects;
 
 public class BrimStone extends AttackTypeItem {
     public BrimStone(Settings settings, double health, double strength, double speed, double attackSpeed, double attackRange, double attackMultiplier, double attackSpeedMultiplier, boolean isSpecific) {
@@ -43,7 +44,7 @@ public class BrimStone extends AttackTypeItem {
         List<MissileEntity> brimStones = world.getEntitiesByClass(
                 MissileEntity.class,
                 player.getBoundingBox().expand(attackRange*4),
-                entity -> entity.getOwner().equals(player)&&entity.getAttackType().equals(AttackTypes.AttackType.BRIMSTONE));
+                entity -> Objects.equals(entity.getOwner(), player) &&entity.getAttackType().equals(AttackTypes.AttackType.BRIMSTONE));
 
 
         if (!world.isClient) {
@@ -104,7 +105,7 @@ public class BrimStone extends AttackTypeItem {
         List<MissileEntity> missileEntities = world.getEntitiesByClass(
                 MissileEntity.class,
                 player.getBoundingBox().expand(attackRange*8),
-                entity -> entity.getOwner().equals(player)
+                entity -> Objects.equals(entity.getOwner(), player)
         );
             int count = 16;
             double radius = 2.0;
@@ -113,7 +114,7 @@ public class BrimStone extends AttackTypeItem {
                     List<MissileEntity> brimStones = world.getEntitiesByClass(
                             MissileEntity.class,
                             missile.getBoundingBox().expand(attackRange*4),
-                            entity->entity.getOwner().equals(missile)&&entity.getAttackType().equals(AttackTypes.AttackType.BRIMSTONE)
+                            entity-> Objects.equals(entity.getOwner(), missile) &&entity.getAttackType().equals(AttackTypes.AttackType.BRIMSTONE)
                     );
                     if (brimStones.isEmpty()) {
                         player.getWorld().playSound(null, player.getBlockPos(), ModSoundEvents.BRIMSTONE_ATTACK,

@@ -98,6 +98,11 @@ public class MissileEntity extends Entity {
                         getX(), getY(), getZ(), 1, 0, 0, 0, 0);
             }
         }
+
+        if (this.getOwner()==null) {
+            this.kill();
+            return;
+        }
         if (this.age>1000){this.kill();}
         if (aliveDuration==time){this.kill();}
         if (entityCheckCollision()) return;
@@ -118,7 +123,7 @@ public class MissileEntity extends Entity {
                     this.getBoundingBox().expand(expandX, expandY, expandZ),
                     entity -> {
                         if (!(entity instanceof LivingEntity) || entity == directOwner) return false;
-                        // 弹幕链：跳过 owner 弹幕的直属发射者，避免误伤发射链上的实体
+                        // 跳过 owner 弹幕的直属发射者，避免误伤玩家
                         if (directOwner instanceof MissileEntity missileOwner && entity.equals(missileOwner.getOwner())) return false;
                         // 非玩家发射的弹幕（Boss等）只攻击玩家
                         if (!(getRealOwner() instanceof PlayerEntity)) {
@@ -219,7 +224,6 @@ public class MissileEntity extends Entity {
         }
         if (nbt.containsUuid("Owner")) {
             UUID ownerUuid = nbt.getUuid("Owner");
-            // 同步到 DataTracker，保证实体重新加载后客户端能通过网络同步解析出 owner
             this.dataTracker.set(OWNER_UUID, Optional.of(ownerUuid));
             if (this.getWorld() instanceof ServerWorld serverWorld) {
                 Entity ownerEntity = serverWorld.getEntity(ownerUuid);
@@ -280,11 +284,9 @@ public class MissileEntity extends Entity {
     public int getTime(){return time;}
     @Nullable
     public Entity getOwner() {
-        // 优先返回缓存的 owner（服务端构造/NBT加载时直接赋值或解析成功后缓存）
         if (this.owner != null && !this.owner.isRemoved()) {
             return this.owner;
         }
-        // 缓存为空或已失效：从 DataTracker 同步的 UUID 解析并缓存
         Optional<UUID> ownerUuid = this.dataTracker.get(OWNER_UUID);
         if (ownerUuid.isPresent()) {
             Entity resolvedOwner = this.resolveOwnerByUuid(ownerUuid.get());
@@ -299,11 +301,9 @@ public class MissileEntity extends Entity {
     @Nullable
     private Entity resolveOwnerByUuid(UUID ownerUuid) {
         World world = this.getWorld();
-        // 服务端：直接按 UUID 查询实体
         if (world instanceof ServerWorld serverWorld) {
             return serverWorld.getEntity(ownerUuid);
         }
-        // 客户端：不依赖 client 类，按 UUID 在附近实体中匹配（弹幕存活期间发射者必然在附近）
         return world.getEntitiesByClass(Entity.class, this.getBoundingBox().expand(128),
                 entity -> entity.getUuid().equals(ownerUuid)).stream().findFirst().orElse(null);
     }

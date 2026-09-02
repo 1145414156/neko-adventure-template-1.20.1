@@ -6,9 +6,8 @@
     "itemApart.EnderPearlEntityMixin",
     "itemApart.MixinMilkBucketItem",
     "itemApart.PlayerEntityMixin",
-    "itemApart.ServerPlayerEntityMixin",
     "itemApart.ServerPlayerInteractionManagerMixin",
-    "itemApart.NekoPacckageSlotMixin",
+    "itemApart.NekoPackageSlotMixin",
     "mazeApart.ZombieEntityMixin"
   ],
   "injectors": {

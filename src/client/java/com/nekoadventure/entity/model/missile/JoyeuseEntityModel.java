@@ -1,6 +1,3 @@
-// Made with Blockbench 5.1.4
-// Exported for Minecraft version 1.17+ for Yarn
-// Paste this class into your mod and generate all required imports
 
 package com.nekoadventure.entity.model.missile;
 
@@ -18,15 +15,13 @@ public class JoyeuseEntityModel extends SinglePartEntityModel<MissileEntity> {
 	public static TexturedModelData getTexturedModelData() {
 		ModelData modelData = new ModelData();
 		ModelPartData modelPartData = modelData.getRoot();
-        modelPartData.addChild("main", ModelPartBuilder.create().uv(1, 13).cuboid(-8.0F, -2.0F, -1.0F, 2.0F, 3.0F, 3.0F, new Dilation(0.0F))
-                .uv(12, 12).cuboid(-3.0F, -3.0F, -1.0F, 2.0F, 5.0F, 3.0F, new Dilation(0.0F))
-                .uv(0, 0).cuboid(-1.0F, 0.0F, -1.0F, 14.0F, 1.0F, 3.0F, new Dilation(0.0F))
-                .uv(0, 8).cuboid(-1.0F, 0.0F, -1.0F, 14.0F, 0.0F, 2.0F, new Dilation(0.0F))
-                .uv(0, 10).cuboid(-1.0F, -1.0F, 0.0F, 14.0F, 1.0F, 1.0F, new Dilation(0.0F))
-                .uv(0, 19).cuboid(-6.0F, -1.0F, 0.0F, 3.0F, 1.0F, 1.0F, new Dilation(0.0F))
-                .uv(0, 4).cuboid(-1.0F, -2.0F, -1.0F, 14.0F, 1.0F, 3.0F, new Dilation(0.0F)), ModelTransform.pivot(0F, 8.0F, 0.0F));
-        return TexturedModelData.of(modelData, 64, 64);
+		ModelPartData main = modelPartData.addChild("main", ModelPartBuilder.create().uv(0, 19).cuboid(-5.0F, -1.0F, 0.0F, 3.0F, 1.0F, 1.0F, new Dilation(0.0F))
+				.uv(2, 6).cuboid(-1.7F, -1.0F, 0.0F, 14.0F, 1.0F, 1.0F, new Dilation(0.0F)), ModelTransform.pivot(-3.0F, 24.0F, 0.0F));
+		ModelPartData cube_r1 = main.addChild("cube_r1", ModelPartBuilder.create().uv(0, 19).cuboid(-1.0F, -1.01F, 0.0F, 3.0F, 2.0F, 1.0F, new Dilation(0.0F)), ModelTransform.of(-1.0F, -0.5F, 0.5F, 0.0F, -0.6109F, 0.0F));
+		ModelPartData cube_r2 = main.addChild("cube_r2", ModelPartBuilder.create().uv(0, 19).cuboid(-1.0F, -1.0099F, -1.0F, 3.0F, 2.0F, 1.0F, new Dilation(0.0F)), ModelTransform.of(-1.0F, -0.5F, 0.5F, 0.0F, 0.6109F, 0.0F));
+		return TexturedModelData.of(modelData, 64, 64);
 	}
+
 
 	@Override
 	public void render(MatrixStack matrices, VertexConsumer vertexConsumer, int light, int overlay, float red, float green, float blue, float alpha) {

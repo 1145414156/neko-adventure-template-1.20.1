@@ -14,12 +14,12 @@ public class FloorShakeNetworking {
 
     public static final Identifier CHANNEL = new Identifier(NekoAdventure.MOD_ID, "floor_rotate");
 
-    /** 默认的最小/最大弹跳高度（兼容旧调用） */
+    /** 默认的最小/最大弹跳高度 */
     public static final float DEFAULT_MIN_HEIGHT = 0.8F;
     public static final float DEFAULT_MAX_HEIGHT = 2.0F;
 
     /**
-     * 给单个玩家发送地板旋转效果（带高度范围）
+     * 给单个玩家发送地板旋转效果
      */
     public static void sendToPlayer(ServerPlayerEntity player, BlockPos center, double radius,
                                     float minHeight, float maxHeight) {
@@ -32,7 +32,7 @@ public class FloorShakeNetworking {
     }
 
     /**
-     * 给一个世界里的所有在线玩家发送地板旋转效果（纯视觉，不破坏方块）
+     * 给一个世界里的所有在线玩家发送地板效果
      * 使用默认高度范围
      */
     public static void sendToAll(ServerWorld world, BlockPos center, double radius) {
@@ -40,7 +40,7 @@ public class FloorShakeNetworking {
     }
 
     /**
-     * 给一个世界里的所有在线玩家发送地板旋转效果（纯视觉，可自定义高度范围）
+     * 给一个世界里的所有在线玩家发送地板效果
      */
     public static void sendToAll(ServerWorld world, BlockPos center, double radius,
                                  float minHeight, float maxHeight) {

@@ -1,4 +1,4 @@
-package com.nekoadventure.entity.animation.boss;// Save this class in your mod and generate all required imports
+package com.nekoadventure.entity.animation.boss;
 
 import net.minecraft.client.render.entity.animation.Animation;
 import net.minecraft.client.render.entity.animation.AnimationHelper;

@@ -20,22 +20,18 @@ public class NekoPackageDataManager {
         public int recycleTime = 0;
     }
 
-    // 服务端：获取或创建玩家数据
     public static PlayerNekoData getOrCreate(PlayerEntity player) {
         return SERVER_DATA.computeIfAbsent(player.getUuid(), uuid -> new PlayerNekoData());
     }
 
-    // 服务端：读取玩家数据（不存在返回 null）
     public static PlayerNekoData get(PlayerEntity player) {
         return SERVER_DATA.get(player.getUuid());
     }
 
-    // 服务端：玩家退出时清理
     public static void remove(UUID playerUuid) {
         SERVER_DATA.remove(playerUuid);
     }
 
-    // 统一读取最终数据：服务端按玩家隔离读取，客户端读同步过来的缓存
     public static double[] getFinalData(PlayerEntity player) {
         if (player.getWorld().isClient) {
             return clientFinalData;
@@ -57,7 +53,6 @@ public class NekoPackageDataManager {
         }
     }
 
-    // 服务端：标记需要重新计算数据
     public static void reset(PlayerEntity player) {
         if (player.getWorld().isClient) {
             return;
@@ -67,7 +62,6 @@ public class NekoPackageDataManager {
         data.recycleTime = 0;
     }
 
-    // 客户端：网络包同步过来的本地玩家最终数据
     public static void setClientFinalData(double[] finalData) {
         clientFinalData = finalData;
     }
