@@ -66,13 +66,14 @@ public class MazeStructureBuilder {
 
             //这个是处理当死胡同不够的时候的情况
             if (impasseCount < MIN_IMPASSE_COUNT) {
-                List<MazePosNBTCompound> furcationCount = Stream.concat(calculateRoomType(world, 3).stream(), calculateRoomType(world, 2).stream()).toList();
+                List<MazePosNBTCompound> furcation = Stream.concat(calculateRoomType(world, 3).stream(), calculateRoomType(world, 2).stream()).toList();
                 int needRoomCount = MIN_IMPASSE_COUNT - impasseCount;
-                if (furcationCount.isEmpty()) {return;}
+                if (furcation.isEmpty()) {
+                    throw new IllegalStateException(String.format("IllegalRoomData:because Impasse count is %d,but need MIN_IMPASSE_COUNT is 3", needRoomCount));
+                }
                 for (int i = 0; i < needRoomCount; i++) {
-                    MazePosNBTCompound roomData = furcationCount.get(i);
-                    int roomDistance = MazeBlockEntity.detectRoomDistance(world, roomData.roomCenter());
-                    addImpasseRoom(world, roomData, roomDistance, impasse);
+                    MazePosNBTCompound roomData = furcation.get(i);
+                    impasse.add(roomData);
                 }
                 placeBaseSpecialRooms(impasse,world);
             }
@@ -93,7 +94,7 @@ public class MazeStructureBuilder {
         if (data != null) {
             List<MazePosNBTCompound> allRoom= data.getInitialData();
             for(MazePosNBTCompound roomData : allRoom) {
-                int roomDistance = MazeBlockEntity.detectRoomDistance(world, roomData.roomCenter());
+                int roomDistance = MazeBlockEntity.detectRoomDistance(world, roomData.roomCenter())*2;
                 BlockPos pos=new BlockPos(roomData.roomCenter());
                 List<ItemEntity> entities= world.getEntitiesByClass(
                         ItemEntity.class,
@@ -104,22 +105,6 @@ public class MazeStructureBuilder {
                 );
                 for (Entity entity : entities) {
                     entity.kill();
-                }
-            }
-        }
-    }
-
-    private void addImpasseRoom(World world, MazePosNBTCompound roomData, int roomDistance, List<MazePosNBTCompound> impasseCount) {
-        for (int a = -1; a <= 1; a++) {
-            for (int b = -1; b <= 1; b++) {
-                if (!(Math.abs(a) == Math.abs(b))) {
-                    BlockPos detectPos = new BlockPos(roomData.roomCenter().getX() + roomDistance *a,
-                            roomData.roomCenter().getY(),
-                            roomData.roomCenter().getZ() + roomDistance *b);
-                    if (!world.getBlockState(detectPos).getBlock().equals(ModBlocks.GATE_BLOCK)) {
-                        BlockPos placePos=new BlockPos(detectPos.getX()+a* roomDistance +a,detectPos.getY(),detectPos.getZ()+b* roomDistance +b);
-                        impasseCount.add(new MazePosNBTCompound(placePos,1));
-                    }
                 }
             }
         }

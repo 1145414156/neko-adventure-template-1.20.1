@@ -111,7 +111,7 @@ public class GrandKnightEntity extends HostileEntity implements Monster {
         this.experiencePoints = 50;
     }
 
-    // ========== 基础属性（自行设置数值） ==========
+    // ========== 基础属性 ==========
     public static DefaultAttributeContainer.Builder createGrandKnightAttributes() {
         return HostileEntity.createHostileAttributes()
                 .add(EntityAttributes.GENERIC_MAX_HEALTH, 800.00)

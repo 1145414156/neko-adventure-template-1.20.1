@@ -7,6 +7,7 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.server.MinecraftServer;
@@ -134,8 +135,8 @@ public class MazeRemoveHandler {
         }
         List<Entity> entities=world.getEntitiesByClass(
                 Entity.class,
-                box,
-                entity -> true
+                box.expand(6,6,6),
+                entity -> entity.isAlive()&&!(entity instanceof PlayerEntity)
 
         );
         for (Entity entity : entities) {
@@ -171,14 +172,13 @@ public class MazeRemoveHandler {
             }
         }
         Box box = new Box(
-                minX, minY, minZ,
+                minX-1, minY-1, minZ-1,
                 maxX + 1.0, maxY + 1.0, maxZ + 1.0
         );
         List<Entity> entities=world.getEntitiesByClass(
                 Entity.class,
-                box,
-                entity -> true
-
+                box.expand(16,16,16),
+                entity -> entity.isAlive()&&!(entity instanceof PlayerEntity)
         );
         for (Entity entity : entities) {
             entity.kill();
