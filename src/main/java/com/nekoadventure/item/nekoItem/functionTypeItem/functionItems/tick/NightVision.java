@@ -15,6 +15,6 @@ public class NightVision extends FunctionItem {
 
     @Override
     public void applyTickFunctionItem(PlayerEntity player) {
-        player.addStatusEffect(new StatusEffectInstance(StatusEffects.NIGHT_VISION,301,1,false,false));
+        player.addStatusEffect(new StatusEffectInstance(StatusEffects.NIGHT_VISION,301,1,true,false,false));
     }
 }

@@ -14,6 +14,6 @@ public class TacticalVest extends FunctionItem {
 
     @Override
     public void applyTickFunctionItem(PlayerEntity player) {
-        player.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE,20,0,false,false));
+        player.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE,20,0,true,false,false));
     }
 }

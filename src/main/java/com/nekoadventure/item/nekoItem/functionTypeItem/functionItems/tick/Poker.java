@@ -74,7 +74,7 @@ public class Poker extends FunctionItem {
                 effects,
                 20 * 10,
                 1,
-                false,
+                true,
                 false,
                 false
         );

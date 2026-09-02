@@ -11,8 +11,8 @@ import com.nekoadventure.other.mazeApart.MazeDataManager;
 import com.nekoadventure.other.mazeApart.MazePosNBTCompound;
 import com.nekoadventure.other.mazeApart.MazeStructureBuilder;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
@@ -22,9 +22,11 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
 import org.jetbrains.annotations.Nullable;
@@ -37,17 +39,14 @@ public class TPNextLevelBlock extends Block {
     public TPNextLevelBlock(Settings settings) {
         super(settings);
     }
-
     @Override
-    public void onEntityLand(BlockView world, Entity entity) {
-        super.onEntityLand(world, entity);
-        if (entity instanceof PlayerEntity player){
-            if (findNekoPackage(player)!=null) {
-                World world1= (World) world;
-                world1.setBlockState(player.getBlockPos(), Blocks.AIR.getDefaultState());
-                apply(player, world1);
-            }
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+        if (findNekoPackage(player)!=null) {
+            world.setBlockState(player.getBlockPos(), Blocks.AIR.getDefaultState());
+            apply(player, world);
+            return ActionResult.SUCCESS;
         }
+        return ActionResult.PASS;
     }
 
     private void apply(PlayerEntity player, World world) {

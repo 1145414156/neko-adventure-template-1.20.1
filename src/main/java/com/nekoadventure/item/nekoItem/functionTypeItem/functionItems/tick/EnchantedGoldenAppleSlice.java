@@ -18,9 +18,9 @@ public class EnchantedGoldenAppleSlice extends FunctionItem {
                 StatusEffects.REGENERATION,
                 20,
                 0,
-                false,
                 true,
-                true
+                false,
+                false
         ));
     }
 }

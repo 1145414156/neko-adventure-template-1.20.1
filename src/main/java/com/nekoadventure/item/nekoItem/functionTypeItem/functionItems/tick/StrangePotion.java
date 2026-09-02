@@ -23,6 +23,7 @@ public class StrangePotion extends FunctionItem {
 
         if (tick <= 0) {
             applyRandomPotionEffect(player);
+            tick=40;
         } else {
            tick--;
         }
@@ -58,15 +59,15 @@ public class StrangePotion extends FunctionItem {
         );
         Random random = new Random();
         StatusEffect selectedEffect = effects.get(random.nextInt(effects.size()));
-        int amplifier = random.nextInt(3);
+        int amplifier = random.nextInt(5);
         int duration = 40;
         player.addStatusEffect(new StatusEffectInstance(
                 selectedEffect,
                 duration,
                 amplifier,
-                false,
                 true,
-                true
+                false,
+                false
         ));
 
     }

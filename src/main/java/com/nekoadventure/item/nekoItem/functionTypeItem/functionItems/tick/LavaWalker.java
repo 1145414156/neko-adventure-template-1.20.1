@@ -18,9 +18,9 @@ public class LavaWalker extends FunctionItem {
                 StatusEffects.FIRE_RESISTANCE,
                 20,
                 0,
+                true,
                 false,
-                false,
-                true
+                false
         ));
     }
 }
