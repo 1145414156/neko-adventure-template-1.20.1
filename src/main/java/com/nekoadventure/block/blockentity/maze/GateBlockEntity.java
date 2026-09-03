@@ -7,7 +7,6 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
-import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.tag.TagKey;
@@ -64,20 +63,24 @@ public class GateBlockEntity extends BlockEntity implements BlockEntityTicker<Ga
 
     private void placeGate(World world, BlockPos pos) {
         if (!getPlayersInRange().isEmpty()) {
+            boolean haveMazeCurse=false;
             for (PlayerEntity player : getPlayersInRange()) {
-                if (!player.isCreative()||hasMonstersInRange()) {
-                        if (player.hasStatusEffect(ModStatusEffects.MAZE_CURSE)||hasMonstersInRange()) {
-                            for (int i=4;i>0;i--){
-                                if (world.getBlockState(new BlockPos(pos.getX(), pos.getY()+i, pos.getZ())).equals(Blocks.AIR.getDefaultState())) {
-                                    world.setBlockState(new BlockPos(pos.getX(), pos.getY()+i, pos.getZ()),Blocks.BEDROCK.getDefaultState());
-                                }
-                            }
+                if (!player.isCreative()&&!player.isSpectator()) {
+                        if (player.hasStatusEffect(ModStatusEffects.MAZE_CURSE)||player.hasStatusEffect(ModStatusEffects.BOSS_FIGHT)) {
+                            haveMazeCurse=true;
                         }
-                        else {
-                            for (int i=4;i>0;i--){
-                                world.setBlockState(new BlockPos(pos.getX(), pos.getY()+i, pos.getZ()),Blocks.AIR.getDefaultState());
-                            }
-                        }
+                }
+            }
+            if (haveMazeCurse) {
+                for (int i=4;i>0;i--){
+                    if (world.getBlockState(new BlockPos(pos.getX(), pos.getY()+i, pos.getZ())).equals(Blocks.AIR.getDefaultState())) {
+                        world.setBlockState(new BlockPos(pos.getX(), pos.getY()+i, pos.getZ()),Blocks.BEDROCK.getDefaultState());
+                    }
+                }
+            }
+            else {
+                for (int i=4;i>0;i--){
+                    world.setBlockState(new BlockPos(pos.getX(), pos.getY()+i, pos.getZ()),Blocks.AIR.getDefaultState());
                 }
             }
         }
@@ -104,19 +107,6 @@ public class GateBlockEntity extends BlockEntity implements BlockEntityTicker<Ga
                 }
             }
         }
-    }
-
-    private boolean hasMonstersInRange() {
-        Box detectionBox = getBox();
-        if (world != null) {
-            List<HostileEntity> monsters = world.getEntitiesByClass(
-                    HostileEntity.class,
-                    detectionBox,
-                    monster -> monster.isAlive() && !monster.isRemoved()
-            );
-            return !monsters.isEmpty();
-        }
-        return false;
     }
 
     private boolean isMazeDimension(ServerWorld world) {

@@ -252,11 +252,11 @@ public class GrandKnightEntityModel extends SinglePartEntityModel<GrandKnightEnt
 	public void setAngles(GrandKnightEntity entity, float limbAngle, float limbDistance, float animationProgress, float headYaw, float headPitch) {
 		this.getPart().traverse().forEach(ModelPart::resetTransform);
 		this.animateMovement(GrandKnightEntityModelAnimation.walk,limbAngle,limbDistance,2f,2.5f);
-		this.updateAnimation(GrandKnightEntity.STAGE_2_START_APART_ANI, GrandKnightEntityModelAnimation.levelTwo,animationProgress,1.0f);
-		this.updateAnimation(GrandKnightEntity.GRAB_ANI, GrandKnightEntityModelAnimation.grab,animationProgress,1.0f);
-		this.updateAnimation(GrandKnightEntity.SHIELD_SMASH_ANI, GrandKnightEntityModelAnimation.shieldSmash,animationProgress,1.0f);
-		this.updateAnimation(GrandKnightEntity.SHIELD_SLAP_ANI, GrandKnightEntityModelAnimation.shieldSlap,animationProgress,1.0f);
-		this.updateAnimation(GrandKnightEntity.EARTH_SHAKER_ANI, GrandKnightEntityModelAnimation.earthshaker,animationProgress,1.0f);
+		this.updateAnimation(entity.STAGE_2_START_APART_ANI, GrandKnightEntityModelAnimation.levelTwo,animationProgress,1.0f);
+		this.updateAnimation(entity.GRAB_ANI, GrandKnightEntityModelAnimation.grab,animationProgress,1.0f);
+		this.updateAnimation(entity.SHIELD_SMASH_ANI, GrandKnightEntityModelAnimation.shieldSmash,animationProgress,1.0f);
+		this.updateAnimation(entity.SHIELD_SLAP_ANI, GrandKnightEntityModelAnimation.shieldSlap,animationProgress,1.0f);
+		this.updateAnimation(entity.EARTH_SHAKER_ANI, GrandKnightEntityModelAnimation.earthshaker,animationProgress,1.0f);
 
 		this.head.yaw = headYaw * (float) (Math.PI / 180.0);
 		this.head.pitch = -headPitch * (float) (Math.PI / 180.0);

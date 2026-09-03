@@ -46,7 +46,7 @@ public class NekoAdventureClient implements ClientModInitializer {
 				ModBlocks.WISH_POOL_BLOCK,ModBlocks.SPAWN_MOB_BLOCK,
 				ModBlocks.RESET_FURNACE_BLOCK,ModBlocks.REROLL_FURNACE_BLOCK,
 				ModBlocks.TP_DUNGEON_BLOCK,ModBlocks.ITEM_BASE_BLOCK,
-				ModBlocks.MONUMENT_BLOCK);
+				ModBlocks.MONUMENT_BLOCK,ModBlocks.TP_NEXT_LEVEL_BLOCK);
 
 	}
 }

@@ -16,15 +16,16 @@ import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.structure.StructurePlacementData;
 import net.minecraft.structure.StructureTemplate;
 import net.minecraft.structure.StructureTemplateManager;
+import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -45,12 +46,24 @@ public class BossRoomBlock extends AbstractRoomBlock {
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
         if (BossRoomBlock.canTeleport(world.getBlockState(pos))) {
-            player.teleport(-3,4,-3);
-            return ActionResult.SUCCESS;
+            List<PlayerEntity> allPlayers=getPlayersInRange(world,pos);
+            for (PlayerEntity p : allPlayers) {
+                BlockPos pPos = p.getBlockPos();
+                int dx = Math.abs(pPos.getX() - pos.getX());
+                int dy = Math.abs(pPos.getY() - pos.getY());
+                int dz = Math.abs(pPos.getZ() - pos.getZ());
+                if (dx > 12 || dy > 12 || dz > 12) {
+                    p.sendMessage(Text.of("玩家 " + p.getName().getString() + " 不在传送范围内！"), true);
+                    return ActionResult.FAIL;
+                }
+                p.teleport(0,3,0);
+                return ActionResult.SUCCESS;
+            }
         }
         else {
             return ActionResult.PASS;
         }
+        return ActionResult.PASS;
     }
 
     @Override
@@ -63,7 +76,7 @@ public class BossRoomBlock extends AbstractRoomBlock {
             level = mazeDataManager.getLevelData();
         }
     if (level%2==0){
-        placeBossStructure(new BlockPos(-22,1,-22),world);
+        placeBossStructure(new BlockPos(-22,0,-22),world);
     }
     else {
         world.setBlockState(pos, ModBlocks.TP_NEXT_LEVEL_BLOCK.getDefaultState());
@@ -102,14 +115,22 @@ public class BossRoomBlock extends AbstractRoomBlock {
             if (world instanceof ServerWorld serverWorld) {
                 StructureTemplateManager structureManager = serverWorld.getStructureTemplateManager();
                 Optional<StructureTemplate> optional = structureManager.getTemplate(new Identifier(NekoAdventure.MOD_ID, path));
-                for (int i = 2; optional.isPresent(); i++){
+                for (int i = 1; optional.isPresent(); i++){
+                    if (i==1){
+                        continue;
+                    }
                     allMobPath.add(path);
                     path=dimensionPath + "/specific_room" +"/boss_room"+ "/room" + "/level/" + level + "/room"+i;
                     optional = structureManager.getTemplate(new Identifier(NekoAdventure.MOD_ID, path));
                 }
             }
         }
-        String finalPath=allMobPath.get(Random.create().nextInt(allMobPath.size()));
+        String finalPath;
+        try {
+            finalPath=allMobPath.get(Random.create().nextInt(allMobPath.size()));
+        } catch (Exception e) {
+            throw new RuntimeException(new RuntimeException("boss_room file is illegal"));
+        }
         return new Identifier(NekoAdventure.MOD_ID,finalPath);
     }
 
@@ -119,6 +140,16 @@ public class BossRoomBlock extends AbstractRoomBlock {
                 new Identifier(NekoAdventure.MOD_ID, "is_maze")
         );
         return world.getDimensionEntry().isIn(isMazeTag);
+    }
+
+    private List<PlayerEntity> getPlayersInRange(World world, BlockPos pos) {
+        if (world == null || pos == null) return List.of();
+        Box detectionBox = new Box(pos.getX()-5,pos.getY()-5,pos.getZ()-5,pos.getX()+5,pos.getY()+5,pos.getZ()+5);
+        return world.getEntitiesByClass(
+                PlayerEntity.class,
+                detectionBox,
+                player -> player.isAlive() && !player.isSpectator()&&!player.isCreative()
+        );
     }
 
     public static void setCanTeleport(BlockState state, boolean canTeleport) {

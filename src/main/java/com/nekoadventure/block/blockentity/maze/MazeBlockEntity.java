@@ -11,6 +11,7 @@ import com.nekoadventure.other.mazeApart.ClearRoomIssueRewardManager;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -134,12 +135,11 @@ public class MazeBlockEntity extends AbstractMazeBlockEntity{
     @Override
     public void tick(World world, BlockPos pos, BlockState state, BlockEntity blockEntity) {
         if (world.isClient) return;
-
         if (world instanceof ServerWorld serverWorld) {
             if (isMazeDimension(serverWorld)) {
+                manageErrorStateRoom(world,pos);
                 givePlayerEffectInRange(world);
                 removeErrorMaze(world, pos);
-
                 //将初等合法的房间上方方块转换成MazeStructure方块
                 if (world.getBlockState(pos.up(1)).getBlock().equals(Blocks.BEDROCK)) {
                     world.setBlockState(pos.up(1), ModBlocks.MAZE_STRUCTURE_BLOCK.getDefaultState());
@@ -150,12 +150,32 @@ public class MazeBlockEntity extends AbstractMazeBlockEntity{
                         giveRewardForPlayers(world, pos);
                         removeBedrockForWorld(world, pos.up(1));
                     }
-
                 }
             }
             else {
                 removeErrorMaze(world,pos);
             }
+        }
+    }
+
+    private void manageErrorStateRoom(World world,BlockPos pos) {
+        List<PlayerEntity> players = world.getEntitiesByClass(
+                PlayerEntity.class,
+                createDetectionBox(),
+                player -> player.isAlive() && !player.isSpectator()
+        );
+
+        if (players.isEmpty()&&hasMonstersInRange()&&world.getBlockState(pos.up(1)).equals(ModBlocks.MAZE_ROOM_STAGE_BLOCK.getDefaultState().with(MazeRoomStageBlock.MAZE_STAGE,1))) {
+            List<LivingEntity> entities= world.getEntitiesByClass(
+                    LivingEntity.class,
+                    createDetectionBox(),
+                    entity->entity.isAlive()&&!(entity instanceof PlayerEntity)
+            );
+            for (LivingEntity entity : entities) {
+                entity.kill();
+            }
+            world.setBlockState(pos.up(1),ModBlocks.MAZE_ROOM_STAGE_BLOCK.getDefaultState().with(MazeRoomStageBlock.MAZE_STAGE,2));
+            world.setBlockState(pos,Blocks.BEDROCK.getDefaultState());
         }
     }
 

@@ -23,7 +23,7 @@ public class StrangePotion extends FunctionItem {
 
         if (tick <= 0) {
             applyRandomPotionEffect(player);
-            tick=40;
+            tick=200;
         } else {
            tick--;
         }

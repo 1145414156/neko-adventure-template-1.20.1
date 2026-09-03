@@ -3,13 +3,18 @@ package com.nekoadventure.entity.boss;
 import com.nekoadventure.effect.ModStatusEffects;
 import com.nekoadventure.entity.ModEntities;
 import com.nekoadventure.entity.missile.MissileEntity;
+import com.nekoadventure.item.ModItems;
 import com.nekoadventure.network.FloorShakeNetworking;
 import com.nekoadventure.network.ScreenShakeNetworking;
 import com.nekoadventure.other.attackApart.AttackTypes;
+import com.nekoadventure.other.itemApart.SpawnRandomSoulItems;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.entity.*;
 import net.minecraft.entity.ai.control.MoveControl;
+import net.minecraft.entity.data.DataTracker;
+import net.minecraft.entity.data.TrackedData;
+import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.ai.goal.ActiveTargetGoal;
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
@@ -17,6 +22,7 @@ import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.boss.BossBar;
 import net.minecraft.entity.boss.ServerBossBar;
 import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.mob.Monster;
@@ -43,18 +49,25 @@ import java.util.List;
 
 public class HugeSlimeEntity extends HostileEntity implements Monster {
 
+    // 技能动画为“实例字段 + 客户端驱动”：服务端只同步 ACTIVE_SKILL 编号，客户端收到后播放/停止动画
     @Environment(EnvType.CLIENT)
-    public static final AnimationState TRAMPLE_SKILL_ANI=new AnimationState();
+    public final AnimationState TRAMPLE_SKILL_ANI=new AnimationState();
     private static final int TRAMPLE_SKILL_DURATION=180;
     @Environment(EnvType.CLIENT)
-    public static final AnimationState SUMMON_SKILL_ANI=new AnimationState();
+    public final AnimationState SUMMON_SKILL_ANI=new AnimationState();
     private static final int SUMMON_SKILL_DURATION=40;
     @Environment(EnvType.CLIENT)
-    public static final AnimationState BULLET_SKILL_ANI=new AnimationState();
+    public final AnimationState BULLET_SKILL_ANI=new AnimationState();
     private static final int BULLET_SKILL_DURATION=100;
     @Environment(EnvType.CLIENT)
-    public static final AnimationState DASH_SKILL_ANI=new AnimationState();
+    public final AnimationState DASH_SKILL_ANI=new AnimationState();
     private static final int DASH_SKILL_DURATION=60;
+
+    // 服务端 -> 客户端 动作同步字段：0三连跳 1召唤 2子弹 3冲刺，-1=空闲
+    private static final TrackedData<Integer> ACTIVE_SKILL =
+            DataTracker.registerData(HugeSlimeEntity.class, TrackedDataHandlerRegistry.INTEGER);
+    // 仅客户端有意义：记录“已播放到”的技能编号，避免每个tick重复start动画
+    private int playedSkill = -1;
 
     private int summonCount = 0;
     private Vec3d targetPos;
@@ -104,9 +117,18 @@ public class HugeSlimeEntity extends HostileEntity implements Monster {
     @Override
     public void tick() {
         super.tick();
+        // 客户端：把服务端广播的技能编号翻译成实例动画播放（落地/拉伸等渲染逻辑两端照常执行）
+        if (this.getWorld().isClient) {
+            this.syncClientAnimations();
+        }
         this.bossBar.setPercent(this.getHealth() / this.getMaxHealth());
         this.stretch = this.stretch + (this.targetStretch - this.stretch) * 0.5F;
         this.lastStretch = this.stretch;
+
+        List<? extends PlayerEntity> players=this.getWorld().getPlayers();
+        if (!players.isEmpty()){
+            players.forEach(p-> p.addStatusEffect(new StatusEffectInstance(ModStatusEffects.BOSS_FIGHT,40,0,false,false,true)));
+        }
 
         // 落地效果：粒子、音效、动画的触发点
         if (this.isOnGround() && !this.onGroundLastTick&&canJump) {
@@ -136,6 +158,26 @@ public class HugeSlimeEntity extends HostileEntity implements Monster {
         this.updateStretch();
     }
 
+    // 把服务端广播的 ACTIVE_SKILL 翻译成实例动画的播放/停止（仅客户端调用）
+    private void syncClientAnimations() {
+        int activeSkill = this.dataTracker.get(ACTIVE_SKILL);
+        if (activeSkill != this.playedSkill) {
+            TRAMPLE_SKILL_ANI.stop();
+            SUMMON_SKILL_ANI.stop();
+            BULLET_SKILL_ANI.stop();
+            DASH_SKILL_ANI.stop();
+            if (activeSkill >= 0) {
+                switch (activeSkill) {
+                    case 0 -> TRAMPLE_SKILL_ANI.start(this.age);
+                    case 1 -> SUMMON_SKILL_ANI.start(this.age);
+                    case 2 -> BULLET_SKILL_ANI.start(this.age);
+                    case 3 -> DASH_SKILL_ANI.start(this.age);
+                }
+            }
+            this.playedSkill = activeSkill;
+        }
+    }
+
     @Override
     public void onStartedTrackingBy(ServerPlayerEntity player) {
         super.onStartedTrackingBy(player);
@@ -152,79 +194,44 @@ public class HugeSlimeEntity extends HostileEntity implements Monster {
         if(skillTick>0){
             skillTick--;
             if (skillStage!=0){
-
-                    if (skill == 0) {
-                        trampleSkill();
-                    } else if (skill == 1) {
-                        summonSkill();
-                    } else if (skill == 2) {
-                        bulletSkill();
-                    } else if (skill == 3) {
-                        dashSkill();
-                    }
-
+                if (skill == 0) {
+                    trampleSkill();
+                } else if (skill == 1) {
+                    summonSkill();
+                } else if (skill == 2) {
+                    bulletSkill();
+                } else if (skill == 3) {
+                    dashSkill();
+                }
             }
         }
-        else {
-            if (skillStage==0){
-                if (this.getTarget()==null){
-                    setCanJump(true);
-                    skillStage=0;
-                    return;
-                }
-               skill=this.random.nextInt(4);
-                //0.三连跳，1.召唤怪物，2.子弹，3.冲刺
-                switch (skill) {
-                    case 0:{
-                        skillTick= TRAMPLE_SKILL_DURATION;
-                        TRAMPLE_SKILL_ANI.startIfNotRunning(this.age);
-                        break;
-                    }
-                    case 1:{
-                        skillTick= SUMMON_SKILL_DURATION;
-                        SUMMON_SKILL_ANI.startIfNotRunning(this.age);
-                        break;
-                    }
-                    case 2:{
-                        skillTick= BULLET_SKILL_DURATION;
-                        BULLET_SKILL_ANI.startIfNotRunning(this.age);
-                        break;
-                    }
-                    case 3:{
-                        skillTick= DASH_SKILL_DURATION;
-                        DASH_SKILL_ANI.startIfNotRunning(this.age);
-                        break;
-                    }
-                }
-                skillStage++;
-            }
-            else {
+        else if (skillStage==0){
+            // 空闲期挑选下一个技能
+            if (this.getTarget()==null){
                 setCanJump(true);
-                skillTick=this.random.nextInt(10)+10;
                 skillStage=0;
-                switch (skill){
-                    case 0:{
-                        skill=-999;
-                        TRAMPLE_SKILL_ANI.stop();
-                        break;
-                    }
-                    case 1:{
-                        skill=-999;
-                        SUMMON_SKILL_ANI.stop();
-                        break;
-                    }
-                    case 2:{
-                        skill=-999;
-                        BULLET_SKILL_ANI.stop();
-                        break;
-                    }
-                    case 3:{
-                        skill=-999;
-                        DASH_SKILL_ANI.stop();
-                        break;
-                    }
-                }
+                return;
             }
+            skill=this.random.nextInt(4);
+            //0.三连跳，1.召唤怪物，2.子弹，3.冲刺
+            switch (skill) {
+                case 0 -> skillTick = TRAMPLE_SKILL_DURATION;
+                case 1 -> skillTick = SUMMON_SKILL_DURATION;
+                case 2 -> skillTick = BULLET_SKILL_DURATION;
+                case 3 -> skillTick = DASH_SKILL_DURATION;
+            }
+            skillStage++;
+            // 起手：把技能编号广播给所有客户端播放动画
+            this.dataTracker.set(ACTIVE_SKILL, skill);
+        }
+        else {
+            // 当前技能结束
+            setCanJump(true);
+            skillTick=this.random.nextInt(10)+10;
+            skillStage=0;
+            skill=-999;
+            // 收尾：通知客户端停止动画
+            this.dataTracker.set(ACTIVE_SKILL, -1);
         }
     }
 
@@ -352,6 +359,13 @@ public class HugeSlimeEntity extends HostileEntity implements Monster {
 
     protected void updateStretch() {
         this.targetStretch *= 0.6F;
+    }
+
+    @Override
+    protected void dropLoot(DamageSource damageSource, boolean causedByPlayer) {
+        SpawnRandomSoulItems spawnRandomSoulItems = new SpawnRandomSoulItems();
+        this.dropItem(ModItems.PROP_PROTOTYPE);
+        this.dropItem(spawnRandomSoulItems.summonRandomSoulItem(this.getWorld()).getItem());
     }
 
     private @NotNull MissileEntity getMissileEntity(Entity owner, double range,int time) {
@@ -716,6 +730,12 @@ public class HugeSlimeEntity extends HostileEntity implements Monster {
     @Override
     public int getMaxLookPitchChange() {
         return 0;
+    }
+
+    @Override
+    protected void initDataTracker() {
+        super.initDataTracker();
+        this.dataTracker.startTracking(ACTIVE_SKILL, -1);
     }
 
     @Override

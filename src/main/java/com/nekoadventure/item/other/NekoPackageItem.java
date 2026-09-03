@@ -178,23 +178,17 @@ public class NekoPackageItem extends Item {
                 healthAttr.addTemporaryModifier(healthModifier);
             }
         }
-        // 速度值（太快了得乘0.05）
+        // 速度值（*0.01）
         if (data.finalData[1] > 0) {
-            if (data.finalData[1] > 10) {
-                data.finalData[1] = 10;//卡上限，防止速度太快
-            }
             EntityAttributeModifier speedModifier = new EntityAttributeModifier(
                     UUID.fromString("550e8400-e29b-41d4-a716-446655440001"),
                     "Neko Package Speed",
-                   data.finalData[1]*0.05,
+                   data.finalData[1]*0.01,
                     EntityAttributeModifier.Operation.ADDITION
             );
             if (speedAttr != null) {
                 speedAttr.addTemporaryModifier(speedModifier);
             }
-        }
-        if (data.finalData[2]==0){
-            data.finalData[2]=1;
         }
         // 力量值
         EntityAttributeModifier strengthModifier = new EntityAttributeModifier(
@@ -206,25 +200,18 @@ public class NekoPackageItem extends Item {
         if (damageAttr != null) {
             damageAttr.addTemporaryModifier(strengthModifier);
         }
-        //攻速值（*0.2）
+        //攻速值（*0.3）
         if (data.finalData[3]>12) {
             data.finalData[3]=12;
         }
         EntityAttributeModifier attackSpeedModifier = new EntityAttributeModifier(
                 UUID.fromString("550e8400-e29b-41d4-a716-446655440003"),
                 "Neko Package AttackSpeed",
-                data.finalData[3]*0.2,
+                data.finalData[3]*0.3,
                 EntityAttributeModifier.Operation.ADDITION
         );
         if (attackSpeedAttr != null) {
             attackSpeedAttr.addTemporaryModifier(attackSpeedModifier);
-        }
-        //射程值
-        if (data.finalData[4] > 32) {
-            data.finalData[4] = 32;//卡上限，防止一刀劈到三百米开外的人
-        }
-        if (data.finalData[4] < 4) {
-            data.finalData[4] = 4;
         }
         if (player instanceof ServerPlayerEntity serverPlayer) {
             NekoPackageDataNetworking.sendToPlayer(serverPlayer, data.finalData);
@@ -232,21 +219,26 @@ public class NekoPackageItem extends Item {
     }
 
     private void calculateData(double[] data) {
-        data[1]= data[1] * 0.02;
+        // [0]=health, [1]=speed, [2]=strength，[3]=attackSpeed,
+        // [4]=attackRange,[5]=attackMultiplier,[6]=attackSpeedMultiplier
         data[2]= data[2] * data[5] + data[2];
         data[3]= data[3] + data[3] * data[6];
         if (data[3]==0){
             data[3]= data[3]+ data[6];
         }
-        if (data[3]<-1){
-            data[3]=-1;
+        if (data[3]<-5){
+            data[3]=-5;
         }
         if (data[2]==0){
-            data[2]= data[2]+ data[5];
+            data[2]= data[2]+data[5];
         }
-        if (data[2]<0){
+        if (data[2]<1){
             data[2]=1;
         }
+        if (data[5]<0.5&&data[5]>0){
+            data[5]=0.5;
+        }
+        data[4]=Math.max(Math.min(data[4],32),4);
     }
 
     private void clearPlayerAttributeInstance(EntityAttributeInstance damageAttr, EntityAttributeInstance speedAttr, EntityAttributeInstance healthAttr, EntityAttributeInstance attackSpeedAttr) {

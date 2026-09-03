@@ -158,6 +158,7 @@ public class AttackTypes {
                     missile.setYaw((float) yaw);
                     missile.setPitch((float) pitch);
                 }
+                entity.getWorld().spawnEntity(missile);
             }
             entity.remove(Entity.RemovalReason.KILLED);
         }

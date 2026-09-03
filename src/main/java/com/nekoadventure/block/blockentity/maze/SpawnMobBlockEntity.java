@@ -43,9 +43,9 @@ public class SpawnMobBlockEntity extends AbstractMazeBlockEntity {
         super(ModBlockEntityTypes.SPAWN_MOB_ENTITY_BLOCK_ENTITY, pos, state);
     }
 
-    private List<PlayerEntity> getPlayersInRange() {
+    private List<PlayerEntity> getPlayersInRange(double expand) {
         if (world == null || pos == null) return List.of();
-        Box detectionBox = getBox();
+        Box detectionBox = getBox().expand(expand);
         return world.getEntitiesByClass(
                 PlayerEntity.class,
                 detectionBox,
@@ -78,7 +78,7 @@ public class SpawnMobBlockEntity extends AbstractMazeBlockEntity {
                             world.syncWorldEvent(2001, checkPos, Block.getRawIdFromState(blockState));
 
 
-                            if (this.getWorld() != null && this.getWorld().getBlockState(this.getPos().down(1)).equals(ModBlocks.BOSS_ROOM_BLOCK.getDefaultState())){
+                            if (this.getWorld() != null && this.getWorld().getBlockState(this.getPos().down(1)).equals(ModBlocks.BOSS_ROOM_BLOCK.getDefaultState().with(BossRoomBlock.CAN_TELEPORT,false))){
                                 placeBossStructure(checkPos);
                                 List<? extends PlayerEntity> playerEntities=world.getPlayers();
                                 if (!playerEntities.isEmpty()){
@@ -192,11 +192,10 @@ public class SpawnMobBlockEntity extends AbstractMazeBlockEntity {
     @Override
     public void tick(World world, BlockPos pos, BlockState state, BlockEntity blockEntity) {
         if (world.isClient) return;
-
         if (world instanceof ServerWorld serverWorld) {
             if (isMazeDimension(serverWorld)) {
-                if (!getPlayersInRange().isEmpty()) {
-                    for (PlayerEntity player : getPlayersInRange()) {
+                if (!getPlayersInRange(0).isEmpty()) {
+                    for (PlayerEntity player : getPlayersInRange(0)) {
                         if (!(player.isCreative()&&!player.isSpectator())&&spawnMobInRange()) {
                             player.sendMessage(Text.of("开始战斗"),true);
                             if (world.getBlockState(pos.down(1)).isOf(ModBlocks.MAZE_ROOM_STAGE_BLOCK)) {
@@ -204,6 +203,11 @@ public class SpawnMobBlockEntity extends AbstractMazeBlockEntity {
                             }
                         }
                     }
+                    List<PlayerEntity> allPlayerInRange = getPlayersInRange(1.5);
+                    PlayerEntity player=world.getClosestPlayer(pos.getX(),pos.getY(),pos.getZ(),getBox().maxX,true);
+                    allPlayerInRange.forEach(p->{
+                        if (player != null) {if (!p.equals(player)) {p.teleport(player.getX(),player.getY(),player.getZ());}}
+                    });
                 }
             }
         }

@@ -4,9 +4,11 @@ import com.nekoadventure.effect.ModStatusEffects;
 import com.nekoadventure.entity.ModEntities;
 import com.nekoadventure.entity.missile.MissileEntity;
 import com.nekoadventure.entity.missile.MissileModelType;
+import com.nekoadventure.item.ModItems;
 import com.nekoadventure.network.FloorShakeNetworking;
 import com.nekoadventure.network.ScreenShakeNetworking;
 import com.nekoadventure.other.attackApart.AttackTypes;
+import com.nekoadventure.other.itemApart.SpawnRandomSoulItems;
 import com.nekoadventure.sound.ModSoundEvents;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -25,6 +27,7 @@ import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.mob.Monster;
+import net.minecraft.entity.mob.ZombieEntity;
 import net.minecraft.entity.passive.IronGolemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
@@ -50,44 +53,65 @@ import java.util.UUID;
 public class GrandKnightEntity extends HostileEntity implements Monster {
 
     // ========== 动画状态 ==========
+    // AnimationState 是进程内对象、无法跨网络同步。为了让局域网/独立服务端的玩家也能看到动作，
+    // 动画改为“实例字段 + 客户端驱动”：服务端只把当前技能编号写入 ACTIVE_SKILL / STAGE_CHANGE
+    // 两个 DataTracker；客户端 tick 收到变化后，才对实例 AnimationState 做 start/stop。
+    // 注意：动画不能做成 static（会跨实体共享互相打架），也不能由服务端直接 start（其他玩家看不到动作）。
     @Environment(EnvType.CLIENT)
-    public static final AnimationState GRAB_ANI = new AnimationState();
+    public final AnimationState GRAB_ANI = new AnimationState();
     private static final int GRAB_DURATION = 125;
 
     @Environment(EnvType.CLIENT)
-    public static final AnimationState SHIELD_SMASH_ANI = new AnimationState();
+    public final AnimationState SHIELD_SMASH_ANI = new AnimationState();
     private static final int SHIELD_SMASH_DURATION = 85;
 
     @Environment(EnvType.CLIENT)
-    public static final AnimationState SHIELD_SLAP_ANI = new AnimationState();
+    public final AnimationState SHIELD_SLAP_ANI = new AnimationState();
     private static final int SHIELD_SLAP_DURATION = 60;
 
     @Environment(EnvType.CLIENT)
-    public static final AnimationState EARTH_SHAKER_ANI = new AnimationState();
+    public final AnimationState EARTH_SHAKER_ANI = new AnimationState();
     private static final int EARTH_SHAKER_DURATION = 50;
 
     @Environment(EnvType.CLIENT)
-    public static final AnimationState BRIMSTONE_ANI = new AnimationState();
+    public final AnimationState BRIMSTONE_ANI = new AnimationState();
     private static final int BRIMSTONE_DURATION = 70;
 
     @Environment(EnvType.CLIENT)
-    public static final AnimationState RAPID_SLASHES_ANI = new AnimationState();
+    public final AnimationState RAPID_SLASHES_ANI = new AnimationState();
     private static final int RAPID_SLASHES_DURATION = 70;
 
     @Environment(EnvType.CLIENT)
-    public static final AnimationState DELAY_BULLET_ANI = new AnimationState();
+    public final AnimationState DELAY_BULLET_ANI = new AnimationState();
     private static final int DELAY_BULLET_DURATION = 50;
 
     @Environment(EnvType.CLIENT)
-    public static final AnimationState ATTACK_ANI = new AnimationState();
+    public final AnimationState ATTACK_ANI = new AnimationState();
     private static final int ATTACK_DURATION = 60;
 
+    // 阶段2 起手/成型动画（实例字段）
+    @Environment(EnvType.CLIENT)
+    public final AnimationState STAGE_2_START_APART_ANI = new AnimationState();
+    @Environment(EnvType.CLIENT)
+    public final AnimationState STAGE_2_STOP_APART_ANI = new AnimationState();
+
+    // 技能轴状态：只在服务端实例上推进，客户端副本不自行驱动技能轴
     private int skillTick = 0;
     private int skillStage = 0;
     private int skill = -114514;
     private LivingEntity target;
 
-    private static final TrackedData<Boolean> ATTACKING = DataTracker.registerData(GrandKnightEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
+    // 服务端 -> 客户端 的动作同步字段
+    // ACTIVE_SKILL：当前技能编号（0.盾推 1.盾扫 2.震地 3.喷射 4.连斩 5.延迟弹幕 6.抓取 7.剑扫），-1=空闲
+    private static final TrackedData<Integer> ACTIVE_SKILL =
+            DataTracker.registerData(GrandKnightEntity.class, TrackedDataHandlerRegistry.INTEGER);
+    // STAGE_CHANGE：0=无 1=二阶段起手 2=二阶段成型
+    private static final TrackedData<Integer> STAGE_CHANGE =
+            DataTracker.registerData(GrandKnightEntity.class, TrackedDataHandlerRegistry.INTEGER);
+
+    // 以下两个字段仅客户端有意义：记录“已播放到”的编号，避免每个tick重复start动画
+    private int playedSkill = -1;
+    private int playedStageChange = 0;
 
     // ========== BossBar ==========
     private final ServerBossBar bossBar = new ServerBossBar(this.getDisplayName(), BossBar.Color.PURPLE, BossBar.Style.PROGRESS);
@@ -96,11 +120,6 @@ public class GrandKnightEntity extends HostileEntity implements Monster {
     private int stage=1;
     private static final TrackedData<Integer> STAGE =
             DataTracker.registerData(GrandKnightEntity.class, TrackedDataHandlerRegistry.INTEGER);
-
-    @Environment(EnvType.CLIENT)
-    public static final AnimationState STAGE_2_START_APART_ANI =new AnimationState();
-    @Environment(EnvType.CLIENT)
-    public static final AnimationState STAGE_2_STOP_APART_ANI =new AnimationState();
 
     private boolean isChangingStage=false;
     private int changingTime=0;
@@ -140,7 +159,20 @@ public class GrandKnightEntity extends HostileEntity implements Monster {
     @Override
     public void tick() {
         super.tick();
+
+        // 客户端：动作由服务端通过DataTracker同步过来，这里只把编号翻译成实例动画播放/停止。
+        // 客户端不再自跑技能轴，避免本地随机数和服务端不一致导致动作错位。
+        if (this.getWorld().isClient) {
+            this.syncClientAnimations();
+            return;
+        }
+
         this.bossBar.setPercent(this.getHealth() / this.getMaxHealth());
+
+        List<? extends PlayerEntity> players=this.getWorld().getPlayers();
+        if (!players.isEmpty()){
+            players.forEach(p-> p.addStatusEffect(new StatusEffectInstance(ModStatusEffects.BOSS_FIGHT,40,0,false,false,true)));
+        }
 
         if (skillStage != 0&&skill!=6) {
             LivingEntity target = this.getTarget();
@@ -148,6 +180,7 @@ public class GrandKnightEntity extends HostileEntity implements Monster {
                 this.lookAtEntity(target, 360.0F, 360.0F);
             }
         }
+
         // 0.盾推，1.盾扫，2.震地，3.喷射，4.连斩，5.延迟弹幕，6.抓取，7.剑扫
         if ((skillStage != 0 &&skill!=1&&skill!=4&&skill!=7)||isChangingStage) {
             this.setVelocity(0, this.getVelocity().y, 0);
@@ -159,31 +192,73 @@ public class GrandKnightEntity extends HostileEntity implements Monster {
         }
     }
 
-    private void changeStage() {
-        if (skill==-114514) {
-            if (this.getHealth()<=this.getMaxHealth()/2 && getStage()==1 && changingTime==0){
-                this.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE,5*20,100,false,false,false));
-               isChangingStage=true;
-               if (!STAGE_2_START_APART_ANI.isRunning()){
-                   STAGE_2_START_APART_ANI.start(this.age);
-               }
-               changingTime++;
-            }
-            else if (changingTime>0&&changingTime<100){
-                changingTime++;
-                if (changingTime==20){
-                    this.setStage(2);
-                    this.stage=2;
-                    STAGE_2_START_APART_ANI.stop();
-                    if (!STAGE_2_STOP_APART_ANI.isRunning()){
-                        STAGE_2_STOP_APART_ANI.start(this.age);
-                    }
+    // 把服务端广播的 ACTIVE_SKILL / STAGE_CHANGE 翻译成实例动画的 start/stop（仅客户端调用）
+    private void syncClientAnimations() {
+        int activeSkill = this.dataTracker.get(ACTIVE_SKILL);
+        if (activeSkill != this.playedSkill) {
+            GRAB_ANI.stop();
+            SHIELD_SMASH_ANI.stop();
+            SHIELD_SLAP_ANI.stop();
+            EARTH_SHAKER_ANI.stop();
+            BRIMSTONE_ANI.stop();
+            RAPID_SLASHES_ANI.stop();
+            DELAY_BULLET_ANI.stop();
+            ATTACK_ANI.stop();
+            if (activeSkill >= 0) {
+                switch (activeSkill) {
+                    case 0 -> SHIELD_SMASH_ANI.start(this.age);
+                    case 1 -> SHIELD_SLAP_ANI.start(this.age);
+                    case 2 -> EARTH_SHAKER_ANI.start(this.age);
+                    case 3 -> BRIMSTONE_ANI.start(this.age);
+                    case 4 -> RAPID_SLASHES_ANI.start(this.age);
+                    case 5 -> DELAY_BULLET_ANI.start(this.age);
+                    case 6 -> GRAB_ANI.start(this.age);
+                    case 7 -> ATTACK_ANI.start(this.age);
                 }
             }
-            else if (changingTime==100){
+            this.playedSkill = activeSkill;
+        }
+
+        int stageChange = this.dataTracker.get(STAGE_CHANGE);
+        if (stageChange != this.playedStageChange) {
+            if (stageChange == 1) {
                 STAGE_2_STOP_APART_ANI.stop();
-                isChangingStage=false;
+                STAGE_2_START_APART_ANI.start(this.age);
+            } else if (stageChange == 2) {
+                STAGE_2_START_APART_ANI.stop();
+                STAGE_2_STOP_APART_ANI.start(this.age);
+            } else {
+                STAGE_2_START_APART_ANI.stop();
+                STAGE_2_STOP_APART_ANI.stop();
             }
+            this.playedStageChange = stageChange;
+        }
+    }
+
+    private void changeStage() {
+        if (skill != -114514) {
+            return;
+        }
+        if (this.getHealth()<=this.getMaxHealth()/2 && getStage()==1 && changingTime==0){
+            this.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE,5*20,100,false,false,false));
+            isChangingStage=true;
+            changingTime++;
+            // 通知客户端播放“二阶段起手”动画
+            this.dataTracker.set(STAGE_CHANGE, 1);
+        }
+        else if (changingTime>0&&changingTime<100){
+            changingTime++;
+            if (changingTime==20){
+                this.setStage(2);
+                this.stage=2;
+                // 通知客户端切换为“二阶段成型”动画
+                this.dataTracker.set(STAGE_CHANGE, 2);
+            }
+        }
+        else if (changingTime==100){
+            isChangingStage=false;
+            changingTime=0;
+            this.dataTracker.set(STAGE_CHANGE, 0);
         }
     }
 
@@ -261,98 +336,67 @@ public class GrandKnightEntity extends HostileEntity implements Monster {
                     attackSkill();
                 }
             }
-        } else {
-            if (skillStage == 0) {
-                if (!ATTACK_ANI.isRunning()) {
-                    if (this.getTarget() == null) {
-                        skillTick = this.random.nextInt(20) + 20;
-                        skillStage = 0;
-                        return;
-                    }
-                    skill = this.random.nextInt(4);
-                    if (getStage() == 1) {
-                        if (skill == 3) {
-                            skill = 6;
-                        }
-                        if (isTargetInRange(3)&&this.random.nextInt(3)<2) {
-                            skill=1;
-                        }
-                    } else {
-                        skill = this.random.nextInt(6);
-                        if (isTargetInRange(5)&&this.random.nextInt(4)<3&&this.getStage()==2){
-                            skill=7;
-                        }
-                    }
-                    // 0.盾推，1.盾扫，2.震地，3.喷射，4.连斩，5.延迟弹幕，6.抓取
-                    switch (skill) {
-                        case 0 -> {
-                            skillTick = SHIELD_SMASH_DURATION;
-                            SHIELD_SMASH_ANI.startIfNotRunning(this.age);
-                        }
-                        case 1 -> {
-                            skillTick = SHIELD_SLAP_DURATION;
-                            SHIELD_SLAP_ANI.startIfNotRunning(this.age);
-                        }
-                        case 2 -> {
-                            skillTick = EARTH_SHAKER_DURATION;
-                            EARTH_SHAKER_ANI.startIfNotRunning(this.age);
-                        }
-                        case 3 ->{
-                            skillTick=BRIMSTONE_DURATION;
-                            BRIMSTONE_ANI.startIfNotRunning(this.age);
-                        }
-                        case 4 ->{
-                            skillTick=RAPID_SLASHES_DURATION;
-                            RAPID_SLASHES_ANI.startIfNotRunning(this.age);
-                        }
-                        case 5->{
-                            skillTick=DELAY_BULLET_DURATION;
-                            DELAY_BULLET_ANI.startIfNotRunning(this.age);
-                        }
-                        case 6->{
-                            skillTick=GRAB_DURATION;
-                            GRAB_ANI.startIfNotRunning(this.age);
-                        }
-                        case 7->{
-                            skillTick=ATTACK_DURATION;
-                            ATTACK_ANI.startIfNotRunning(this.age);
-                        }
-                    }
-                    skillStage++;
-                }
-            }
-            else {
-                skillTick = this.random.nextInt(40) + 40;
-                if (stage==2){
-                    skillTick=this.random.nextInt(20)+20;
-                }
-                if (ATTACK_ANI.isRunning()){
-                    skillTick=this.random.nextInt(30)+10;
-                }
-                skill=-114514;
+        } else if (skillStage == 0) {
+            // 空闲期挑选下一个技能
+            if (this.getTarget() == null) {
+                skillTick = this.random.nextInt(20) + 20;
                 skillStage = 0;
-                target=null;
-                GRAB_ANI.stop();
-                SHIELD_SMASH_ANI.stop();
-                SHIELD_SLAP_ANI.stop();
-                EARTH_SHAKER_ANI.stop();
-                BRIMSTONE_ANI.stop();
-                RAPID_SLASHES_ANI.stop();
-                DELAY_BULLET_ANI.stop();
-                ATTACK_ANI.stop();
+                return;
             }
+            skill = this.random.nextInt(4);
+            if (getStage() == 1) {
+                if (skill == 3) {
+                    skill = 6;
+                }
+                if (isTargetInRange(3)&&this.random.nextInt(3)<2) {
+                    skill=1;
+                }
+            } else {
+                skill = this.random.nextInt(6);
+                if (isTargetInRange(5)&&this.random.nextInt(4)<3&&this.getStage()==2){
+                    skill=7;
+                }
+            }
+            // 0.盾推，1.盾扫，2.震地，3.喷射，4.连斩，5.延迟弹幕，6.抓取，7.剑扫
+            switch (skill) {
+                case 0 -> skillTick = SHIELD_SMASH_DURATION;
+                case 1 -> skillTick = SHIELD_SLAP_DURATION;
+                case 2 -> skillTick = EARTH_SHAKER_DURATION;
+                case 3 -> skillTick = BRIMSTONE_DURATION;
+                case 4 -> skillTick = RAPID_SLASHES_DURATION;
+                case 5 -> skillTick = DELAY_BULLET_DURATION;
+                case 6 -> skillTick = GRAB_DURATION;
+                case 7 -> skillTick = ATTACK_DURATION;
+            }
+            skillStage++;
+            // 起手：把技能编号广播给所有客户端播放动画
+            this.dataTracker.set(ACTIVE_SKILL, skill);
+        } else {
+            // 当前技能结束
+            skillTick = this.random.nextInt(40) + 40;
+            if (stage==2){
+                skillTick=this.random.nextInt(20)+20;
+            }
+            // 剑扫(7)结束后把下一次起手间隔缩短一点（原逻辑判断刚结束的是否为剑扫动画）
+            if (skill==7){
+                skillTick=this.random.nextInt(30)+10;
+            }
+            skill=-114514;
+            skillStage = 0;
+            target=null;
+            // 收尾：通知客户端停止动画
+            this.dataTracker.set(ACTIVE_SKILL, -1);
         }
     }
 
 
     @Override
     public boolean damage(DamageSource source, float amount) {
-        if(STAGE_2_START_APART_ANI.isRunning()||STAGE_2_STOP_APART_ANI.isRunning()){
+        // 阶段切换期间无敌：直接使用服务端实例字段判断，不再依赖客户端动画状态
+        if (isChangingStage) {
             return false;
         }
-        else {
         return super.damage(source, amount);
-        }
     }
 
 
@@ -644,6 +688,11 @@ public class GrandKnightEntity extends HostileEntity implements Monster {
                 this.getDamageAmount());
     }
 
+    @Override
+    public boolean isFireImmune() {
+        return true;
+    }
+
     private void damageEntitiesInFront(double range, double width, double height, float damage) {
         if (this.getWorld().isClient) return;
         Vec3d eyePos = this.getEyePos();
@@ -733,6 +782,13 @@ public class GrandKnightEntity extends HostileEntity implements Monster {
         this.bossBar.removePlayer(player);
     }
 
+    @Override
+    protected void dropLoot(DamageSource damageSource, boolean causedByPlayer) {
+        SpawnRandomSoulItems spawnRandomSoulItems = new SpawnRandomSoulItems();
+        this.dropItem(ModItems.PROP_PROTOTYPE);
+        this.dropItem(spawnRandomSoulItems.summonRandomSoulItem(this.getWorld()).getItem());
+    }
+
     // ========== NBT 持久化 ==========
     @Override
     public void writeCustomDataToNbt(NbtCompound nbt) {
@@ -754,12 +810,18 @@ public class GrandKnightEntity extends HostileEntity implements Monster {
         if (this.hasCustomName()) {
             this.bossBar.setName(this.getDisplayName());
         }
+
+        // 区块重载恢复技能轴后，把当前技能编号补发给客户端，保证动画能接上
+        if (this.skillStage != 0 && this.skill >= 0 && this.skill <= 7) {
+            this.dataTracker.set(ACTIVE_SKILL, this.skill);
+        }
     }
     @Override
     protected void initDataTracker() {
         super.initDataTracker();
-        this.dataTracker.startTracking(ATTACKING, false);
+        this.dataTracker.startTracking(ACTIVE_SKILL, -1);
         this.dataTracker.startTracking(STAGE,1);
+        this.dataTracker.startTracking(STAGE_CHANGE, 0);
     }
     protected float getDamageAmount() {
         return (float) this.getAttributeValue(EntityAttributes.GENERIC_ATTACK_DAMAGE);

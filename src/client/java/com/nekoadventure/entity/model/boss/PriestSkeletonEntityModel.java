@@ -159,10 +159,10 @@ public class PriestSkeletonEntityModel extends SinglePartEntityModel<PriestSkele
 	public void setAngles(PriestSkeletonEntity entity, float limbAngle, float limbDistance, float animationProgress, float headYaw, float headPitch) {
 		this.getPart().traverse().forEach(ModelPart::resetTransform);
 		this.animateMovement(PriestSkeletonModelAnimation.WALK,limbAngle,limbDistance,2f,2.5f);
-		this.updateAnimation(PriestSkeletonEntity.FIRE_SKILL, PriestSkeletonModelAnimation.FIRE,animationProgress,1.0f);
-		this.updateAnimation(PriestSkeletonEntity.SWEEP_SKILL, PriestSkeletonModelAnimation.SWEEP,animationProgress,1.0f);
-		this.updateAnimation(PriestSkeletonEntity.SPIKE_SKILL, PriestSkeletonModelAnimation.SPIKE,animationProgress,1.0f);
-		this.updateAnimation(PriestSkeletonEntity.BULLET_SKILL, PriestSkeletonModelAnimation.BULLET,animationProgress,1.0f);
+		this.updateAnimation(entity.FIRE_SKILL, PriestSkeletonModelAnimation.FIRE,animationProgress,1.0f);
+		this.updateAnimation(entity.SWEEP_SKILL, PriestSkeletonModelAnimation.SWEEP,animationProgress,1.0f);
+		this.updateAnimation(entity.SPIKE_SKILL, PriestSkeletonModelAnimation.SPIKE,animationProgress,1.0f);
+		this.updateAnimation(entity.BULLET_SKILL, PriestSkeletonModelAnimation.BULLET,animationProgress,1.0f);
 
 		this.Head.yaw = headYaw * (float) (Math.PI / 180.0);
 		this.Head.pitch = headPitch * (float) (Math.PI / 180.0);

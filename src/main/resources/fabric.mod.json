@@ -1,7 +1,7 @@
 {
 	"schemaVersion": 1,
 	"id": "neko-adventure",
-	"version": "0.0.1",
+	"version": "${version}",
 	"name": "Neko Adventure",
 	"description": "This is an adventure module that allows you to have a brand-new experience, enabling you to quickly feel the joy of exploration!",
 	"authors": [

@@ -81,10 +81,10 @@ public class HugeSlimeEntityModel extends SinglePartEntityModel<HugeSlimeEntity>
 	@Override
 	public void setAngles(HugeSlimeEntity entity, float limbAngle, float limbDistance, float animationProgress, float headYaw, float headPitch) {
 		this.getPart().traverse().forEach(ModelPart::resetTransform);
-		this.updateAnimation(HugeSlimeEntity.TRAMPLE_SKILL_ANI, HugeSlimeEntityModelAnimation.TRAMPLE,animationProgress,1.0f);
-		this.updateAnimation(HugeSlimeEntity.SUMMON_SKILL_ANI, HugeSlimeEntityModelAnimation.SUMMON,animationProgress,1.0f);
-		this.updateAnimation(HugeSlimeEntity.BULLET_SKILL_ANI, HugeSlimeEntityModelAnimation.BULLET,animationProgress,1.0f);
-		this.updateAnimation(HugeSlimeEntity.DASH_SKILL_ANI, HugeSlimeEntityModelAnimation.DASH,animationProgress,1.0f);
+		this.updateAnimation(entity.TRAMPLE_SKILL_ANI, HugeSlimeEntityModelAnimation.TRAMPLE,animationProgress,1.0f);
+		this.updateAnimation(entity.SUMMON_SKILL_ANI, HugeSlimeEntityModelAnimation.SUMMON,animationProgress,1.0f);
+		this.updateAnimation(entity.BULLET_SKILL_ANI, HugeSlimeEntityModelAnimation.BULLET,animationProgress,1.0f);
+		this.updateAnimation(entity.DASH_SKILL_ANI, HugeSlimeEntityModelAnimation.DASH,animationProgress,1.0f);
 
 	}
 }

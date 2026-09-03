@@ -45,8 +45,11 @@ public class MissileEntityRenderer extends EntityRenderer<MissileEntity> {
     public void render(MissileEntity entity, float yaw, float tickDelta,
                        MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
         super.render(entity, yaw, tickDelta, matrices, vertexConsumers, light);
-        boolean renderRed =((entity.getOwner() != null && !(entity.getOwner() instanceof PlayerEntity))&&
-                (entity.getOwner()!=null&&(entity.getOwner() instanceof MissileEntity)&&(!(((MissileEntity)entity.getOwner()).getOwner() instanceof PlayerEntity))));
+        boolean renderRed;
+        if(entity.getOwner() != null && entity.getOwner() instanceof PlayerEntity){
+            renderRed=false;
+        } else renderRed= entity.getOwner() == null || !(entity.getOwner() instanceof MissileEntity) || !((((MissileEntity) entity.getOwner()).getOwner()) instanceof PlayerEntity);
+
         float red =1.0f;
         float green = renderRed ? 0.0f : 1.0f;
         float blue = renderRed ? 0.0f : 1.0f;

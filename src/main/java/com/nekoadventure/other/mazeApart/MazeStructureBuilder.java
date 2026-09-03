@@ -30,6 +30,7 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
+import net.minecraft.world.chunk.light.LightingProvider;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -86,6 +87,52 @@ public class MazeStructureBuilder {
                 placeBaseSpecialRooms(impasse, world);
                 placeMoreSpecialRooms(impasse, impasseCount - MIN_IMPASSE_COUNT,world);
             }
+
+            //服务端与客户端的光照不同步会让部分房间在客户端渲染成全黑，
+            //所以放置完所有特殊房间后，把impasse中的每一个房间区域逐格重新标记给光照引擎重算
+            MazeDataManager data = MazeDataManager.get(world);
+            List<MazePosNBTCompound> initialRoomData=new ArrayList<>();
+            if (data != null) {
+                initialRoomData = data.getInitialData();
+            }
+            recalculateRoomLight(world, initialRoomData);
+        }
+    }
+
+    //这个方法的作用是在放置完特殊房间后，立刻重新计算所有特殊房间区域的光照
+    //服务端光照引擎重算完成后会主动把新的光照数据推送回所有客户端，从而消除全黑房间
+    private void recalculateRoomLight(World world, List<MazePosNBTCompound> rooms) {
+        if (!(world instanceof ServerWorld serverWorld) || rooms.isEmpty()) {
+            return;
+        }
+        LightingProvider lightingProvider = serverWorld.getChunkManager().getLightingProvider();
+        for (MazePosNBTCompound room : rooms) {
+            BlockPos center = room.roomCenter();
+            int distance = MazeBlockEntity.detectRoomDistance(serverWorld, center);
+            if (distance <= 0) {
+                distance = 8;
+            }
+            //水平方向把大门和伪装墙的厚度也算进去，垂直方向按房间高度留出余量
+            int margin = 3;
+            int minY = Math.max(serverWorld.getBottomY() + 1, center.getY() - 4);
+            int maxY = Math.min(serverWorld.getTopY() - 1, center.getY() + 18);
+            BlockPos minPos = new BlockPos(
+                    center.getX() - distance - margin,
+                    minY,
+                    center.getZ() - distance - margin
+            );
+            BlockPos maxPos = new BlockPos(
+                    center.getX() + distance + margin,
+                    maxY,
+                    center.getZ() + distance + margin
+            );
+            for (BlockPos pos : BlockPos.iterate(minPos, maxPos)) {
+                lightingProvider.checkBlock(pos);
+            }
+
+            //开发辅助
+            System.out.println("已重新标记特殊房间光照区域: " + center + " 范围: " + minPos + " 到 " + maxPos);
+            //开发辅助
         }
     }
 
@@ -321,6 +368,9 @@ public class MazeStructureBuilder {
             else {
                 List<String> allPath=new ArrayList<>();
                 for (int a = 1; structureManager.getTemplate(new Identifier(NekoAdventure.MOD_ID,path)).isPresent(); a++){
+                    if (a==1){
+                        continue;
+                    }
                     allPath.add(path);
                     path=dimensionPath + "/specific_room/" + roomType+"/"+roomType+a;
                 }

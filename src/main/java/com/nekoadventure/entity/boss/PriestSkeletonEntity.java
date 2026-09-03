@@ -4,7 +4,9 @@ package com.nekoadventure.entity.boss;
 import com.nekoadventure.effect.ModStatusEffects;
 import com.nekoadventure.entity.ModEntities;
 import com.nekoadventure.entity.missile.MissileEntity;
+import com.nekoadventure.item.ModItems;
 import com.nekoadventure.other.attackApart.AttackTypes;
+import com.nekoadventure.other.itemApart.SpawnRandomSoulItems;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.BlockState;
@@ -26,6 +28,9 @@ import net.minecraft.entity.mob.Monster;
 import net.minecraft.entity.passive.IronGolemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.FireballEntity;
+import net.minecraft.entity.data.DataTracker;
+import net.minecraft.entity.data.TrackedData;
+import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundEvent;
@@ -42,18 +47,25 @@ import java.util.List;
 
 public class PriestSkeletonEntity extends HostileEntity implements Monster {
 
+    // 技能动画为“实例字段 + 客户端驱动”：服务端只同步 ACTIVE_SKILL 编号，客户端收到后播放/停止动画
     @Environment(EnvType.CLIENT)
-    public static final AnimationState FIRE_SKILL =new AnimationState();
+    public final AnimationState FIRE_SKILL =new AnimationState();
     private static final int FIRE_SKILL_DURATION =80;
     @Environment(EnvType.CLIENT)
-    public static final AnimationState SWEEP_SKILL =new AnimationState();
+    public final AnimationState SWEEP_SKILL =new AnimationState();
     private static final int SWEEP_SKILL_DURATION =45;
     @Environment(EnvType.CLIENT)
-    public static final AnimationState SPIKE_SKILL =new AnimationState();
+    public final AnimationState SPIKE_SKILL =new AnimationState();
     private static final int SPIKE_SKILL_DURATION =50;
     @Environment(EnvType.CLIENT)
-    public static final AnimationState BULLET_SKILL =new AnimationState();
+    public final AnimationState BULLET_SKILL =new AnimationState();
     private static final int BULLET_SKILL_DURATION =70;
+
+    // 服务端 -> 客户端 动作同步字段：0火球术 1横扫 2尖刺 3弹幕，-1=空闲
+    private static final TrackedData<Integer> ACTIVE_SKILL =
+            DataTracker.registerData(PriestSkeletonEntity.class, TrackedDataHandlerRegistry.INTEGER);
+    // 仅客户端有意义：记录“已播放到”的技能编号，避免每个tick重复start动画
+    private int playedSkill = -1;
 
     private final ServerBossBar bossBar = new ServerBossBar(this.getDisplayName(), BossBar.Color.PURPLE, BossBar.Style.PROGRESS);
 
@@ -95,13 +107,45 @@ public class PriestSkeletonEntity extends HostileEntity implements Monster {
     @Override
     public void tick() {
         super.tick();
+
+        // 客户端：动作由服务端通过DataTracker同步过来，这里只把编号翻译成实例动画播放/停止
+        if (this.getWorld().isClient) {
+            this.syncClientAnimations();
+            return;
+        }
+
         this.bossBar.setPercent(this.getHealth() / this.getMaxHealth());
+
+        List<? extends PlayerEntity> players=this.getWorld().getPlayers();
+        if (!players.isEmpty()){
+            players.forEach(p-> p.addStatusEffect(new StatusEffectInstance(ModStatusEffects.BOSS_FIGHT,40,0,false,false,true)));
+        }
 
         if (skillStage != 0&&skill!=0&&skill!=1){
             this.setVelocity(0,0,0);
         }
 
         this.applySkill();
+    }
+
+    // 把服务端广播的 ACTIVE_SKILL 翻译成实例动画的播放/停止（仅客户端调用）
+    private void syncClientAnimations() {
+        int activeSkill = this.dataTracker.get(ACTIVE_SKILL);
+        if (activeSkill != this.playedSkill) {
+            FIRE_SKILL.stop();
+            SWEEP_SKILL.stop();
+            SPIKE_SKILL.stop();
+            BULLET_SKILL.stop();
+            if (activeSkill >= 0) {
+                switch (activeSkill) {
+                    case 0 -> FIRE_SKILL.start(this.age);
+                    case 1 -> SWEEP_SKILL.start(this.age);
+                    case 2 -> SPIKE_SKILL.start(this.age);
+                    case 3 -> BULLET_SKILL.start(this.age);
+                }
+            }
+            this.playedSkill = activeSkill;
+        }
     }
 
     private void applySkill() {
@@ -119,67 +163,36 @@ public class PriestSkeletonEntity extends HostileEntity implements Monster {
                 }
             }
         }
-        else {
-            if (skillStage==0){
-                if (this.getTarget()==null){
-                    skillTick=this.random.nextInt(40)+40;
-                    skillStage=0;
-                    return;
-                }
-               skill=this.random.nextInt(4);
-                //0.火球术，1.横扫，2.尖刺，3.弹幕
-                switch (skill) {
-                    case 0:{
-                        skillTick= FIRE_SKILL_DURATION;
-                        FIRE_SKILL.startIfNotRunning(this.age);
-                        break;
-                    }
-                    case 1:{
-                        skillTick= SWEEP_SKILL_DURATION;
-                        SWEEP_SKILL.startIfNotRunning(this.age);
-                        break;
-                    }
-                    case 2:{
-                        skillTick= SPIKE_SKILL_DURATION;
-                        SPIKE_SKILL.startIfNotRunning(this.age);
-                        break;
-                    }
-                    case 3:{
-                        skillTick= BULLET_SKILL_DURATION;
-                        BULLET_SKILL.startIfNotRunning(this.age);
-                        break;
-                    }
-                }
-                skillStage++;
-            }
-            else {
-                skillTick=this.random.nextInt(30)+30;
+        else if (skillStage==0){
+            // 空闲期挑选下一个技能
+            if (this.getTarget()==null){
+                skillTick=this.random.nextInt(40)+40;
                 skillStage=0;
-                switch (skill){
-                    case 0:{
-                        skill=-999;
-                        FIRE_SKILL.stop();
-                        break;
-                    }
-                    case 1:{
-                        skill=-999;
-                        SWEEP_SKILL.stop();
-                        break;
-                    }
-                    case 2:{
-                        skill=-999;
-                        SPIKE_SKILL.stop();
-                        break;
-                    }
-                    case 3:{
-                        skill=-999;
-                        BULLET_SKILL.stop();
-                        break;
-                    }
-                }
+                return;
             }
+            skill=this.random.nextInt(4);
+            //0.火球术，1.横扫，2.尖刺，3.弹幕
+            switch (skill) {
+                case 0 -> skillTick = FIRE_SKILL_DURATION;
+                case 1 -> skillTick = SWEEP_SKILL_DURATION;
+                case 2 -> skillTick = SPIKE_SKILL_DURATION;
+                case 3 -> skillTick = BULLET_SKILL_DURATION;
+            }
+            skillStage++;
+            // 起手：把技能编号广播给所有客户端播放动画
+            this.dataTracker.set(ACTIVE_SKILL, skill);
+        }
+        else {
+            // 当前技能结束
+            skillTick=this.random.nextInt(30)+30;
+            skillStage=0;
+            skill=-999;
+            // 收尾：通知客户端停止动画
+            this.dataTracker.set(ACTIVE_SKILL, -1);
         }
     }
+
+
 
     private void fireballSkill(){
         if (this.getTarget()==null&&targetPos==null){return;}
@@ -278,6 +291,13 @@ public class PriestSkeletonEntity extends HostileEntity implements Monster {
 
     }
 
+    @Override
+    protected void dropLoot(DamageSource damageSource, boolean causedByPlayer) {
+        SpawnRandomSoulItems spawnRandomSoulItems = new SpawnRandomSoulItems();
+        this.dropItem(ModItems.PROP_PROTOTYPE);
+        this.dropItem(spawnRandomSoulItems.summonRandomSoulItem(this.getWorld()).getItem());
+    }
+
     private void damageEntitiesInFront(double range, double width, double height, float damage) {
         if (this.getWorld().isClient) return;
         range=range+1;
@@ -324,6 +344,11 @@ public class PriestSkeletonEntity extends HostileEntity implements Monster {
     }
 
     @Override
+    public boolean isFireImmune() {
+        return true;
+    }
+
+    @Override
     public void onStartedTrackingBy(ServerPlayerEntity player) {
         super.onStartedTrackingBy(player);
         this.bossBar.addPlayer(player);
@@ -356,6 +381,12 @@ public class PriestSkeletonEntity extends HostileEntity implements Monster {
     }
 
     @Override
+    protected void initDataTracker() {
+        super.initDataTracker();
+        this.dataTracker.startTracking(ACTIVE_SKILL, -1);
+    }
+
+    @Override
     public void writeCustomDataToNbt(NbtCompound nbt) {
         super.writeCustomDataToNbt(nbt);
         nbt.putInt("SkillTick", this.skillTick);
@@ -372,6 +403,11 @@ public class PriestSkeletonEntity extends HostileEntity implements Monster {
 
         if (this.hasCustomName()) {
             this.bossBar.setName(this.getDisplayName());
+        }
+
+        // 区块重载恢复技能轴后，把当前技能编号补发给客户端，保证动画能接上
+        if (this.skillStage != 0 && this.skill >= 0 && this.skill <= 3) {
+            this.dataTracker.set(ACTIVE_SKILL, this.skill);
         }
     }
 

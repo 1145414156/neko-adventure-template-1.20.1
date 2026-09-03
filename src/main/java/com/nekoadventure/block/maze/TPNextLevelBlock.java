@@ -90,18 +90,20 @@ public class TPNextLevelBlock extends Block {
                             mazeDataManager.clearAllData();
                         }
                         PlayerFirstEnterMazeHandler.dimensionHasBeenVisited.remove(world.getRegistryKey().getValue());
-                        player.sendMessage(Text.of("玩家"+player.getName().getString()+"已通关地牢"),false);
+                        allPlayers.forEach(serverPlayer-> serverPlayer.sendMessage(Text.of("玩家"+player.getName().getString()+"已通关地牢"),false));
                     }
                 }
                 else {
+
                     Identifier dimensionId = serverWorld.getRegistryKey().getValue();
                     MazeStructureBuilder builder = new MazeStructureBuilder();
-                    player.sendMessage(Text.literal("§e正在加载迷宫中，请勿退出游戏"), false);
+                    allPlayers.forEach(serverPlayer-> serverPlayer.sendMessage(Text.literal("§e正在加载迷宫中，请勿退出游戏"), false));
                     if (player instanceof ServerPlayerEntity) {
                         ScreenBlackEffectPacket.send((ServerPlayerEntity) player, true);
                     }
                     //这里因为这个方块本身并没有tick方法所以用了服务器那里的计时器（人话：我偷懒了）
                     PlayerFirstEnterMazeHandler.delayedTasks.put(dimensionId, 80);
+                    List<ServerPlayerEntity> finalAllPlayers = allPlayers;
                     PlayerFirstEnterMazeHandler.delayedActions.put(dimensionId, () -> {
                         builder.placeAllSpecialRoom(serverWorld);
                         PlayerFirstEnterMazeHandler.delayedTasks.put(dimensionId, 20);
@@ -109,7 +111,7 @@ public class TPNextLevelBlock extends Block {
                             builder.clearRoomItemEntity(world);
                             if (mazeDataManager != null) {
                                 mazeDataManager.clearInitialData();
-                                player.sendMessage(Text.literal("§e加载迷宫成功"), false);
+                                finalAllPlayers.forEach(serverPlayer-> serverPlayer.sendMessage(Text.literal("§e加载迷宫成功"), false));
                                 if (player instanceof ServerPlayerEntity) {
                                     ScreenBlackEffectPacket.send((ServerPlayerEntity) player, false);
                                 }

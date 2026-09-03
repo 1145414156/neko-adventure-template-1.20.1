@@ -118,9 +118,9 @@ public class ModCNLanguageProvider extends FabricLanguageProvider {
         translationBuilder.add(ModItems.THE_FOURTH_EYE,"突变四眼");
         //物品栏
         translationBuilder.add(ModItemGroups.NEKO_GROUP,"猫的旅途：其他方块和物品");
-        translationBuilder.add(ModItemGroups.NUM_ITEM_GROUP,"猫的旅途：数值类道具");
-        translationBuilder.add(ModItemGroups.SOUL_ITEM_GROUP,"猫的旅途：魂石类道具");
-        translationBuilder.add(ModItemGroups.MAZE_GROUP,"猫的旅途:传送");
+        translationBuilder.add(ModItemGroups.NUM_ITEM_GROUP,"猫的旅途：全部道具");
+        translationBuilder.add(ModItemGroups.SOUL_ITEM_GROUP,"猫的旅途：全部魂石");
+        translationBuilder.add(ModItemGroups.MAZE_GROUP,"猫的旅途:传送所需方块与物品");
         //方块
         translationBuilder.add(ModBlocks.GATE_BLOCK,"大门方块");
         translationBuilder.add(ModBlocks.MAZE_BLOCK,"迷宫方块");

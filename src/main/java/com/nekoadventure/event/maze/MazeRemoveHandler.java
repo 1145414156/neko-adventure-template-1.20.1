@@ -7,6 +7,7 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.tag.TagKey;
@@ -17,7 +18,6 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
-import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,24 +38,25 @@ public class MazeRemoveHandler {
             if (mazeData.isEmpty()){return;}
 
             if (world.getPlayers().isEmpty()) {
-
-                if (tick==1){
-                    for (ServerPlayerEntity player : allPlayers) {
-                        System.out.println(mazeData.size());
-                        player.sendMessage(Text.literal("§e正在移除迷宫中，请勿退出游戏"), false);
-                    }
-                }
                 if (tick<=APPLY_TICK) {
                     tick++;
                 }
-                if (tick>APPLY_TICK) {
+                if (tick==1){
+                    allPlayers.forEach(e->e.sendMessage(Text.of("§e正在清除迷宫中，请勿退出游戏"),false));
+                }
+                else if (tick==5){
+                    mazeData.forEach(room->clearRoomEntities(world,room.roomCenter()));
+                    removeBossEntity(world,new BlockPos(0,0,0));
+                }
+                else if (tick>APPLY_TICK) {
                     removeAllMaze(world,allPlayers);
+                    removeBossRoom(world,new BlockPos(0,0,0));
                     tick=0;
                 }
             }
-                else {
-                    tick=0;
-                }
+            else {
+                tick=0;
+            }
         });
     }
 
@@ -65,13 +66,9 @@ public class MazeRemoveHandler {
         if (mazeDataManager != null) {
             List<MazePosNBTCompound> mazeData = mazeDataManager.getRoomData();
             if (!mazeData.isEmpty()) {
-
                 for (MazePosNBTCompound mazePosNBTCompound : mazeData) {
                     BlockPos center = mazePosNBTCompound.roomCenter();
                     clearRooms(world, center);
-                }
-                if (mazeDataManager.getLevelData()>1){
-                    removeBossRoom(world,new BlockPos(0,0,0));
                 }
                 mazeDataManager.clearAllData();
                 for (ServerPlayerEntity player : allPlayers) {
@@ -93,11 +90,10 @@ public class MazeRemoveHandler {
                 BlockPos center = mazePosNBTCompound.roomCenter();
                 clearRooms(world, center);
             }
-
             if (mazeDataManager.getLevelData()>1){
+                removeBossEntity(world,new BlockPos(0,0,0));
                 removeBossRoom(world,new BlockPos(0,0,0));
             }
-
             mazeDataManager.clearRoomData();
             for (ServerPlayerEntity player : allPlayers) {
                 player.sendMessage(Text.literal("§a已移除迷宫"), false);
@@ -106,7 +102,7 @@ public class MazeRemoveHandler {
     }
 
     //这个是实际开始清除房间的方法
-    private static void clearRooms(ServerWorld world, BlockPos center) {
+    private static void clearRoomEntities(ServerWorld world, BlockPos center) {
         // 计算范围：中心点向各个方向延伸 24 格（总共 50 格）
         int radius = 24;
         int startX = center.getX() - radius;
@@ -122,17 +118,6 @@ public class MazeRemoveHandler {
                 startX,startY,startZ,
                 endX,endY,endZ
         );
-        for (int x = startX; x <= endX; x++) {
-            for (int y = world.getBottomY(); y < world.getTopY(); y++) {
-                for (int z = startZ; z <= endZ; z++) {
-                    BlockPos pos = new BlockPos(x, y, z);
-                    BlockState blockState = world.getBlockState(pos);
-                    if (!blockState.isAir()) {
-                        world.setBlockState(pos, Blocks.AIR.getDefaultState(), 3);
-                    }
-                }
-            }
-        }
         List<Entity> entities=world.getEntitiesByClass(
                 Entity.class,
                 box.expand(6,6,6),
@@ -144,25 +129,20 @@ public class MazeRemoveHandler {
         }
     }
 
-    private static boolean isMazeDimension(ServerWorld world) {
-        TagKey<DimensionType> isMazeTag = TagKey.of(
-                RegistryKeys.DIMENSION_TYPE,
-                new Identifier(NekoAdventure.MOD_ID, "is_maze")
-        );
-        return world.getDimensionEntry().isIn(isMazeTag);
-    }
-    private static void removeBossRoom(World world, BlockPos center) {
-        if (world.isClient) return;
-        int minX = center.getX() - 32;
-        int maxX = center.getX() + 32;
-        int minY = center.getY();
-        int maxY = center.getY() + 64;
-        int minZ = center.getZ() - 32;
-        int maxZ = center.getZ() + 32;
-        minY = Math.max(minY, world.getBottomY());
-        for (int x = minX; x <= maxX; x++) {
-            for (int y = minY; y <= maxY; y++) {
-                for (int z = minZ; z <= maxZ; z++) {
+    private static void clearRooms(ServerWorld world, BlockPos center) {
+        // 计算范围：中心点向各个方向延伸 24 格（总共 50 格）
+        int radius = 24;
+        int startX = center.getX() - radius;
+        int endX = center.getX() + radius;
+        int startY = center.getY() - radius;
+        int endY = center.getY() + radius;
+        int startZ = center.getZ() - radius;
+        int endZ = center.getZ() + radius;
+        startY = Math.max(startY, world.getBottomY());
+        endY = Math.min(endY, world.getTopY() - 1);
+        for (int x = startX; x <= endX; x++) {
+            for (int y = startY; y < endY; y++) {
+                for (int z = startZ; z <= endZ; z++) {
                     BlockPos pos = new BlockPos(x, y, z);
                     BlockState blockState = world.getBlockState(pos);
                     if (!blockState.isAir()) {
@@ -171,17 +151,57 @@ public class MazeRemoveHandler {
                 }
             }
         }
+    }
+
+
+    private static boolean isMazeDimension(ServerWorld world) {
+        TagKey<DimensionType> isMazeTag = TagKey.of(
+                RegistryKeys.DIMENSION_TYPE,
+                new Identifier(NekoAdventure.MOD_ID, "is_maze")
+        );
+        return world.getDimensionEntry().isIn(isMazeTag);
+    }
+    private static void removeBossEntity(ServerWorld world, BlockPos center) {
+        if (world.isClient) return;
+        int minX = center.getX() - 32;
+        int maxX = center.getX() + 32;
+        int minY = center.getY();
+        int maxY = center.getY() + 48;
+        int minZ = center.getZ() - 32;
+        int maxZ = center.getZ() + 32;
+        minY = Math.max(minY, world.getBottomY());
         Box box = new Box(
-                minX-1, minY-1, minZ-1,
+                minX-1, minY, minZ-1,
                 maxX + 1.0, maxY + 1.0, maxZ + 1.0
         );
-        List<Entity> entities=world.getEntitiesByClass(
-                Entity.class,
+        List<LivingEntity> entities=world.getEntitiesByClass(
+                LivingEntity.class,
                 box.expand(16,16,16),
                 entity -> entity.isAlive()&&!(entity instanceof PlayerEntity)
         );
         for (Entity entity : entities) {
             entity.kill();
+        }
+    }
+    private static void removeBossRoom(ServerWorld world, BlockPos center) {
+        if (world.isClient) return;
+        int minX = center.getX() - 32;
+        int maxX = center.getX() + 32;
+        int minY = center.getY();
+        int maxY = center.getY() + 48;
+        int minZ = center.getZ() - 32;
+        int maxZ = center.getZ() + 32;
+        minY = Math.max(minY, world.getBottomY());
+        for (int x = minX; x <= maxX; x++) {
+            for (int y = maxY; y >= minY; y--) {
+                for (int z = minZ; z <= maxZ; z++) {
+                    BlockPos pos = new BlockPos(x, y, z);
+                    BlockState blockState = world.getBlockState(pos);
+                    if (!blockState.isAir()) {
+                        world.setBlockState(pos, Blocks.AIR.getDefaultState(), 3);
+                    }
+                }
+            }
         }
     }
 }

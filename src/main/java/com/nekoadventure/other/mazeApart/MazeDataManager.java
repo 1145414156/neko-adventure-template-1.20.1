@@ -85,7 +85,6 @@ public class MazeDataManager extends PersistentState {
         return new ArrayList<>(roomData);
     }
 
-    // 清除 initialData
     public void clearInitialData() {
         initialData.clear();
         markDirty();

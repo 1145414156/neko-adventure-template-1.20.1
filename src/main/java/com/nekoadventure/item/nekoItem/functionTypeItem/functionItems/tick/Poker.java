@@ -65,7 +65,7 @@ public class Poker extends FunctionItem {
         };
 
         if (effect != null) {
-            player.sendMessage(Text.of(message), false);
+            player.sendMessage(Text.of(message), true);
             player.addStatusEffect(effect);
         }
     }
@@ -76,7 +76,7 @@ public class Poker extends FunctionItem {
                 1,
                 true,
                 false,
-                false
+                true
         );
     }
 }
