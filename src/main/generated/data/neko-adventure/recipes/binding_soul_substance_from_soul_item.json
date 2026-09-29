@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "tag": "neko-adventure:soul_item"
+    }
+  ],
+  "result": {
+    "item": "neko-adventure:binding_soul_substance"
+  }
+}

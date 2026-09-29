@@ -1,0 +1,18 @@
+{
+  "replace": false,
+  "values": [
+    "neko-adventure:get_apart_pool_soul",
+    "neko-adventure:get_first_pool_soul",
+    "neko-adventure:origin_soul",
+    "neko-adventure:get_conceal_pool_soul",
+    "neko-adventure:tp_start_room_soul",
+    "neko-adventure:get_shop_pool_soul",
+    "neko-adventure:greedy_soul",
+    "neko-adventure:reset_soul",
+    "neko-adventure:desire_soul",
+    "neko-adventure:instance_health_soul",
+    "neko-adventure:get_last_pool_soul",
+    "neko-adventure:get_third_pool_soul",
+    "neko-adventure:get_chao_pool_soul"
+  ]
+}
