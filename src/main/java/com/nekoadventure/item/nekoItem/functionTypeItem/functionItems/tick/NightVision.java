@@ -1,12 +1,12 @@
 package com.nekoadventure.item.nekoItem.functionTypeItem.functionItems.tick;
 
-import com.nekoadventure.item.nekoItem.functionTypeItem.functionItems.FunctionItem;
+import com.nekoadventure.item.nekoItem.functionTypeItem.functionItems.NekoFunctionItem;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.Text;
 
-public class NightVision extends FunctionItem {
+public class NightVision extends NekoFunctionItem {
 
     public NightVision(Settings settings) {
         super(settings);

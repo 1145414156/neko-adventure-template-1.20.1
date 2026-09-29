@@ -3,6 +3,7 @@ package com.nekoadventure.block.other;
 import com.nekoadventure.block.blockentity.other.ResetFurnaceBlockEntity;
 import com.nekoadventure.item.ModItems;
 import com.nekoadventure.item.nekoItem.AbstractNekoItem;
+import com.nekoadventure.item.soulItem.AbstractSoulItem;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
@@ -27,7 +28,7 @@ public class ResetFurnaceBlock extends Block implements BlockEntityProvider {
             return ActionResult.SUCCESS;
         }
         ItemStack heldStack = player.getStackInHand(hand);
-        if (!(heldStack.getItem() instanceof AbstractNekoItem)) {
+        if (!(heldStack.getItem() instanceof AbstractNekoItem)&&!(heldStack.getItem() instanceof AbstractSoulItem)) {
             return ActionResult.FAIL;
         }
         BlockEntity blockEntity = world.getBlockEntity(pos);
@@ -43,14 +44,20 @@ public class ResetFurnaceBlock extends Block implements BlockEntityProvider {
         int random = world.getRandom().nextInt(100);
         if (removeCoinsFromPlayer(player, requiredCoins)) {
             if (random < successRate) {
+                int count=world.getRandom().nextInt(2)+1;
                 heldStack.decrement(1);
-                for (int r=4;r>0;r--) {
+                player.giveItemStack(ModItems.BINDING_SOUL_SUBSTANCE.getDefaultStack());
+                for (int r=count;r>0;r--){
                     player.giveItemStack(ModItems.BINDING_SOUL_SUBSTANCE.getDefaultStack());
                 }
+                if (heldStack.getItem() instanceof AbstractNekoItem){
+                    for (int z=2;z>0;z--) {
+                        player.giveItemStack(ModItems.BINDING_SOUL_SUBSTANCE.getDefaultStack());
+                    }
+                }
                 furnace.addUseCount();
-
                 furnace.syncToClient();
-                player.sendMessage(Text.literal("成功！物品已还原"), true);
+                player.sendMessage(Text.literal("物品已还原"), true);
 
             }
             else {

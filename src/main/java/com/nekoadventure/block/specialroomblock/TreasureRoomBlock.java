@@ -14,7 +14,7 @@ import java.util.Random;
 
 //通过硬编码来随机生成物品底座和物品(其他的是检测物品底座后生成物品)
 public class TreasureRoomBlock extends AbstractRoomBlock {
-    private final int[] PROBABILITIES_HEIGHT = {50, 30, 17, 3};
+    private final int[] PROBABILITIES_HEIGHT = {48, 30, 17, 5};
     private final Random RANDOM=new Random();
     public TreasureRoomBlock(Settings settings) {
         super(settings);
@@ -37,7 +37,6 @@ public class TreasureRoomBlock extends AbstractRoomBlock {
             else {
                 placeTwoBase(world, pos);
             }
-            world.setBlockState(pos.down(1),ModBlocks.MAZE_BLOCK.getDefaultState());
         }
     }
 

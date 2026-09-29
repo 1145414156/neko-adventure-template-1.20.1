@@ -1,7 +1,7 @@
 package com.nekoadventure.item.nekoItem.attackTypeItem.specificItems;
 
 import com.nekoadventure.client.ShiftKeyHelper;
-import com.nekoadventure.item.nekoItem.attackTypeItem.AttackTypeItem;
+import com.nekoadventure.item.nekoItem.attackTypeItem.NekoAttackTypeItem;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
@@ -15,7 +15,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.Objects;
 
-public class VenomousFang extends AttackTypeItem {
+public class VenomousFang extends NekoAttackTypeItem {
     public VenomousFang(Settings settings, double health, double strength, double speed, double attackSpeed, double attackRange, double attackMultiplier, double attackSpeedMultiplier, boolean isSpecific) {
         super(settings, health, strength, speed, attackSpeed, attackRange, attackMultiplier, attackSpeedMultiplier, isSpecific);
     }

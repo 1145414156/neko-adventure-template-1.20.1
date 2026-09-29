@@ -1,6 +1,6 @@
 package com.nekoadventure.block.other;
 
-import com.nekoadventure.network.OpenCreditsScreenPacket;
+import com.nekoadventure.network.maze.OpenMonumentScreenPacket;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
@@ -23,7 +23,7 @@ public class MonumentBlock extends Block {
             return ActionResult.SUCCESS;
         }
         if (player instanceof ServerPlayerEntity serverPlayer) {
-            OpenCreditsScreenPacket.send(serverPlayer);
+            OpenMonumentScreenPacket.send(serverPlayer);
         }
         return ActionResult.SUCCESS;
     }

@@ -1,7 +1,7 @@
 package com.nekoadventure.entity.missile;
 
 
-import com.nekoadventure.item.nekoItem.attackTypeItem.AttackTypeItem;
+import com.nekoadventure.item.nekoItem.attackTypeItem.NekoAttackTypeItem;
 import com.nekoadventure.item.other.NekoPackageItem;
 import com.nekoadventure.other.attackApart.AttackTypes;
 import net.minecraft.entity.Entity;
@@ -103,7 +103,7 @@ public class MissileEntity extends Entity {
             this.kill();
             return;
         }
-        if (this.age>1000){this.kill();}
+        if (this.age>2000){this.kill();}
         if (aliveDuration==time){this.kill();}
         if (entityCheckCollision()) return;
         blockCheckCollision();
@@ -148,7 +148,7 @@ public class MissileEntity extends Entity {
                             for (Object specificItem:specificItems){
                                 for (Entity livingEntity:entities){
                                     if (livingEntity instanceof LivingEntity){
-                                        ((AttackTypeItem) specificItem).applySpecificItem(player, (LivingEntity) livingEntity);
+                                        ((NekoAttackTypeItem) specificItem).applySpecificItem(player, (LivingEntity) livingEntity);
                                     }
                                 }
                             }

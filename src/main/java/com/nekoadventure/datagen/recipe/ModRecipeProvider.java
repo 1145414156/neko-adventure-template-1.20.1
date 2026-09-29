@@ -1,6 +1,7 @@
 package com.nekoadventure.datagen.recipe;
 
 import com.nekoadventure.NekoAdventure;
+import com.nekoadventure.datagen.tags.ModItemTagsProvider;
 import com.nekoadventure.item.ModItems;
 import com.nekoadventure.other.itemApart.SpawnRandomNekoItems;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
@@ -33,5 +34,11 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                 .input('S', ModItems.BINDING_SOUL_SUBSTANCE)
                 .criterion("has_binding_soul_substance", conditionsFromItem(ModItems.BINDING_SOUL_SUBSTANCE))
                 .offerTo(exporter, new Identifier(NekoAdventure.MOD_ID, "prop_prototype_from_soul_substance"));
+
+        // 任意 soul_item 标签道具 -> 1 个绑定灵魂物质
+        ShapelessRecipeJsonBuilder.create(RecipeCategory.MISC, ModItems.BINDING_SOUL_SUBSTANCE, 1)
+                .input(ModItemTagsProvider.SOUL_ITEM)
+                .criterion("has_soul_item", conditionsFromTag(ModItemTagsProvider.SOUL_ITEM))
+                .offerTo(exporter, new Identifier(NekoAdventure.MOD_ID, "binding_soul_substance_from_soul_item"));
     }
 }

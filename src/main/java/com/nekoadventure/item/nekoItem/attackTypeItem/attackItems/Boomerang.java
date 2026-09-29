@@ -4,9 +4,9 @@ import com.nekoadventure.client.ShiftKeyHelper;
 import com.nekoadventure.entity.ModEntities;
 import com.nekoadventure.entity.missile.MissileEntity;
 import com.nekoadventure.entity.missile.MissileModelType;
-import com.nekoadventure.item.nekoItem.attackTypeItem.AttackTypeItem;
+import com.nekoadventure.item.nekoItem.attackTypeItem.NekoAttackTypeItem;
 import com.nekoadventure.item.other.NekoPackageItem;
-import com.nekoadventure.network.NekoPackageDataManager;
+import com.nekoadventure.other.itemApart.NekoPackageDataManager;
 import com.nekoadventure.other.attackApart.AttackTypes;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.Entity;
@@ -24,7 +24,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Comparator;
 import java.util.List;
 
-public class Boomerang extends AttackTypeItem {
+public class Boomerang extends NekoAttackTypeItem {
     public Boomerang(Settings settings, double health, double strength, double speed, double attackSpeed, double attackRange, double attackMultiplier, double attackSpeedMultiplier, boolean isSpecific) {
         super(settings, health, strength, speed, attackSpeed, attackRange, attackMultiplier, attackSpeedMultiplier, isSpecific);
     }
@@ -44,7 +44,7 @@ public class Boomerang extends AttackTypeItem {
         player.getWorld().spawnEntity(missileEntity);
         double[] finalData = NekoPackageDataManager.getFinalData(player);
         double attackSpeed = finalData != null ? finalData[3] : 0;
-        int cooldown = (int) (100 - (attackSpeed / 12.0) * 100);
+        int cooldown = (int) (100 - (attackSpeed / NekoPackageDataManager.MAX_ATTACK_SPEED) * 100);
         cooldown = Math.max(10, Math.min(100, cooldown));
         player.getItemCooldownManager().set(player.getOffHandStack().getItem(), cooldown);
     }

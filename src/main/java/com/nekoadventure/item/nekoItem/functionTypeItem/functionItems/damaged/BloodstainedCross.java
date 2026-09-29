@@ -1,10 +1,10 @@
 package com.nekoadventure.item.nekoItem.functionTypeItem.functionItems.damaged;
 
-import com.nekoadventure.item.nekoItem.functionTypeItem.functionItems.FunctionItem;
+import com.nekoadventure.item.nekoItem.functionTypeItem.functionItems.NekoFunctionItem;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.Text;
 
-public class BloodstainedCross extends FunctionItem {
+public class BloodstainedCross extends NekoFunctionItem {
     public BloodstainedCross(Settings settings) {
         super(settings);
         text= Text.of("受到伤害时，有当前已损生命值/100概率免疫此次伤害");

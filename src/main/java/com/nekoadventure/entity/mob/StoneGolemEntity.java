@@ -37,7 +37,7 @@ public class StoneGolemEntity extends HostileEntity implements Monster {
                 .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.2D)
                 .add(EntityAttributes.GENERIC_ARMOR, 2.0D)
                 .add(EntityAttributes.GENERIC_ARMOR_TOUGHNESS, 2.0D)
-                .add(EntityAttributes.GENERIC_ATTACK_DAMAGE, 6.0D)
+                .add(EntityAttributes.GENERIC_ATTACK_DAMAGE, 4.0D)
                 .add(EntityAttributes.GENERIC_ATTACK_KNOCKBACK, 3.0D)
                 .add(EntityAttributes.GENERIC_FOLLOW_RANGE, 32.0D)
                 .add(EntityAttributes.GENERIC_KNOCKBACK_RESISTANCE, 1.0D);

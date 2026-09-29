@@ -1,6 +1,6 @@
 package com.nekoadventure.item.nekoItem.functionTypeItem.functionItems.damaged;
 
-import com.nekoadventure.item.nekoItem.functionTypeItem.functionItems.FunctionItem;
+import com.nekoadventure.item.nekoItem.functionTypeItem.functionItems.NekoFunctionItem;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -12,7 +12,7 @@ import net.minecraft.world.World;
 import java.util.Comparator;
 import java.util.List;
 
-public class CactusBall extends FunctionItem {
+public class CactusBall extends NekoFunctionItem {
     public CactusBall(Settings settings) {
         super(settings);
         text= Text.of("受到伤害时，给予最近生物3点伤害");

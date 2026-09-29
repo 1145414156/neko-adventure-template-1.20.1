@@ -3,9 +3,9 @@ package com.nekoadventure.item.nekoItem.attackTypeItem.attackItems;
 import com.nekoadventure.client.ShiftKeyHelper;
 import com.nekoadventure.entity.ModEntities;
 import com.nekoadventure.entity.missile.MissileEntity;
-import com.nekoadventure.item.nekoItem.attackTypeItem.AttackTypeItem;
+import com.nekoadventure.item.nekoItem.attackTypeItem.NekoAttackTypeItem;
 import com.nekoadventure.item.other.NekoPackageItem;
-import com.nekoadventure.network.NekoPackageDataManager;
+import com.nekoadventure.other.itemApart.NekoPackageDataManager;
 import com.nekoadventure.other.attackApart.AttackTypes;
 import com.nekoadventure.sound.ModSoundEvents;
 import net.minecraft.client.item.TooltipContext;
@@ -27,9 +27,10 @@ import org.jetbrains.annotations.UnknownNullability;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class ExposedWire extends AttackTypeItem {
+public class ExposedWire extends NekoAttackTypeItem {
     int maxConnect=8;
     public ExposedWire(Settings settings, double health, double strength, double speed, double attackSpeed, double attackRange, double attackMultiplier, double attackSpeedMultiplier, boolean isSpecific) {
         super(settings, health, strength, speed, attackSpeed, attackRange, attackMultiplier, attackSpeedMultiplier, isSpecific);
@@ -53,7 +54,7 @@ public class ExposedWire extends AttackTypeItem {
         if (!entities.isEmpty()) {
             for (Entity entity : entities) {
                 Vec3d pos=new Vec3d(entity.getX(),entity.getEyeY(),entity.getZ());
-                AttackTypes lazyAttack=new AttackTypes(AttackTypes.AttackType.LAZY);
+                AttackTypes lazyAttack=new AttackTypes(AttackTypes.AttackType.HOMING);
                 MissileEntity missile=new MissileEntity(ModEntities.MISSILE,world,player,
                         lazyAttack,true,attackRange,5, strength);
                 missile.setPosition(pos);
@@ -66,7 +67,7 @@ public class ExposedWire extends AttackTypeItem {
         maxConnect=8;
         double[] finalData = NekoPackageDataManager.getFinalData(player);
         double attackSpeed = finalData != null ? finalData[3] : 0;
-        int cooldown = (int) (60 - (attackSpeed / 12.0) * 60);
+        int cooldown = (int) (60 - (attackSpeed / NekoPackageDataManager.MAX_ATTACK_SPEED) * 60);
         cooldown = Math.max(4, Math.min(60, cooldown));
         player.getItemCooldownManager().set(player.getOffHandStack().getItem(), cooldown);
     }
@@ -96,7 +97,7 @@ public class ExposedWire extends AttackTypeItem {
                 List<Entity> entities = getEntitiesInRange(missileEntity, world, attackRange<=4? (int) attackRange :4);
 
                 List<LivingEntity> livingEntities = entities.stream()
-                        .filter(e -> e instanceof LivingEntity&&!missileEntity.getOwner().equals(e))
+                        .filter(e -> e instanceof LivingEntity&&!Objects.equals(missileEntity.getOwner(), e))
                         .map(e -> (LivingEntity) e)
                         .collect(Collectors.toList());
 

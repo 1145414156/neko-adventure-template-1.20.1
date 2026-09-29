@@ -19,7 +19,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class SpawnRandomNekoItems {
-    public final int[] ALL_POOL_PROBABILITIES_HEIGHT = {75, 20, 3, 2};
+    public final int[] ALL_POOL_PROBABILITIES_HEIGHT = {70, 20, 8, 2};
     private final Random RANDOM = new Random();
     public static final TagKey<Item> ALL_POOL= TagKey.of(RegistryKeys.ITEM, new Identifier(NekoAdventure.MOD_ID, "all_item_pool"));
     public static final TagKey<Item> TREASURE_POOL=TagKey.of(RegistryKeys.ITEM, new Identifier(NekoAdventure.MOD_ID, "treasure_pool"));

@@ -7,7 +7,7 @@ import net.minecraft.client.render.entity.animation.Transformation;
 
 public class GrandKnightLevelTwoEntityModelAnimation {
 	public static final Animation brimStone = Animation.Builder.create(3.5F).looping()
-		.addBoneAnimation("body", new Transformation(Transformation.Targets.ROTATE, 
+		.addBoneAnimation("body", new Transformation(Transformation.Targets.ROTATE,
 			new Keyframe(0.0F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
 			new Keyframe(0.75F, AnimationHelper.createRotationalVector(-12.5F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
 			new Keyframe(1.5F, AnimationHelper.createRotationalVector(-17.5F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
@@ -15,7 +15,7 @@ public class GrandKnightLevelTwoEntityModelAnimation {
 			new Keyframe(3.125F, AnimationHelper.createRotationalVector(12.5F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
 			new Keyframe(3.5F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
 		))
-		.addBoneAnimation("leftHand", new Transformation(Transformation.Targets.ROTATE, 
+		.addBoneAnimation("leftHand", new Transformation(Transformation.Targets.ROTATE,
 			new Keyframe(0.0F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
 			new Keyframe(0.75F, AnimationHelper.createRotationalVector(18.8253F, 16.0148F, 11.5693F), Transformation.Interpolations.LINEAR),
 			new Keyframe(1.5F, AnimationHelper.createRotationalVector(16.9267F, 23.1802F, 8.6507F), Transformation.Interpolations.LINEAR),
@@ -23,7 +23,7 @@ public class GrandKnightLevelTwoEntityModelAnimation {
 			new Keyframe(3.125F, AnimationHelper.createRotationalVector(17.9152F, -61.5557F, 32.9095F), Transformation.Interpolations.LINEAR),
 			new Keyframe(3.5F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
 		))
-		.addBoneAnimation("head", new Transformation(Transformation.Targets.ROTATE, 
+		.addBoneAnimation("head", new Transformation(Transformation.Targets.ROTATE,
 			new Keyframe(0.0F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
 			new Keyframe(0.75F, AnimationHelper.createRotationalVector(-30.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
 			new Keyframe(1.5F, AnimationHelper.createRotationalVector(-30.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
@@ -31,7 +31,7 @@ public class GrandKnightLevelTwoEntityModelAnimation {
 			new Keyframe(3.125F, AnimationHelper.createRotationalVector(10.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
 			new Keyframe(3.5F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
 		))
-		.addBoneAnimation("rightHand", new Transformation(Transformation.Targets.ROTATE, 
+		.addBoneAnimation("rightHand", new Transformation(Transformation.Targets.ROTATE,
 			new Keyframe(0.0F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
 			new Keyframe(0.25F, AnimationHelper.createRotationalVector(11.5458F, -13.4238F, 0.0671F), Transformation.Interpolations.LINEAR),
 			new Keyframe(0.75F, AnimationHelper.createRotationalVector(70.9305F, -45.0416F, 0.2253F), Transformation.Interpolations.LINEAR),
@@ -40,7 +40,7 @@ public class GrandKnightLevelTwoEntityModelAnimation {
 			new Keyframe(3.125F, AnimationHelper.createRotationalVector(99.8502F, 49.7391F, 10.655F), Transformation.Interpolations.LINEAR),
 			new Keyframe(3.5F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
 		))
-		.addBoneAnimation("rightHandItem", new Transformation(Transformation.Targets.ROTATE, 
+		.addBoneAnimation("rightHandItem", new Transformation(Transformation.Targets.ROTATE,
 			new Keyframe(0.0F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
 			new Keyframe(0.75F, AnimationHelper.createRotationalVector(-225.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
 			new Keyframe(1.5F, AnimationHelper.createRotationalVector(-225.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
@@ -48,7 +48,7 @@ public class GrandKnightLevelTwoEntityModelAnimation {
 			new Keyframe(3.125F, AnimationHelper.createRotationalVector(-225.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
 			new Keyframe(3.5F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
 		))
-		.addBoneAnimation("leftChest", new Transformation(Transformation.Targets.ROTATE, 
+		.addBoneAnimation("leftChest", new Transformation(Transformation.Targets.ROTATE,
 			new Keyframe(0.0F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
 			new Keyframe(0.75F, AnimationHelper.createRotationalVector(0.0F, 27.5F, 0.0F), Transformation.Interpolations.LINEAR),
 			new Keyframe(1.5F, AnimationHelper.createRotationalVector(0.0F, 27.5F, 0.0F), Transformation.Interpolations.LINEAR),
@@ -56,14 +56,14 @@ public class GrandKnightLevelTwoEntityModelAnimation {
 			new Keyframe(3.125F, AnimationHelper.createRotationalVector(0.0F, -20.0F, 0.0F), Transformation.Interpolations.LINEAR),
 			new Keyframe(3.5F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
 		))
-		.addBoneAnimation("leftChest1", new Transformation(Transformation.Targets.ROTATE, 
+		.addBoneAnimation("leftChest1", new Transformation(Transformation.Targets.ROTATE,
 			new Keyframe(0.0F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
 			new Keyframe(1.5F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
 			new Keyframe(1.625F, AnimationHelper.createRotationalVector(0.0F, -32.5F, 0.0F), Transformation.Interpolations.LINEAR),
 			new Keyframe(3.125F, AnimationHelper.createRotationalVector(0.0F, -52.5F, 0.0F), Transformation.Interpolations.LINEAR),
 			new Keyframe(3.5F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
 		))
-		.addBoneAnimation("rightChest", new Transformation(Transformation.Targets.ROTATE, 
+		.addBoneAnimation("rightChest", new Transformation(Transformation.Targets.ROTATE,
 			new Keyframe(0.0F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
 			new Keyframe(0.75F, AnimationHelper.createRotationalVector(0.0F, -27.5F, 0.0F), Transformation.Interpolations.LINEAR),
 			new Keyframe(1.5F, AnimationHelper.createRotationalVector(0.0F, -27.5F, 0.0F), Transformation.Interpolations.LINEAR),
@@ -71,7 +71,7 @@ public class GrandKnightLevelTwoEntityModelAnimation {
 			new Keyframe(3.125F, AnimationHelper.createRotationalVector(0.0F, 20.0F, 0.0F), Transformation.Interpolations.LINEAR),
 			new Keyframe(3.5F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
 		))
-		.addBoneAnimation("rightChest1", new Transformation(Transformation.Targets.ROTATE, 
+		.addBoneAnimation("rightChest1", new Transformation(Transformation.Targets.ROTATE,
 			new Keyframe(0.0F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
 			new Keyframe(1.5F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
 			new Keyframe(1.625F, AnimationHelper.createRotationalVector(0.0F, 32.5F, 0.0F), Transformation.Interpolations.LINEAR),
@@ -156,20 +156,20 @@ public class GrandKnightLevelTwoEntityModelAnimation {
 
 
 	public static final Animation delayBullet = Animation.Builder.create(2.5F).looping()
-		.addBoneAnimation("body", new Transformation(Transformation.Targets.ROTATE, 
+		.addBoneAnimation("body", new Transformation(Transformation.Targets.ROTATE,
 			new Keyframe(0.0F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
 			new Keyframe(1.25F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
 			new Keyframe(1.5F, AnimationHelper.createRotationalVector(0.0F, -30.0F, 0.0F), Transformation.Interpolations.LINEAR),
 			new Keyframe(2.0F, AnimationHelper.createRotationalVector(0.0F, -30.0F, 0.0F), Transformation.Interpolations.LINEAR),
 			new Keyframe(2.5F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
 		))
-		.addBoneAnimation("head", new Transformation(Transformation.Targets.ROTATE, 
+		.addBoneAnimation("head", new Transformation(Transformation.Targets.ROTATE,
 			new Keyframe(1.25F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
 			new Keyframe(1.5F, AnimationHelper.createRotationalVector(0.0F, 30.0F, 0.0F), Transformation.Interpolations.LINEAR),
 			new Keyframe(2.0F, AnimationHelper.createRotationalVector(0.0F, 30.0F, 0.0F), Transformation.Interpolations.LINEAR),
 			new Keyframe(2.5F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
 		))
-		.addBoneAnimation("rightHand", new Transformation(Transformation.Targets.ROTATE, 
+		.addBoneAnimation("rightHand", new Transformation(Transformation.Targets.ROTATE,
 			new Keyframe(0.0F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
 			new Keyframe(0.75F, AnimationHelper.createRotationalVector(144.0683F, -27.6621F, -10.043F), Transformation.Interpolations.LINEAR),
 			new Keyframe(1.25F, AnimationHelper.createRotationalVector(161.57F, -27.66F, -10.04F), Transformation.Interpolations.LINEAR),
@@ -177,7 +177,7 @@ public class GrandKnightLevelTwoEntityModelAnimation {
 			new Keyframe(2.0F, AnimationHelper.createRotationalVector(60.44F, 13.99F, -27.11F), Transformation.Interpolations.LINEAR),
 			new Keyframe(2.5F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
 		))
-		.addBoneAnimation("rightHand", new Transformation(Transformation.Targets.TRANSLATE, 
+		.addBoneAnimation("rightHand", new Transformation(Transformation.Targets.TRANSLATE,
 			new Keyframe(0.0F, AnimationHelper.createTranslationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
 			new Keyframe(0.75F, AnimationHelper.createTranslationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
 			new Keyframe(1.25F, AnimationHelper.createTranslationalVector(0.0F, 1.0F, 0.0F), Transformation.Interpolations.LINEAR),
@@ -185,7 +185,7 @@ public class GrandKnightLevelTwoEntityModelAnimation {
 			new Keyframe(2.0F, AnimationHelper.createTranslationalVector(0.0F, 1.0F, 0.0F), Transformation.Interpolations.LINEAR),
 			new Keyframe(2.5F, AnimationHelper.createTranslationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
 		))
-		.addBoneAnimation("rightHand1", new Transformation(Transformation.Targets.ROTATE, 
+		.addBoneAnimation("rightHand1", new Transformation(Transformation.Targets.ROTATE,
 			new Keyframe(0.0F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
 			new Keyframe(0.75F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
 			new Keyframe(1.25F, AnimationHelper.createRotationalVector(-2.5F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
@@ -193,7 +193,7 @@ public class GrandKnightLevelTwoEntityModelAnimation {
 			new Keyframe(2.0F, AnimationHelper.createRotationalVector(-2.5F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
 			new Keyframe(2.5F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
 		))
-		.addBoneAnimation("rightHand1", new Transformation(Transformation.Targets.TRANSLATE, 
+		.addBoneAnimation("rightHand1", new Transformation(Transformation.Targets.TRANSLATE,
 			new Keyframe(0.0F, AnimationHelper.createTranslationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
 			new Keyframe(0.75F, AnimationHelper.createTranslationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
 			new Keyframe(1.25F, AnimationHelper.createTranslationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
@@ -201,7 +201,7 @@ public class GrandKnightLevelTwoEntityModelAnimation {
 			new Keyframe(2.0F, AnimationHelper.createTranslationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
 			new Keyframe(2.5F, AnimationHelper.createTranslationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
 		))
-		.addBoneAnimation("rightHandItem", new Transformation(Transformation.Targets.ROTATE, 
+		.addBoneAnimation("rightHandItem", new Transformation(Transformation.Targets.ROTATE,
 			new Keyframe(0.0F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
 			new Keyframe(0.75F, AnimationHelper.createRotationalVector(-58.1424F, 3.9955F, -8.4978F), Transformation.Interpolations.LINEAR),
 			new Keyframe(1.25F, AnimationHelper.createRotationalVector(-60.64F, 4.0F, -8.5F), Transformation.Interpolations.LINEAR),
@@ -211,7 +211,7 @@ public class GrandKnightLevelTwoEntityModelAnimation {
 			new Keyframe(2.3333F, AnimationHelper.createRotationalVector(-420.64F, 4.0F, -8.5F), Transformation.Interpolations.LINEAR),
 			new Keyframe(2.5F, AnimationHelper.createRotationalVector(-360.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
 		))
-		.addBoneAnimation("rightHandItem", new Transformation(Transformation.Targets.TRANSLATE, 
+		.addBoneAnimation("rightHandItem", new Transformation(Transformation.Targets.TRANSLATE,
 			new Keyframe(0.0F, AnimationHelper.createTranslationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
 			new Keyframe(0.75F, AnimationHelper.createTranslationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
 			new Keyframe(1.25F, AnimationHelper.createTranslationalVector(0.0F, 0.0F, -1.5F), Transformation.Interpolations.LINEAR),
@@ -222,11 +222,11 @@ public class GrandKnightLevelTwoEntityModelAnimation {
 		.build();
 
 	public static final Animation attack = Animation.Builder.create(3.0F).looping()
-		.addBoneAnimation("body", new Transformation(Transformation.Targets.ROTATE, 
+		.addBoneAnimation("body", new Transformation(Transformation.Targets.ROTATE,
 			new Keyframe(1.0F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
 			new Keyframe(1.0833F, AnimationHelper.createRotationalVector(2.5F, -5.0F, 0.0F), Transformation.Interpolations.LINEAR)
 		))
-		.addBoneAnimation("leftHand", new Transformation(Transformation.Targets.ROTATE, 
+		.addBoneAnimation("leftHand", new Transformation(Transformation.Targets.ROTATE,
 			new Keyframe(0.0F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
 			new Keyframe(0.75F, AnimationHelper.createRotationalVector(0.0F, 0.0F, -20.0F), Transformation.Interpolations.LINEAR),
 			new Keyframe(1.0F, AnimationHelper.createRotationalVector(1.7964F, -12.379F, 1.2883F), Transformation.Interpolations.LINEAR),
@@ -236,7 +236,7 @@ public class GrandKnightLevelTwoEntityModelAnimation {
 			new Keyframe(1.8333F, AnimationHelper.createRotationalVector(18.0253F, -7.7357F, 4.3609F), Transformation.Interpolations.LINEAR),
 			new Keyframe(3.0F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
 		))
-		.addBoneAnimation("rightHand", new Transformation(Transformation.Targets.ROTATE, 
+		.addBoneAnimation("rightHand", new Transformation(Transformation.Targets.ROTATE,
 			new Keyframe(0.0F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
 			new Keyframe(0.75F, AnimationHelper.createRotationalVector(-24.3086F, 7.407F, -19.8027F), Transformation.Interpolations.LINEAR),
 			new Keyframe(1.0F, AnimationHelper.createRotationalVector(-15.7921F, 8.6664F, -13.3777F), Transformation.Interpolations.LINEAR),
@@ -246,12 +246,12 @@ public class GrandKnightLevelTwoEntityModelAnimation {
 			new Keyframe(2.25F, AnimationHelper.createRotationalVector(-16.7296F, -8.3503F, -50.8116F), Transformation.Interpolations.LINEAR),
 			new Keyframe(3.0F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
 		))
-		.addBoneAnimation("rightHand", new Transformation(Transformation.Targets.TRANSLATE, 
+		.addBoneAnimation("rightHand", new Transformation(Transformation.Targets.TRANSLATE,
 			new Keyframe(1.0F, AnimationHelper.createTranslationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
 			new Keyframe(1.0833F, AnimationHelper.createTranslationalVector(-2.0F, -1.0F, 11.0F), Transformation.Interpolations.LINEAR),
 			new Keyframe(1.6667F, AnimationHelper.createTranslationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
 		))
-		.addBoneAnimation("rightHand1", new Transformation(Transformation.Targets.ROTATE, 
+		.addBoneAnimation("rightHand1", new Transformation(Transformation.Targets.ROTATE,
 			new Keyframe(0.0F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
 			new Keyframe(0.75F, AnimationHelper.createRotationalVector(0.0F, 150.0F, 0.0F), Transformation.Interpolations.LINEAR),
 			new Keyframe(1.0F, AnimationHelper.createRotationalVector(0.0F, 150.0F, 0.0F), Transformation.Interpolations.LINEAR),
@@ -262,7 +262,7 @@ public class GrandKnightLevelTwoEntityModelAnimation {
 			new Keyframe(2.25F, AnimationHelper.createRotationalVector(-12.72F, 2.69F, 3.1F), Transformation.Interpolations.LINEAR),
 			new Keyframe(3.0F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
 		))
-		.addBoneAnimation("rightHandItem", new Transformation(Transformation.Targets.ROTATE, 
+		.addBoneAnimation("rightHandItem", new Transformation(Transformation.Targets.ROTATE,
 			new Keyframe(1.0F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
 			new Keyframe(1.0833F, AnimationHelper.createRotationalVector(-40.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
 			new Keyframe(1.5F, AnimationHelper.createRotationalVector(-40.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
@@ -270,44 +270,44 @@ public class GrandKnightLevelTwoEntityModelAnimation {
 		.build();
 
 	public static final Animation levelTwoSummon = Animation.Builder.create(4.0F).looping()
-		.addBoneAnimation("a", new Transformation(Transformation.Targets.TRANSLATE, 
+		.addBoneAnimation("a", new Transformation(Transformation.Targets.TRANSLATE,
 			new Keyframe(0.0F, AnimationHelper.createTranslationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
 			new Keyframe(0.2917F, AnimationHelper.createTranslationalVector(0.0F, -3.0F, 0.0F), Transformation.Interpolations.LINEAR),
 			new Keyframe(1.5F, AnimationHelper.createTranslationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
 			new Keyframe(1.7083F, AnimationHelper.createTranslationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
 		))
-		.addBoneAnimation("leg", new Transformation(Transformation.Targets.ROTATE, 
+		.addBoneAnimation("leg", new Transformation(Transformation.Targets.ROTATE,
 			new Keyframe(0.0F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
 			new Keyframe(0.1667F, AnimationHelper.createRotationalVector(0.0F, -360.0F, 0.0F), Transformation.Interpolations.LINEAR),
 			new Keyframe(1.5F, AnimationHelper.createRotationalVector(0.0F, -360.0F, 0.0F), Transformation.Interpolations.LINEAR),
 			new Keyframe(1.7083F, AnimationHelper.createRotationalVector(0.0F, -360.0F, 0.0F), Transformation.Interpolations.LINEAR)
 		))
-		.addBoneAnimation("rightLeg", new Transformation(Transformation.Targets.ROTATE, 
+		.addBoneAnimation("rightLeg", new Transformation(Transformation.Targets.ROTATE,
 			new Keyframe(0.0F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
 			new Keyframe(0.2917F, AnimationHelper.createRotationalVector(40.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
 			new Keyframe(1.5F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
 			new Keyframe(1.7083F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
 		))
-		.addBoneAnimation("rightLeg1", new Transformation(Transformation.Targets.ROTATE, 
+		.addBoneAnimation("rightLeg1", new Transformation(Transformation.Targets.ROTATE,
 			new Keyframe(0.0F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
 			new Keyframe(0.2917F, AnimationHelper.createRotationalVector(-30.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
 			new Keyframe(1.5F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
 			new Keyframe(1.7083F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
 		))
-		.addBoneAnimation("leftLeg", new Transformation(Transformation.Targets.ROTATE, 
+		.addBoneAnimation("leftLeg", new Transformation(Transformation.Targets.ROTATE,
 			new Keyframe(0.0F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
 			new Keyframe(0.2917F, AnimationHelper.createRotationalVector(-52.5F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
 			new Keyframe(1.5F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
 			new Keyframe(1.7083F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
 		))
-		.addBoneAnimation("body", new Transformation(Transformation.Targets.ROTATE, 
+		.addBoneAnimation("body", new Transformation(Transformation.Targets.ROTATE,
 			new Keyframe(0.0F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
 			new Keyframe(0.1667F, AnimationHelper.createRotationalVector(0.0F, -335.0F, 0.0F), Transformation.Interpolations.LINEAR),
 			new Keyframe(0.2917F, AnimationHelper.createRotationalVector(-12.6044F, -367.3212F, 1.6322F), Transformation.Interpolations.LINEAR),
 			new Keyframe(1.5F, AnimationHelper.createRotationalVector(0.0F, -360.0F, 0.0F), Transformation.Interpolations.LINEAR),
 			new Keyframe(1.7083F, AnimationHelper.createRotationalVector(0.0F, -360.0F, 0.0F), Transformation.Interpolations.LINEAR)
 		))
-		.addBoneAnimation("leftHand", new Transformation(Transformation.Targets.ROTATE, 
+		.addBoneAnimation("leftHand", new Transformation(Transformation.Targets.ROTATE,
 			new Keyframe(0.0F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
 			new Keyframe(0.2917F, AnimationHelper.createRotationalVector(10.6445F, -61.7115F, -2.1534F), Transformation.Interpolations.LINEAR),
 			new Keyframe(1.5F, AnimationHelper.createRotationalVector(10.64F, -61.71F, -2.15F), Transformation.Interpolations.LINEAR),
@@ -316,13 +316,13 @@ public class GrandKnightLevelTwoEntityModelAnimation {
 			new Keyframe(3.2083F, AnimationHelper.createRotationalVector(8.9001F, -54.341F, -1.0979F), Transformation.Interpolations.LINEAR),
 			new Keyframe(4.0F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
 		))
-		.addBoneAnimation("head", new Transformation(Transformation.Targets.ROTATE, 
+		.addBoneAnimation("head", new Transformation(Transformation.Targets.ROTATE,
 			new Keyframe(1.5F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
 			new Keyframe(1.7083F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
 			new Keyframe(1.9583F, AnimationHelper.createRotationalVector(-12.5F, 5.0F, 0.0F), Transformation.Interpolations.LINEAR),
 			new Keyframe(4.0F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
 		))
-		.addBoneAnimation("rightHand", new Transformation(Transformation.Targets.ROTATE, 
+		.addBoneAnimation("rightHand", new Transformation(Transformation.Targets.ROTATE,
 			new Keyframe(0.0F, AnimationHelper.createRotationalVector(155.0832F, -2.1113F, -9.5335F), Transformation.Interpolations.LINEAR),
 			new Keyframe(0.1667F, AnimationHelper.createRotationalVector(123.4294F, 46.8734F, 29.0497F), Transformation.Interpolations.LINEAR),
 			new Keyframe(0.2917F, AnimationHelper.createRotationalVector(58.4193F, -7.9198F, 22.0337F), Transformation.Interpolations.LINEAR),
@@ -333,7 +333,7 @@ public class GrandKnightLevelTwoEntityModelAnimation {
 			new Keyframe(3.75F, AnimationHelper.createRotationalVector(62.9438F, -10.1658F, 3.8184F), Transformation.Interpolations.LINEAR),
 			new Keyframe(4.0F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
 		))
-		.addBoneAnimation("rightHand", new Transformation(Transformation.Targets.TRANSLATE, 
+		.addBoneAnimation("rightHand", new Transformation(Transformation.Targets.TRANSLATE,
 			new Keyframe(0.0F, AnimationHelper.createTranslationalVector(0.0F, -3.0F, 0.0F), Transformation.Interpolations.LINEAR),
 			new Keyframe(0.1667F, AnimationHelper.createTranslationalVector(-1.0F, -5.75F, 6.5F), Transformation.Interpolations.LINEAR),
 			new Keyframe(0.2917F, AnimationHelper.createTranslationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
@@ -344,7 +344,7 @@ public class GrandKnightLevelTwoEntityModelAnimation {
 			new Keyframe(3.75F, AnimationHelper.createTranslationalVector(-3.0F, -2.25F, 6.0F), Transformation.Interpolations.LINEAR),
 			new Keyframe(4.0F, AnimationHelper.createTranslationalVector(0.0F, 0.0F, 6.0F), Transformation.Interpolations.LINEAR)
 		))
-		.addBoneAnimation("rightHand1", new Transformation(Transformation.Targets.ROTATE, 
+		.addBoneAnimation("rightHand1", new Transformation(Transformation.Targets.ROTATE,
 			new Keyframe(0.0F, AnimationHelper.createRotationalVector(102.5954F, 3.7067F, 5.0239F), Transformation.Interpolations.LINEAR),
 			new Keyframe(0.1667F, AnimationHelper.createRotationalVector(0.0F, 65.0F, 0.0F), Transformation.Interpolations.LINEAR),
 			new Keyframe(0.2917F, AnimationHelper.createRotationalVector(-57.5F, 65.0F, 0.0F), Transformation.Interpolations.LINEAR),
@@ -355,13 +355,13 @@ public class GrandKnightLevelTwoEntityModelAnimation {
 			new Keyframe(3.75F, AnimationHelper.createRotationalVector(-13.9329F, 2.7484F, -5.3361F), Transformation.Interpolations.LINEAR),
 			new Keyframe(4.0F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
 		))
-		.addBoneAnimation("rightHand1", new Transformation(Transformation.Targets.TRANSLATE, 
+		.addBoneAnimation("rightHand1", new Transformation(Transformation.Targets.TRANSLATE,
 			new Keyframe(0.0F, AnimationHelper.createTranslationalVector(0.0F, 4.0F, 0.0F), Transformation.Interpolations.LINEAR),
 			new Keyframe(0.1667F, AnimationHelper.createTranslationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
 			new Keyframe(1.5F, AnimationHelper.createTranslationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
 			new Keyframe(1.7083F, AnimationHelper.createTranslationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
 		))
-		.addBoneAnimation("rightHandItem", new Transformation(Transformation.Targets.ROTATE, 
+		.addBoneAnimation("rightHandItem", new Transformation(Transformation.Targets.ROTATE,
 			new Keyframe(0.0F, AnimationHelper.createRotationalVector(45.6389F, 0.9633F, -90.8889F), Transformation.Interpolations.LINEAR),
 			new Keyframe(0.1667F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
 			new Keyframe(0.2917F, AnimationHelper.createRotationalVector(-40.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
@@ -372,11 +372,12 @@ public class GrandKnightLevelTwoEntityModelAnimation {
 			new Keyframe(3.75F, AnimationHelper.createRotationalVector(-53.0721F, 3.7565F, -7.0275F), Transformation.Interpolations.LINEAR),
 			new Keyframe(4.0F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
 		))
-		.addBoneAnimation("rightHandItem", new Transformation(Transformation.Targets.TRANSLATE, 
+		.addBoneAnimation("rightHandItem", new Transformation(Transformation.Targets.TRANSLATE,
 			new Keyframe(0.0F, AnimationHelper.createTranslationalVector(-0.1051F, -0.391F, 2.6055F), Transformation.Interpolations.LINEAR),
 			new Keyframe(0.1667F, AnimationHelper.createTranslationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
 			new Keyframe(1.5F, AnimationHelper.createTranslationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
 			new Keyframe(1.7083F, AnimationHelper.createTranslationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
 		))
 		.build();
+
 }

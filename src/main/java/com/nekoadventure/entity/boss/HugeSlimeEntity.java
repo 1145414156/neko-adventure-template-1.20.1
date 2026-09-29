@@ -4,8 +4,8 @@ import com.nekoadventure.effect.ModStatusEffects;
 import com.nekoadventure.entity.ModEntities;
 import com.nekoadventure.entity.missile.MissileEntity;
 import com.nekoadventure.item.ModItems;
-import com.nekoadventure.network.FloorShakeNetworking;
-import com.nekoadventure.network.ScreenShakeNetworking;
+import com.nekoadventure.network.mob.FloorShakeNetworking;
+import com.nekoadventure.network.mob.ScreenShakeNetworking;
 import com.nekoadventure.other.attackApart.AttackTypes;
 import com.nekoadventure.other.itemApart.SpawnRandomSoulItems;
 import net.fabricmc.api.EnvType;
@@ -359,6 +359,11 @@ public class HugeSlimeEntity extends HostileEntity implements Monster {
 
     protected void updateStretch() {
         this.targetStretch *= 0.6F;
+    }
+
+    @Override
+    public boolean handleFallDamage(float fallDistance, float damageMultiplier, DamageSource damageSource) {
+        return false;
     }
 
     @Override
@@ -759,10 +764,8 @@ public class HugeSlimeEntity extends HostileEntity implements Monster {
         super.setCustomName(name);
         this.bossBar.setName(this.getDisplayName());
     }
-
-    // Boss 只显示血条，不显示头顶名字
     @Override
-    public boolean isCustomNameVisible() {
+    protected boolean canStartRiding(Entity entity) {
         return false;
     }
 }

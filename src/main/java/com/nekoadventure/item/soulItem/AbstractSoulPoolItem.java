@@ -1,11 +1,15 @@
 package com.nekoadventure.item.soulItem;
 
+import com.nekoadventure.block.ModBlocks;
 import com.nekoadventure.client.ShiftKeyHelper;
+import com.nekoadventure.item.ModItems;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
+import net.minecraft.util.Hand;
+import net.minecraft.util.TypedActionResult;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
@@ -18,11 +22,22 @@ public abstract class AbstractSoulPoolItem extends AbstractSoulItem {
     }
 
     @Override
-    public void onUseEffect(World world, PlayerEntity player, ItemStack stack) {
-        if (!player.isCreative()&&!player.isSpectator()) {
-            player.giveItemStack(stack);
+    public TypedActionResult<ItemStack> use(World world, PlayerEntity player, Hand hand) {
+        ItemStack stack = player.getStackInHand(hand);
+        if (hand == Hand.MAIN_HAND) {
+            return TypedActionResult.fail(stack);
+        }
+        else {
+            if (player.getMainHandStack().getItem().equals(ModItems.PROP_PROTOTYPE)){
+                return TypedActionResult.success(stack);
+            }
+            return TypedActionResult.pass(stack);
         }
     }
+
+    @Override
+    public void onUseEffect(World world, PlayerEntity player, ItemStack stack) {}
+
     public abstract List<Item> getStoragePoolItems(List<Item> inputPools, PlayerEntity player);
 
     @Override

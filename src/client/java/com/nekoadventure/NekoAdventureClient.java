@@ -9,11 +9,12 @@ import com.nekoadventure.block.blockentity.ResetFurnaceBlockEntityRenderer;
 import com.nekoadventure.client.ShiftKeyHelper;
 import com.nekoadventure.entity.ModEntityRenderer;
 import com.nekoadventure.keyboard.ModKeyBoard;
-import com.nekoadventure.screen.ClientFloorShakeHandler;
-import com.nekoadventure.screen.ClientMonumentCreditsHandler;
-import com.nekoadventure.screen.ClientNekoPackageDataHandler;
-import com.nekoadventure.screen.ClientScreenEffectHandler;
-import com.nekoadventure.screen.ClientScreenShakeHandler;
+import com.nekoadventure.network.mob.ClientFloorShakeHandler;
+import com.nekoadventure.network.maze.ClientMobIdInputHandler;
+import com.nekoadventure.network.maze.ClientMonumentCreditsHandler;
+import com.nekoadventure.network.item.ClientNekoPackageDataHandler;
+import com.nekoadventure.network.maze.ClientScreenEffectHandler;
+import com.nekoadventure.network.mob.ClientScreenShakeHandler;
 import com.nekoadventure.ui.NekoPackageScreen;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
@@ -35,6 +36,7 @@ public class NekoAdventureClient implements ClientModInitializer {
 		ModKeyBoard.register();
 
 		ClientMonumentCreditsHandler.init();
+		ClientMobIdInputHandler.init();
 		ClientScreenEffectHandler.register();
 		ClientScreenShakeHandler.init();
 		ClientFloorShakeHandler.init();

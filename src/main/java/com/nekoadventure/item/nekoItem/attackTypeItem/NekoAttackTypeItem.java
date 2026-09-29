@@ -8,11 +8,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public abstract class AttackTypeItem extends AbstractNekoItem {
+public abstract class NekoAttackTypeItem extends AbstractNekoItem {
     boolean isSpecific;
     private final Map<UUID, Long> lastOffAttackTimes = new HashMap<>();
-    public AttackTypeItem(Settings settings, double health, double strength, double speed, double attackSpeed,
-                          double attackRange,double attackMultiplier,double attackSpeedMultiplier,boolean isSpecific) {
+    public NekoAttackTypeItem(Settings settings, double health, double strength, double speed, double attackSpeed,
+                              double attackRange, double attackMultiplier, double attackSpeedMultiplier, boolean isSpecific) {
         super(settings);
         this.health=health;
         this.attackRange=attackRange;

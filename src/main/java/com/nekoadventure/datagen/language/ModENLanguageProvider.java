@@ -83,6 +83,7 @@ public class ModENLanguageProvider extends FabricLanguageProvider {
         translationBuilder.add(ModItems.ACCELERATION,"acceleration");
         translationBuilder.add(ModItems.DECELERATION,"deceleration");
         translationBuilder.add(ModItems.ZENITH,"zenith");
+        translationBuilder.add(ModItems.SHORT_HOOK,"short_hook");
         translationBuilder.add(ModItems.SPIRITING_AWAY,"spiriting_away");
         translationBuilder.add(ModItems.BLADE,"blade");
         translationBuilder.add(ModItems.SOUL_JAR,"soul_jar");
@@ -115,6 +116,12 @@ public class ModENLanguageProvider extends FabricLanguageProvider {
         translationBuilder.add(ModItems.THE_FOURTH_EYE,"the_fourth_eye");
         translationBuilder.add(ModItems.BINDING_SOUL_SUBSTANCE,"binding_soul_substance");
         translationBuilder.add(ModItems.BROKEN_SWORD,"broken_sword");
+        translationBuilder.add(ModItems.RESTOCK,"restock");
+        translationBuilder.add(ModItems.ABUNDANT_ITEM_BASE,"abundant_item_base");
+        translationBuilder.add(ModItems.CLOUD_BOOTS,"cloud_boots");
+        translationBuilder.add(ModItems.ADRENALINE,"adrenaline");
+        translationBuilder.add(ModItems.BATTERY,"battery");
+        translationBuilder.add(ModItems.BROKEN_CROWN,"broken_crown");
 
         translationBuilder.add(ModItems.INSTANCE_HEALTH_SOUL,"instance_health_soul");
         translationBuilder.add(ModItems.TP_START_ROOM_SOUL,"tp_start_room_soul");
@@ -164,5 +171,8 @@ public class ModENLanguageProvider extends FabricLanguageProvider {
 
         translationBuilder.add(ModEntities.HUGE_SLIME,"huge_slime");
         translationBuilder.add(ModEntities.PRIEST_SKELETON,"priest_skeleton");
+
+        //按键绑定
+        translationBuilder.add("key.neko-adventure.main_attack_type","Apply Main Attack");
     }
 }

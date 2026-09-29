@@ -1,6 +1,6 @@
 package com.nekoadventure.mixin.itemApart;
 
-import com.nekoadventure.item.nekoItem.attackTypeItem.AttackTypeItem;
+import com.nekoadventure.item.nekoItem.attackTypeItem.NekoAttackTypeItem;
 import com.nekoadventure.item.other.NekoPackageItem;
 import com.nekoadventure.other.mazeApart.PlayerBlackScreenState;
 import net.minecraft.entity.Entity;
@@ -26,7 +26,7 @@ import java.util.UUID;
 
 @Mixin(PlayerEntity.class)
 public abstract class PlayerEntityMixin extends LivingEntity {
-	@Shadow
+    @Shadow
 	public abstract boolean damage(DamageSource source, float amount);
 
     protected PlayerEntityMixin(EntityType<? extends LivingEntity> entityType, World world) {
@@ -102,12 +102,12 @@ public abstract class PlayerEntityMixin extends LivingEntity {
 	private void disableAttack(Entity target, CallbackInfo info) {
         if (target instanceof LivingEntity) {
             PlayerEntity player = (PlayerEntity) (Object) this;
-            if (NekoPackageItem.getIsFinished(player.getOffHandStack())!=2 && NekoPackageItem.getNekoItem(player.getOffHandStack(), false, 1)!=null) {
+            if (NekoPackageItem.getIsFinished(player.getOffHandStack())!=2 &&!NekoPackageItem.getNekoItem(player.getOffHandStack(), false, 1).isEmpty()) {
                 if (player.getAttackCooldownProgress(0.0f) == 1) {
                     ArrayList specificItems = NekoPackageItem.getNekoItem(player.getOffHandStack(), false, 1);
                     for (int i = specificItems.size(); i >= 1; i--) {
-                        AttackTypeItem attackTypeItem = (AttackTypeItem) specificItems.get(i - 1);
-                        attackTypeItem.applySpecificItem(player, (LivingEntity) target);
+                        NekoAttackTypeItem nekoAttackTypeItem = (NekoAttackTypeItem) specificItems.get(i - 1);
+                        nekoAttackTypeItem.applySpecificItem(player, (LivingEntity) target);
                     }
                 }
             }
@@ -135,7 +135,7 @@ public abstract class PlayerEntityMixin extends LivingEntity {
             cir.setReturnValue(0.0f);
         }
     }
-    //这个是让玩家黑屏的时候无法跳跃的方法
+    //这个是让玩家黑屏的时候无法跳跃
     @Inject(method = "jump", at = @At("HEAD"), cancellable = true)
     private void onJump(CallbackInfo ci) {
         PlayerEntity player = (PlayerEntity) (Object) this;

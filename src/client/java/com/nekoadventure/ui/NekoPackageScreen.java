@@ -1,6 +1,7 @@
 package com.nekoadventure.ui;
 
 import com.nekoadventure.item.other.NekoPackageItem;
+import com.nekoadventure.other.itemApart.NekoPackageDataManager;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
@@ -11,6 +12,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.text.Text;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -98,17 +100,11 @@ public class NekoPackageScreen implements HudRenderCallback {
         // 调用 NekoPackageItem 的 getFinalData 方法获取数据（客户端读网络包同步的缓存）
         double[] finalData = nekoPackageItem.getFinalData(player);
 
-        // 构建显示文本（只显示前5个）
-        List<String> dataLines = new ArrayList<>();
-        if (finalData != null && finalData.length >= 5) {
-            for (int i = 0; i < 5; i++) {
-                String name = ATTRIBUTE_NAMES[i];
-                double value = finalData[i];
-                dataLines.add("§7" + name + ": §f" + String.format("%.2f", value));
-            }
-        } else {
-            dataLines.add("§8No data");
-        }
+        // 当前楼层（客户端读网络包同步的缓存）
+        int level = NekoPackageDataManager.getClientLevel();
+
+        // 构建显示文本
+        List<String> dataLines = getLines(finalData);
 
         // 计算面板尺寸（增加一行用于楼层显示）
         int padding = 4;
@@ -120,6 +116,13 @@ public class NekoPackageScreen implements HudRenderCallback {
         // 左侧位置
         int x = 0;
         int y = screenHeight / 2 - panelHeight / 2;
+
+        // 绘制当前楼层（面板预留的第一行）
+        int levelY = y + padding;
+        drawContext.drawText(textRenderer,
+                Text.literal("§6楼层: §f" + level),
+                x + padding, levelY,
+                0xFFFFFF, true);
 
         // 绘制属性标题
         int titleY = y + padding + lineHeight;
@@ -142,5 +145,27 @@ public class NekoPackageScreen implements HudRenderCallback {
                     x + padding, dataY,
                     0xFFFFFF, true);
         }
+    }
+
+    private @NotNull List<String> getLines(double[] finalData) {
+        List<String> dataLines = new ArrayList<>();
+        if (finalData != null && finalData.length >= 5) {
+            for (int i = 0; i < 5; i++) {
+                String name = ATTRIBUTE_NAMES[i];
+                double value = finalData[i];
+                if (i==2) {
+                    dataLines.add("§7" + name + ": §f" + String.format("%.2f", value)+"(*"+ String.format("%.1f", finalData[5]) +")");
+                }
+                else if (i==3) {
+                    dataLines.add("§7" + name + ": §f" + String.format("%.2f", value)+"(*"+ String.format("%.1f", finalData[6]) +")");
+                }
+                else {
+                    dataLines.add("§7" + name + ": §f" + String.format("%.2f", value));
+                }
+            }
+        } else {
+            dataLines.add("§8No data");
+        }
+        return dataLines;
     }
 }

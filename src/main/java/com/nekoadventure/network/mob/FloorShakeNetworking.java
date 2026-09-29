@@ -1,4 +1,4 @@
-package com.nekoadventure.network;
+package com.nekoadventure.network.mob;
 
 import com.nekoadventure.NekoAdventure;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;

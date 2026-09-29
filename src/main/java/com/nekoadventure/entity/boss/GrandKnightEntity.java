@@ -1,18 +1,20 @@
 package com.nekoadventure.entity.boss;
 
+import com.nekoadventure.block.ModBlocks;
 import com.nekoadventure.effect.ModStatusEffects;
 import com.nekoadventure.entity.ModEntities;
 import com.nekoadventure.entity.missile.MissileEntity;
 import com.nekoadventure.entity.missile.MissileModelType;
 import com.nekoadventure.item.ModItems;
-import com.nekoadventure.network.FloorShakeNetworking;
-import com.nekoadventure.network.ScreenShakeNetworking;
+import com.nekoadventure.network.mob.FloorShakeNetworking;
+import com.nekoadventure.network.mob.ScreenShakeNetworking;
 import com.nekoadventure.other.attackApart.AttackTypes;
 import com.nekoadventure.other.itemApart.SpawnRandomSoulItems;
 import com.nekoadventure.sound.ModSoundEvents;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.entity.*;
 import net.minecraft.entity.ai.goal.*;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
@@ -27,7 +29,6 @@ import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.mob.Monster;
-import net.minecraft.entity.mob.ZombieEntity;
 import net.minecraft.entity.passive.IronGolemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
@@ -39,9 +40,7 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.*;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -53,10 +52,6 @@ import java.util.UUID;
 public class GrandKnightEntity extends HostileEntity implements Monster {
 
     // ========== 动画状态 ==========
-    // AnimationState 是进程内对象、无法跨网络同步。为了让局域网/独立服务端的玩家也能看到动作，
-    // 动画改为“实例字段 + 客户端驱动”：服务端只把当前技能编号写入 ACTIVE_SKILL / STAGE_CHANGE
-    // 两个 DataTracker；客户端 tick 收到变化后，才对实例 AnimationState 做 start/stop。
-    // 注意：动画不能做成 static（会跨实体共享互相打架），也不能由服务端直接 start（其他玩家看不到动作）。
     @Environment(EnvType.CLIENT)
     public final AnimationState GRAB_ANI = new AnimationState();
     private static final int GRAB_DURATION = 125;
@@ -88,14 +83,25 @@ public class GrandKnightEntity extends HostileEntity implements Monster {
     @Environment(EnvType.CLIENT)
     public final AnimationState ATTACK_ANI = new AnimationState();
     private static final int ATTACK_DURATION = 60;
-
-    // 阶段2 起手/成型动画（实例字段）
     @Environment(EnvType.CLIENT)
     public final AnimationState STAGE_2_START_APART_ANI = new AnimationState();
     @Environment(EnvType.CLIENT)
     public final AnimationState STAGE_2_STOP_APART_ANI = new AnimationState();
 
-    // 技能轴状态：只在服务端实例上推进，客户端副本不自行驱动技能轴
+    private static final int SUMMON_DURATION=180;
+    @Environment(EnvType.CLIENT)
+    public final AnimationState SUMMON_ANI=new AnimationState();
+
+    // ========== 生成召唤 ==========
+    // SUMMON_STATE：0=无 1=召唤动画播放中（服务端广播，客户端收到后播放 SUMMON_ANI）
+    private static final TrackedData<Integer> SUMMON_STATE =
+            DataTracker.registerData(GrandKnightEntity.class, TrackedDataHandlerRegistry.INTEGER);
+    private int playedSummonState = 0;
+    private boolean isSummoning = false;
+    private int summonTick = 0;
+    private boolean summonChecked = false;
+
+    // 技能轴状态
     private int skillTick = 0;
     private int skillStage = 0;
     private int skill = -114514;
@@ -108,8 +114,6 @@ public class GrandKnightEntity extends HostileEntity implements Monster {
     // STAGE_CHANGE：0=无 1=二阶段起手 2=二阶段成型
     private static final TrackedData<Integer> STAGE_CHANGE =
             DataTracker.registerData(GrandKnightEntity.class, TrackedDataHandlerRegistry.INTEGER);
-
-    // 以下两个字段仅客户端有意义：记录“已播放到”的编号，避免每个tick重复start动画
     private int playedSkill = -1;
     private int playedStageChange = 0;
 
@@ -133,7 +137,7 @@ public class GrandKnightEntity extends HostileEntity implements Monster {
     // ========== 基础属性 ==========
     public static DefaultAttributeContainer.Builder createGrandKnightAttributes() {
         return HostileEntity.createHostileAttributes()
-                .add(EntityAttributes.GENERIC_MAX_HEALTH, 800.00)
+                .add(EntityAttributes.GENERIC_MAX_HEALTH, 1000.0)
                 .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.25D)
                 .add(EntityAttributes.GENERIC_ARMOR, 10.0D)
                 .add(EntityAttributes.GENERIC_ARMOR_TOUGHNESS, 8.0D)
@@ -159,15 +163,15 @@ public class GrandKnightEntity extends HostileEntity implements Monster {
     @Override
     public void tick() {
         super.tick();
-
-        // 客户端：动作由服务端通过DataTracker同步过来，这里只把编号翻译成实例动画播放/停止。
-        // 客户端不再自跑技能轴，避免本地随机数和服务端不一致导致动作错位。
         if (this.getWorld().isClient) {
             this.syncClientAnimations();
             return;
         }
-
         this.bossBar.setPercent(this.getHealth() / this.getMaxHealth());
+
+        // 生成召唤：先推进技能轴再做生成检测，触发当 tick 不推进轴（与技能起手一致）
+        this.applySummon();
+        this.checkSummonOnSpawn();
 
         List<? extends PlayerEntity> players=this.getWorld().getPlayers();
         if (!players.isEmpty()){
@@ -182,12 +186,12 @@ public class GrandKnightEntity extends HostileEntity implements Monster {
         }
 
         // 0.盾推，1.盾扫，2.震地，3.喷射，4.连斩，5.延迟弹幕，6.抓取，7.剑扫
-        if ((skillStage != 0 &&skill!=1&&skill!=4&&skill!=7)||isChangingStage) {
-            this.setVelocity(0, this.getVelocity().y, 0);
+        if ((skillStage != 0 &&skill!=1&&skill!=4&&skill!=7)||isChangingStage||isSummoning) {
+            this.setVelocity(0,0, 0);
         }
         this.applyBulletEffect();
         this.changeStage();
-        if (!this.isChangingStage) {
+        if (!this.isChangingStage && !this.isSummoning) {
             this.applySkill();
         }
     }
@@ -233,6 +237,16 @@ public class GrandKnightEntity extends HostileEntity implements Monster {
             }
             this.playedStageChange = stageChange;
         }
+
+        int summonState = this.dataTracker.get(SUMMON_STATE);
+        if (summonState != this.playedSummonState) {
+            if (summonState == 1) {
+                SUMMON_ANI.start(this.age);
+            } else {
+                SUMMON_ANI.stop();
+            }
+            this.playedSummonState = summonState;
+        }
     }
 
     private void changeStage() {
@@ -243,7 +257,6 @@ public class GrandKnightEntity extends HostileEntity implements Monster {
             this.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE,5*20,100,false,false,false));
             isChangingStage=true;
             changingTime++;
-            // 通知客户端播放“二阶段起手”动画
             this.dataTracker.set(STAGE_CHANGE, 1);
         }
         else if (changingTime>0&&changingTime<100){
@@ -251,7 +264,7 @@ public class GrandKnightEntity extends HostileEntity implements Monster {
             if (changingTime==20){
                 this.setStage(2);
                 this.stage=2;
-                // 通知客户端切换为“二阶段成型”动画
+                replaceDeepSlateWithLava(this.getBlockPos());
                 this.dataTracker.set(STAGE_CHANGE, 2);
             }
         }
@@ -259,6 +272,173 @@ public class GrandKnightEntity extends HostileEntity implements Monster {
             isChangingStage=false;
             changingTime=0;
             this.dataTracker.set(STAGE_CHANGE, 0);
+        }
+    }
+
+    private void replaceDeepSlateWithLava(BlockPos center) {
+        World world = this.getWorld();
+        int halfX = 24;
+        int halfZ = 24;
+        int height = 10;
+        for (int dx = -halfX; dx <= halfX; dx++) {
+            for (int dy = -2; dy <= height; dy++) {
+                for (int dz = -halfZ; dz <= halfZ; dz++) {
+                    BlockPos pos = center.add(dx, dy, dz);
+                    BlockState state = world.getBlockState(pos);
+
+                    if (state.isOf(Blocks.DEEPSLATE)) {
+                        world.setBlockState(pos, Blocks.LAVA.getDefaultState(), 3);
+                    }
+                }
+            }
+        }
+    }
+    private void applySummon() {
+        if (!this.isSummoning) {
+            return;
+        }
+        if (this.summonTick > 0) {
+            this.summonTick--;
+            this.summonApart();
+        } else {
+
+            this.isSummoning = false;
+            this.dataTracker.set(SUMMON_STATE, 0);
+        }
+    }
+
+    // 生成时的一次性检测：周围存在首领房方块则播放召唤动画。
+    private void checkSummonOnSpawn() {
+        if (this.summonChecked) {
+            return;
+        }
+        this.summonChecked = true;
+        if (findBossRoomBlock(this.getBlockPos())!=null){
+            this.setAiDisabled(true);
+            this.startSummon();
+        }
+    }
+    private void startSummon() {
+        this.isSummoning = true;
+        this.summonTick = SUMMON_DURATION;
+        this.dataTracker.set(SUMMON_STATE, 1);
+    }
+    private void summonApart() {
+        int time = -(this.summonTick - SUMMON_DURATION);
+        this.setVelocity(Vec3d.ZERO);
+        this.setYaw(0);
+        this.setPitch(0);
+        List<PlayerEntity> playerEntities=this.getWorld().getEntitiesByClass(
+                PlayerEntity.class,
+                this.getBoundingBox().expand(32),
+                e-> true
+        );
+        Direction skillDirection = Direction.SOUTH;
+        BlockPos skillCenter = findBossRoomBlock(this.getBlockPos());
+        if (skillCenter == null) {
+            return;
+        }
+        if (time == 36) {
+            Direction leftDir = skillDirection.rotateYCounterclockwise();
+            breakObsidianArea(skillCenter, leftDir);
+            for (PlayerEntity playerEntity : playerEntities) {
+                if (playerEntity instanceof ServerPlayerEntity){
+                    ScreenShakeNetworking.sendToPlayer((ServerPlayerEntity) playerEntity, 5, 0.5F);
+                }
+            }
+        }
+        if (time == 90) {
+            Direction rightDir = skillDirection.rotateYClockwise();
+            breakObsidianArea(skillCenter, rightDir);
+            for (PlayerEntity playerEntity : playerEntities) {
+                if (playerEntity instanceof ServerPlayerEntity){
+                    ScreenShakeNetworking.sendToPlayer((ServerPlayerEntity) playerEntity, 5, 0.5F);
+                }
+            }
+        }
+        if (time == 126) {
+            transformRoom(skillCenter);
+            spawnParticles();
+            for (PlayerEntity playerEntity : playerEntities) {
+                if (playerEntity instanceof ServerPlayerEntity){
+                    ScreenShakeNetworking.sendToPlayer((ServerPlayerEntity) playerEntity, 20, 0.1F);
+                }
+            }
+            this.setAiDisabled(false);
+        }
+    }
+    private BlockPos findBossRoomBlock(BlockPos origin) {
+        World world = this.getWorld();
+        for (int dx = -2; dx <= 2; dx++) {
+            for (int dy = -2; dy <= 2; dy++) {
+                for (int dz = -2; dz <= 2; dz++) {
+                    BlockPos pos = origin.add(dx, dy, dz);
+                    if (world.getBlockState(pos).isOf(ModBlocks.BOSS_ROOM_BLOCK)) {
+                        return pos;
+                    }
+                }
+            }
+        }
+        return origin;
+    }
+    private void breakObsidianArea(BlockPos center, Direction dir) {
+        World world = this.getWorld();
+        int dx = dir.getOffsetX();
+        int dz = dir.getOffsetZ();
+        int px = -dz;
+        for (int f = 0; f <= 32; f++) {
+            for (int y = 0; y <= 12; y++) {
+                for (int s = -32 / 2; s <= 32 / 2; s++) {
+                    BlockPos pos = center.add(dx * f + px * s, y, dz * f + dx * s);
+                    if (world.getBlockState(pos).isOf(Blocks.OBSIDIAN)) {
+                        world.breakBlock(pos, false);
+                    }
+                }
+            }
+        }
+    }
+    private void transformRoom(BlockPos center) {
+        World world = this.getWorld();
+        int length =32;
+        for (int dx = -length; dx <= length; dx++) {
+            for (int dy = 1; dy <= 12; dy++) {
+                for (int dz = -length; dz <= length; dz++) {
+                    BlockPos pos = center.add(dx, dy, dz);
+                    BlockState state = world.getBlockState(pos);
+                    if (state.isOf(Blocks.REDSTONE_LAMP)) {
+                        world.setBlockState(pos, Blocks.SHROOMLIGHT.getDefaultState(), 3);
+                    }
+                    if (state.isOf(Blocks.NETHERRACK)) {
+                        BlockPos above = pos.up();
+                        if (world.getBlockState(above).isAir()) {
+                            world.setBlockState(above, Blocks.FIRE.getDefaultState(), 3);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    private void spawnParticles() {
+        if (!(this.getWorld() instanceof ServerWorld serverWorld)) {
+            return;
+        }
+        Vec3d center = this.getPos().add(0, this.getHeight() * 0.5, 0);
+        for (int i = 0; i < 120; i++) {
+            double theta = serverWorld.random.nextDouble() * Math.PI * 2;
+            double phi = Math.acos(2.0 * serverWorld.random.nextDouble() - 1.0);
+            double dirX = Math.sin(phi) * Math.cos(theta);
+            double dirY = Math.cos(phi);
+            double dirZ = Math.sin(phi) * Math.sin(theta);
+
+            double speed = 0.6 + serverWorld.random.nextDouble() * 1.2;
+
+            serverWorld.spawnParticles(
+                    ParticleTypes.CLOUD,
+                    center.x, center.y, center.z,
+                    1,
+                    dirX * speed, dirY * speed, dirZ * speed,
+                    1.0
+            );
         }
     }
 
@@ -392,8 +572,8 @@ public class GrandKnightEntity extends HostileEntity implements Monster {
 
     @Override
     public boolean damage(DamageSource source, float amount) {
-        // 阶段切换期间无敌：直接使用服务端实例字段判断，不再依赖客户端动画状态
-        if (isChangingStage) {
+        // 阶段切换/召唤期间无敌：直接使用服务端实例字段判断，不再依赖客户端动画状态
+        if (isChangingStage || isSummoning) {
             return false;
         }
         return super.damage(source, amount);
@@ -483,7 +663,7 @@ public class GrandKnightEntity extends HostileEntity implements Monster {
                     for (PlayerEntity playerEntity : playerEntities) {
                         if (playerEntity.isOnGround()) {
                             Vec3d pullDirection = this.getEyePos().subtract(playerEntity.getPos()).normalize();
-                            double pullStrength = 3.0;
+                            double pullStrength = 2.0;
                             this.getTarget().addVelocity(pullDirection.multiply(pullStrength));
                             this.getTarget().move(MovementType.SELF, playerEntity.getVelocity());
                             DamageSource damageSource = this.getDamageSources().mobProjectile(this,this);
@@ -511,8 +691,8 @@ public class GrandKnightEntity extends HostileEntity implements Monster {
             double spacing = 1.0;
             double cubeSize = 0.5;
             for (int length = 1; length < range; length++) {
-                Vec3d mobPos = this.getEyePos().add(0,-1.5,0);
-                Vec3d lookDirection = this.getRotationVec(1.0F);
+                Vec3d mobPos = this.getEyePos().add(0,-0.7,0);
+                Vec3d lookDirection = this.getRotation(this.getYaw());
                 MissileEntity missile=getMissileEntity(this,10,40);
                 AttackTypes brimstoneType = new AttackTypes(AttackTypes.AttackType.BRIMSTONE);
                 missile.setAttackType(brimstoneType);
@@ -723,6 +903,7 @@ public class GrandKnightEntity extends HostileEntity implements Monster {
                 continue;
             }
             target.damage(this.getDamageSources().mobAttack(this), damage);
+
         }
     }
 
@@ -735,6 +916,20 @@ public class GrandKnightEntity extends HostileEntity implements Monster {
             }
         }
         super.onDeath(damageSource);
+    }
+
+    protected Vec3d getRotation(float yaw) {
+        float f = (float) -10 * (float) (Math.PI / 180.0);
+        float g = -yaw * (float) (Math.PI / 180.0);
+        float h = MathHelper.cos(g);
+        float i = MathHelper.sin(g);
+        float j = MathHelper.cos(f);
+        float k = MathHelper.sin(f);
+        return new Vec3d(i * j, -k, h * j);
+    }
+    @Override
+    protected boolean canStartRiding(Entity entity) {
+        return false;
     }
 
     //==================音效=======================
@@ -770,12 +965,6 @@ public class GrandKnightEntity extends HostileEntity implements Monster {
         super.setCustomName(name);
         this.bossBar.setName(this.getDisplayName());
     }
-
-    @Override
-    public boolean isCustomNameVisible() {
-        return false;
-    }
-
     @Override
     public void onStoppedTrackingBy(ServerPlayerEntity player) {
         super.onStoppedTrackingBy(player);
@@ -797,6 +986,9 @@ public class GrandKnightEntity extends HostileEntity implements Monster {
         nbt.putInt("SkillStage", this.skillStage);
         nbt.putInt("Skill", this.skill);
         nbt.putInt("stage",this.stage);
+        nbt.putBoolean("SummonChecked", this.summonChecked);
+        nbt.putBoolean("IsSummoning", this.isSummoning);
+        nbt.putInt("SummonTick", this.summonTick);
     }
 
     @Override
@@ -806,12 +998,16 @@ public class GrandKnightEntity extends HostileEntity implements Monster {
         this.skillStage = nbt.getInt("SkillStage");
         this.skill = nbt.getInt("Skill");
         this.stage = nbt.getInt("stage");
+        this.summonChecked = nbt.getBoolean("SummonChecked");
+        this.isSummoning = nbt.getBoolean("IsSummoning");
+        this.summonTick = nbt.getInt("SummonTick");
+        if (this.isSummoning) {
+            this.dataTracker.set(SUMMON_STATE, 1);
+        }
 
         if (this.hasCustomName()) {
             this.bossBar.setName(this.getDisplayName());
         }
-
-        // 区块重载恢复技能轴后，把当前技能编号补发给客户端，保证动画能接上
         if (this.skillStage != 0 && this.skill >= 0 && this.skill <= 7) {
             this.dataTracker.set(ACTIVE_SKILL, this.skill);
         }
@@ -822,6 +1018,7 @@ public class GrandKnightEntity extends HostileEntity implements Monster {
         this.dataTracker.startTracking(ACTIVE_SKILL, -1);
         this.dataTracker.startTracking(STAGE,1);
         this.dataTracker.startTracking(STAGE_CHANGE, 0);
+        this.dataTracker.startTracking(SUMMON_STATE, 0);
     }
     protected float getDamageAmount() {
         return (float) this.getAttributeValue(EntityAttributes.GENERIC_ATTACK_DAMAGE);

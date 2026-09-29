@@ -89,18 +89,52 @@ public class ItemBaseBlockEntityRenderer implements BlockEntityRenderer<ItemBase
             if (!displayItem.isEmpty()) {
                 Text itemNameText = displayItem.getName();
                 int nameWidth = textRenderer.getWidth(itemNameText);
-                textRenderer.draw(
-                        itemNameText,
-                        -nameWidth / 2.0f,
-                        -20,
-                        0xFFFFFF,
-                        false,
-                        matrices.peek().getPositionMatrix(),
-                        vertexConsumers,
-                        TextRenderer.TextLayerType.NORMAL,
-                        0x40000000,
-                        0xF000F0
-                );
+                switch (displayItem.getRarity()){
+                    case COMMON-> textRenderer.draw(
+                            itemNameText,
+                            -nameWidth / 2.0f,
+                            -20,
+                            0xFFFFFF,
+                            false,
+                            matrices.peek().getPositionMatrix(),
+                            vertexConsumers,
+                            TextRenderer.TextLayerType.NORMAL,
+                            0x40000000,
+                            0xF000F0);
+                    case UNCOMMON ->textRenderer.draw(
+                            itemNameText,
+                            -nameWidth / 2.0f,
+                            -20,
+                            0xFFFF00,
+                            false,
+                            matrices.peek().getPositionMatrix(),
+                            vertexConsumers,
+                            TextRenderer.TextLayerType.NORMAL,
+                            0x40000000,
+                            0xF000F0);
+                    case RARE -> textRenderer.draw(
+                            itemNameText,
+                            -nameWidth / 2.0f,
+                            -20,
+                            0xADD8E6,
+                            false,
+                            matrices.peek().getPositionMatrix(),
+                            vertexConsumers,
+                            TextRenderer.TextLayerType.NORMAL,
+                            0x40000000,
+                            0xF000F0);
+                    case EPIC -> textRenderer.draw(
+                            itemNameText,
+                            -nameWidth / 2.0f,
+                            -20,
+                            0xFF0000,
+                            false,
+                            matrices.peek().getPositionMatrix(),
+                            vertexConsumers,
+                            TextRenderer.TextLayerType.NORMAL,
+                            0x40000000,
+                            0xF000F0);
+                }
             }
         }
         matrices.pop();

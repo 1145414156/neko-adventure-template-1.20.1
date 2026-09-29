@@ -3,6 +3,7 @@ package com.nekoadventure.datagen.tags;
 import com.nekoadventure.NekoAdventure;
 import com.nekoadventure.item.ModItems;
 import com.nekoadventure.item.nekoItem.AbstractNekoItem;
+import com.nekoadventure.item.soulItem.AbstractSoulItem;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
 import net.minecraft.item.Item;
@@ -26,6 +27,7 @@ public class ModItemTagsProvider extends FabricTagProvider<Item> {
     public static final TagKey<Item> GAMBLE_POOL=TagKey.of(RegistryKeys.ITEM, new Identifier(NekoAdventure.MOD_ID, "gamble_pool"));
     public static final TagKey<Item> SOUL_POOL=TagKey.of(RegistryKeys.ITEM, new Identifier(NekoAdventure.MOD_ID, "soul_pool"));
     public static final TagKey<Item> CONCEAL_POOL=TagKey.of(RegistryKeys.ITEM, new Identifier(NekoAdventure.MOD_ID, "conceal_pool"));
+    public static final TagKey<Item> SOUL_ITEM=TagKey.of(RegistryKeys.ITEM, new Identifier(NekoAdventure.MOD_ID, "soul_item"));
 
     public ModItemTagsProvider(FabricDataOutput output, CompletableFuture<RegistryWrapper.WrapperLookup> registriesFuture) {
         super(output, RegistryKeys.ITEM, registriesFuture);
@@ -33,61 +35,26 @@ public class ModItemTagsProvider extends FabricTagProvider<Item> {
 
     @Override
     protected void configure(RegistryWrapper.WrapperLookup arg) {
-        //通用池
-        Set<AbstractNekoItem> allNekoItem=getAllNekoItems(arg);
-        for (AbstractNekoItem item : allNekoItem) {
-            getOrCreateTagBuilder(ALL_POOL).add(item);
-        }
-
-        //宝箱池
-        Set<AbstractNekoItem> treasurePoolItem=getTreasurePoolItems();
-        for (AbstractNekoItem item : treasurePoolItem) {
-            getOrCreateTagBuilder(TREASURE_POOL).add(item);
-        }
-
-        //商店池
-        Set<AbstractNekoItem> shopPoolItem=getShopPoolItems();
-        for (AbstractNekoItem item : shopPoolItem) {
-            getOrCreateTagBuilder(SHOP_POOL).add(item);
-        }
-
-        //boss池
-        Set<AbstractNekoItem> bossPoolItem=getBossPoolItems();
-        for (AbstractNekoItem item : bossPoolItem) {
-            getOrCreateTagBuilder(BOSS_POOL).add(item);
-        }
-
-        //锻造池
-        Set<AbstractNekoItem> forgePoolItem=getForgePoolItems();
-        for (AbstractNekoItem item : forgePoolItem) {
-            getOrCreateTagBuilder(FORGE_POOL).add(item);
-        }
-
-        //食物池
-        Set<AbstractNekoItem> foodPoolItem=getFoodItems();
-        for (AbstractNekoItem item : foodPoolItem) {
-            getOrCreateTagBuilder(FOOD_POOL).add(item);
-        }
-
-        //赌博池
-        Set<AbstractNekoItem> gamblePoolItem=getGamblePoolItems();
-        for (AbstractNekoItem item : gamblePoolItem) {
-            getOrCreateTagBuilder(GAMBLE_POOL).add(item);
-        }
-
-        //灵魂池
-        Set<AbstractNekoItem> soulPoolItem=getSoulPoolItems();
-        for (AbstractNekoItem item : soulPoolItem) {
-            getOrCreateTagBuilder(SOUL_POOL).add(item);
-        }
-
-        //隐藏池
-        Set<AbstractNekoItem> concealPoolItem=getConcealPoolItems();
-        for (AbstractNekoItem item : concealPoolItem) {
-            getOrCreateTagBuilder(CONCEAL_POOL).add(item);
-        }
+        getAllSoulItems(arg).forEach(soulItem -> getOrCreateTagBuilder(SOUL_ITEM).add(soulItem));
+        getAllNekoItems(arg).forEach(item -> getOrCreateTagBuilder(ALL_POOL).add(item));
+        getTreasurePoolItems().forEach(item -> getOrCreateTagBuilder(TREASURE_POOL).add(item));
+        getShopPoolItems().forEach(item -> getOrCreateTagBuilder(SHOP_POOL).add(item));
+        getBossPoolItems().forEach(item -> getOrCreateTagBuilder(BOSS_POOL).add(item));
+        getForgePoolItems().forEach(item -> getOrCreateTagBuilder(FORGE_POOL).add(item));
+        getFoodItems().forEach(item -> getOrCreateTagBuilder(FOOD_POOL).add(item));
+        getGamblePoolItems().forEach(item -> getOrCreateTagBuilder(GAMBLE_POOL).add(item));
+        getSoulPoolItems().forEach(item -> getOrCreateTagBuilder(SOUL_POOL).add(item));
+        getConcealPoolItems().forEach(item -> getOrCreateTagBuilder(CONCEAL_POOL).add(item));
     }
 
+    private Set<AbstractSoulItem> getAllSoulItems(RegistryWrapper.WrapperLookup registries){
+        RegistryWrapper<Item> itemRegistry = registries.getWrapperOrThrow(RegistryKeys.ITEM);
+        return itemRegistry.streamEntries()
+                .map(RegistryEntry.Reference::value)
+                .filter(item -> item instanceof AbstractSoulItem)
+                .map(item -> (AbstractSoulItem) item)
+                .collect(Collectors.toSet());
+    }
     private Set<AbstractNekoItem> getAllNekoItems(RegistryWrapper.WrapperLookup registries){
         RegistryWrapper<Item> itemRegistry = registries.getWrapperOrThrow(RegistryKeys.ITEM);
         return itemRegistry.streamEntries()
@@ -96,8 +63,10 @@ public class ModItemTagsProvider extends FabricTagProvider<Item> {
                 .map(item -> (AbstractNekoItem) item)
                 .collect(Collectors.toSet());
     }
+
     private Set<AbstractNekoItem> getTreasurePoolItems(){
         Set<AbstractNekoItem> treasurePoolItems=new HashSet<>();
+        treasurePoolItems.add(ModItems.SHORT_HOOK);
         treasurePoolItems.add(ModItems.SOUL_JAR);
         treasurePoolItems.add(ModItems.EXPOSED_WIRE);
         treasurePoolItems.add(ModItems.JOYEUSE);
@@ -148,12 +117,15 @@ public class ModItemTagsProvider extends FabricTagProvider<Item> {
         treasurePoolItems.add(ModItems.MANDRAKE);
         treasurePoolItems.add(ModItems.BANANA);
         treasurePoolItems.add(ModItems.OXIDIZED_COPPER_INGOT);
-
+        treasurePoolItems.add(ModItems.CLOUD_BOOTS);
+        treasurePoolItems.add(ModItems.ADRENALINE);
 
         return treasurePoolItems;
     }
     private Set<AbstractNekoItem> getShopPoolItems(){
         Set<AbstractNekoItem> shopPoolItems =new HashSet<>();
+        shopPoolItems.add(ModItems.BATTERY);
+        shopPoolItems.add(ModItems.CLOUD_BOOTS);
         shopPoolItems.add(ModItems.JOYEUSE);
         shopPoolItems.add(ModItems.COMPRESSED_IRON);
         shopPoolItems.add(ModItems.SPIRITING_AWAY);
@@ -204,10 +176,14 @@ public class ModItemTagsProvider extends FabricTagProvider<Item> {
         shopPoolItems.add(ModItems.BANANA);
         shopPoolItems.add(ModItems.TOAST);
         shopPoolItems.add(ModItems.ZENITH);
+        shopPoolItems.add(ModItems.SHORT_HOOK);
         shopPoolItems.add(ModItems.CAT_TEACUP);
         shopPoolItems.add(ModItems.NATTO);
         shopPoolItems.add(ModItems.POPSICLE);
         shopPoolItems.add(ModItems.A_PIECE_OF_CAKE);
+        shopPoolItems.add(ModItems.RESTOCK);
+        shopPoolItems.add(ModItems.ABUNDANT_ITEM_BASE);
+        shopPoolItems.add(ModItems.ADRENALINE);
 
         return shopPoolItems;
     }
@@ -244,12 +220,16 @@ public class ModItemTagsProvider extends FabricTagProvider<Item> {
         bossPoolItems.add(ModItems.SKELETON_PRIEST_JEWEL);
         bossPoolItems.add(ModItems.TREE_TRUNK);
         bossPoolItems.add(ModItems.NATTO);
+        bossPoolItems.add(ModItems.ADRENALINE);
+        bossPoolItems.add(ModItems.BROKEN_CROWN);
 
         return bossPoolItems;
     }
 
     private Set<AbstractNekoItem> getForgePoolItems(){
         Set<AbstractNekoItem> forgePoolItems =new HashSet<>();
+        forgePoolItems.add(ModItems.SHORT_HOOK);
+        forgePoolItems.add(ModItems.CLOUD_BOOTS);
         forgePoolItems.add(ModItems.COMPRESSED_IRON);
         forgePoolItems.add(ModItems.BLADE);
         forgePoolItems.add(ModItems.PIERCING_DIAMOND);
@@ -320,6 +300,7 @@ public class ModItemTagsProvider extends FabricTagProvider<Item> {
         gamblePoolItems.add(ModItems.CRUSHED_ICE);
         gamblePoolItems.add(ModItems.BANANA);
         gamblePoolItems.add(ModItems.SKELETON_PRIEST_JEWEL);
+        gamblePoolItems.add(ModItems.BROKEN_CROWN);
 
         return gamblePoolItems;
     }
@@ -335,6 +316,7 @@ public class ModItemTagsProvider extends FabricTagProvider<Item> {
         soulPoolItems.add(ModItems.STRANGE_POTION);
         soulPoolItems.add(ModItems.BROKEN_SOUL);
         soulPoolItems.add(ModItems.BLOODSTAINED_CROSS);
+        soulPoolItems.add(ModItems.BATTERY);
 
         return soulPoolItems;
     }
@@ -366,6 +348,10 @@ public class ModItemTagsProvider extends FabricTagProvider<Item> {
         concealPoolItems.add(ModItems.MANDRAKE);
         concealPoolItems.add(ModItems.ZENITH);
         concealPoolItems.add(ModItems.NATTO);
+        concealPoolItems.add(ModItems.ABUNDANT_ITEM_BASE);
+        concealPoolItems.add(ModItems.CLOUD_BOOTS);
+        concealPoolItems.add(ModItems.ADRENALINE);
+        concealPoolItems.add(ModItems.BATTERY);
 
         return concealPoolItems;
     }

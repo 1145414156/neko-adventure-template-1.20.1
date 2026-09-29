@@ -3,7 +3,10 @@ package com.nekoadventure.block.other;
 import com.nekoadventure.block.blockentity.other.RerollFurnaceBlockEntity;
 import com.nekoadventure.item.ModItems;
 import com.nekoadventure.item.nekoItem.AbstractNekoItem;
+import com.nekoadventure.item.soulItem.AbstractSoulItem;
+import com.nekoadventure.item.soulItem.AbstractSoulPoolItem;
 import com.nekoadventure.other.itemApart.SpawnRandomNekoItems;
+import com.nekoadventure.other.itemApart.SpawnRandomSoulItems;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
@@ -30,7 +33,7 @@ public class RerollFurnaceBlock extends Block implements BlockEntityProvider {
             return ActionResult.SUCCESS;
         }
         ItemStack heldStack = player.getStackInHand(hand);
-        if (!(heldStack.getItem() instanceof AbstractNekoItem)) {
+        if (!(heldStack.getItem() instanceof AbstractNekoItem)&&!(heldStack.getItem() instanceof AbstractSoulItem)) {
             return ActionResult.FAIL;
         }
         BlockEntity blockEntity = world.getBlockEntity(pos);
@@ -46,19 +49,26 @@ public class RerollFurnaceBlock extends Block implements BlockEntityProvider {
         int random = world.getRandom().nextInt(100);
         if (removeCoinsFromPlayer(player, requiredCoins)) {
             if (random < successRate) {
+                SpawnRandomSoulItems spawnRandomSoulItems=new SpawnRandomSoulItems();
                 SpawnRandomNekoItems spawnRandomNekoItems=new SpawnRandomNekoItems();
                 if (world instanceof ServerWorld) {
-                    player.setStackInHand(hand, spawnRandomNekoItems.summonRandomItemFromPool(
-                            (ServerWorld) world,
-                            null,
-                            spawnRandomNekoItems.ALL_POOL_PROBABILITIES_HEIGHT[0],
-                            spawnRandomNekoItems.ALL_POOL_PROBABILITIES_HEIGHT[1],
-                            spawnRandomNekoItems.ALL_POOL_PROBABILITIES_HEIGHT[2],
-                            spawnRandomNekoItems.ALL_POOL_PROBABILITIES_HEIGHT[3]));
+                    if (heldStack.getItem() instanceof AbstractSoulItem) {
+                        player.setStackInHand(hand, spawnRandomSoulItems.summonRandomSoulItem(
+                                world));
+                    }
+                    else {
+                        player.setStackInHand(hand, spawnRandomNekoItems.summonRandomItemFromPool(
+                                (ServerWorld) world,
+                                null,
+                                spawnRandomNekoItems.ALL_POOL_PROBABILITIES_HEIGHT[0],
+                                spawnRandomNekoItems.ALL_POOL_PROBABILITIES_HEIGHT[1],
+                                spawnRandomNekoItems.ALL_POOL_PROBABILITIES_HEIGHT[2],
+                                spawnRandomNekoItems.ALL_POOL_PROBABILITIES_HEIGHT[3]));
+                    }
                 }
                 furnace.addUseCount();
                 furnace.syncToClient();
-                player.sendMessage(Text.literal("成功！物品已重置"), true);
+                player.sendMessage(Text.literal("物品已重置"), true);
 
             }
             else {

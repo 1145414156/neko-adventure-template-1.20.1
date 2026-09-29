@@ -1,7 +1,7 @@
 package com.nekoadventure.item.nekoItem;
 
 import com.nekoadventure.client.ShiftKeyHelper;
-import com.nekoadventure.item.nekoItem.functionTypeItem.functionItems.FunctionItem;
+import com.nekoadventure.item.nekoItem.functionTypeItem.functionItems.NekoFunctionItem;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -72,7 +72,7 @@ public abstract class AbstractNekoItem extends Item {
         String textAttackMultiplier = "";
         String textAttackSpeedMultiplier = "";
 
-        if (!(this instanceof FunctionItem)) {
+        if (!(this instanceof NekoFunctionItem)) {
             if (health!=0){if (health>0){textHealth=" 生命"+"+"+health;} else {textHealth=" 生命"+health;}}
             if (strength!=0){if (strength>0){textStrength=" 力量"+"+"+strength;} else {textStrength=" 力量"+strength;}}
             if (speed!=0){if (speed>0){textSpeed=" 移速"+"+"+speed;} else {textSpeed=" 移速"+speed;}}

@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Random;
 
 public class ShopRoomBlock extends AbstractRoomBlock {
-    private final int[] PROBABILITIES_HEIGHT = {50, 35, 12, 3};
+    private final int[] PROBABILITIES_HEIGHT = {40, 35, 17, 8};
     public ShopRoomBlock(Settings settings) {
         super(settings);
     }

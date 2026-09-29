@@ -2,7 +2,7 @@ package com.nekoadventure.item.nekoItem.attackTypeItem.attackItems;
 
 import com.nekoadventure.client.ShiftKeyHelper;
 import com.nekoadventure.entity.missile.MissileEntity;
-import com.nekoadventure.item.nekoItem.attackTypeItem.AttackTypeItem;
+import com.nekoadventure.item.nekoItem.attackTypeItem.NekoAttackTypeItem;
 import com.nekoadventure.item.other.NekoPackageItem;
 import com.nekoadventure.other.attackApart.AttackTypes;
 import net.minecraft.client.item.TooltipContext;
@@ -15,7 +15,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class Twist extends AttackTypeItem {
+public class Twist extends NekoAttackTypeItem {
     public Twist(Settings settings, double health, double strength, double speed, double attackSpeed, double attackRange, double attackMultiplier, double attackSpeedMultiplier, boolean isSpecific) {
         super(settings, health, strength, speed, attackSpeed, attackRange, attackMultiplier, attackSpeedMultiplier, isSpecific);
     }

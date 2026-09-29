@@ -1,5 +1,7 @@
-// 1.20.1	2026-08-26T09:52:10.630522	Neko Adventure/Recipes
+// 1.20.1	2026-09-27T20:31:58.0900657	Neko Adventure/Recipes
 0d6a33e209cc1962899c656bab9336bfd9b5af87 data\neko-adventure\recipes\binding_soul_substance_from_pool.json
 ca98dad87d6199a0a948a44c06d077561979341c data\neko-adventure\advancements\recipes\misc\prop_prototype_from_soul_substance.json
+b31f4c883ffb7a294c3f2ba494ee9c8b992db4d7 data\neko-adventure\advancements\recipes\misc\binding_soul_substance_from_soul_item.json
 f16adfc1dba06a7a3b0077222f6f1eb0633f1a8c data\neko-adventure\recipes\prop_prototype_from_soul_substance.json
 8c3ff6b232d4b9da1065d0e9f9fa2ff3c04fe690 data\neko-adventure\advancements\recipes\misc\binding_soul_substance_from_pool.json
+d939fe75668f0fa0246debf1a572ed45066291a3 data\neko-adventure\recipes\binding_soul_substance_from_soul_item.json

@@ -1,7 +1,7 @@
 package com.nekoadventure.item.nekoItem.attackTypeItem.specificItems;
 
 import com.nekoadventure.client.ShiftKeyHelper;
-import com.nekoadventure.item.nekoItem.attackTypeItem.AttackTypeItem;
+import com.nekoadventure.item.nekoItem.attackTypeItem.NekoAttackTypeItem;
 import com.nekoadventure.item.other.NekoPackageItem;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.LivingEntity;
@@ -14,7 +14,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.Random;
 
-public class Blade extends AttackTypeItem {
+public class Blade extends NekoAttackTypeItem {
 
 
     public Blade(Settings settings, double health, double strength, double speed, double attackSpeed, double attackRange, double attackMultiplier, double attackSpeedMultiplier, boolean isSpecific) {

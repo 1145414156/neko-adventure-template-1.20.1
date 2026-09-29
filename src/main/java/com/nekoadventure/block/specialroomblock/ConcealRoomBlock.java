@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ConcealRoomBlock extends AbstractRoomBlock {
-    private final int[] PROBABILITIES_HEIGHT = {40, 30, 20, 10};
+    private final int[] PROBABILITIES_HEIGHT = {35, 30, 20, 15};
 
     public ConcealRoomBlock(Settings settings) {
         super(settings);

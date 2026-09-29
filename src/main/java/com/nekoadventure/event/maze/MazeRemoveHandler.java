@@ -9,6 +9,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.vehicle.BoatEntity;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.server.MinecraftServer;
@@ -23,10 +24,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MazeRemoveHandler {
-    private static final int APPLY_TICK=100;
+    private static final int APPLY_TICK=60;
     private static int tick=0;
     public static void register() {
         ServerTickEvents.START_WORLD_TICK.register((ServerWorld world) -> {
+            if (!isMazeDimension(world)) {return;}
             MinecraftServer server = world.getServer();
             List<ServerPlayerEntity> allPlayers = server.getPlayerManager().getPlayerList();
             MazeDataManager mazeDataManager=MazeDataManager.get(world);
@@ -34,7 +36,6 @@ public class MazeRemoveHandler {
             if (mazeDataManager != null) {
                  mazeData = mazeDataManager.getRoomData();
             }
-            if (!isMazeDimension(world)) {return;}
             if (mazeData.isEmpty()){return;}
 
             if (world.getPlayers().isEmpty()) {

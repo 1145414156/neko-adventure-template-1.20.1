@@ -1,36 +1,34 @@
 package com.nekoadventure.item.nekoItem.functionTypeItem.functionItems.tick;
 
-import com.nekoadventure.item.nekoItem.functionTypeItem.functionItems.FunctionItem;
+import com.nekoadventure.item.nekoItem.functionTypeItem.functionItems.NekoFunctionItem;
+import com.nekoadventure.other.itemApart.NekoPackageDataManager;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.Text;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Random;
-import java.util.UUID;
 
-public class Poker extends FunctionItem {
+public class Poker extends NekoFunctionItem {
     public Poker(Settings settings) {
         super(settings);
         text= Text.of("每隔10秒，随机给予玩家力量，抗性提升，速度，生命恢复的效果");
     }
-    private final Map<UUID, Integer> playerTimers = new HashMap<>();
     private final Random random = new Random();
 
     @Override
     public void applyTickFunctionItem(PlayerEntity player) {
-        UUID playerUuid = player.getUuid();
-        int z = playerTimers.getOrDefault(playerUuid, 0);
+        //只在服务端执行：客户端也会执行本逻辑，导致计时双倍消耗、随机结果不一致
+        if (player.getWorld().isClient()) return;
+        //状态按玩家存储，避免物品单例跨玩家共享状态
+        int z = NekoPackageDataManager.getItemIntState(player, "poker");
         if (z < 400) {
-            playerTimers.put(playerUuid, z + 1);
+            NekoPackageDataManager.setItemIntState(player, "poker", z + 1);
         } else {
             clearAllEffects(player);
-            int i = random.nextInt(4);
-            applyRandomEffect(player, i);
-            playerTimers.put(playerUuid, 0);
+            applyRandomEffect(player, random.nextInt(4));
+            NekoPackageDataManager.setItemIntState(player, "poker", 0);
         }
     }
     private void clearAllEffects(PlayerEntity player) {

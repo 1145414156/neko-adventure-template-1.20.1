@@ -3,9 +3,9 @@ package com.nekoadventure.item.nekoItem.attackTypeItem.attackItems;
 import com.nekoadventure.client.ShiftKeyHelper;
 import com.nekoadventure.entity.ModEntities;
 import com.nekoadventure.entity.missile.MissileEntity;
-import com.nekoadventure.item.nekoItem.attackTypeItem.AttackTypeItem;
+import com.nekoadventure.item.nekoItem.attackTypeItem.NekoAttackTypeItem;
 import com.nekoadventure.item.other.NekoPackageItem;
-import com.nekoadventure.network.NekoPackageDataManager;
+import com.nekoadventure.other.itemApart.NekoPackageDataManager;
 import com.nekoadventure.other.attackApart.AttackTypes;
 import com.nekoadventure.sound.ModSoundEvents;
 import net.minecraft.client.item.TooltipContext;
@@ -21,10 +21,12 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
-public class Lance extends AttackTypeItem {
+public class Lance extends NekoAttackTypeItem {
     public Lance(Settings settings, double health, double strength, double speed, double attackSpeed, double attackRange, double attackMultiplier, double attackSpeedMultiplier, boolean isSpecific) {
         super(settings, health, strength, speed, attackSpeed, attackRange, attackMultiplier, attackSpeedMultiplier, isSpecific);
     }
@@ -55,8 +57,8 @@ public class Lance extends AttackTypeItem {
         }
         double[] finalData = NekoPackageDataManager.getFinalData(player);
         double attackSpeed = finalData != null ? finalData[3] : 0;
-        int cooldown = (int) (200 - (attackSpeed / 12.0) * 200);
-        cooldown = Math.max(20, Math.min(200, cooldown));
+        int cooldown = (int) (100 - (attackSpeed / NekoPackageDataManager.MAX_ATTACK_SPEED) * 100);
+        cooldown = Math.max(10, Math.min(60, cooldown));
         player.getItemCooldownManager().set(player.getOffHandStack().getItem(), cooldown);
     }
 
@@ -91,50 +93,55 @@ public class Lance extends AttackTypeItem {
     @Override
     public void changeOffAttackType(PlayerEntity player) {
         super.changeOffAttackType(player);
-        if (canExecute(player,5)) {
+        if (canExecute(player,10)) {
             World world = player.getWorld();
-            double damage=1;
+            double damage;
             double attackRange = 3;
             if (player.getOffHandStack().getItem() instanceof NekoPackageItem nekoPackage) {
                 damage= nekoPackage.getStrength(player);
                 attackRange = nekoPackage.getAttackRange(player);
+            } else {
+                damage = 1;
             }
             List<MissileEntity> missileEntities = world.getEntitiesByClass(
                     MissileEntity.class,
-                    player.getBoundingBox().expand(attackRange*4),
-                    entity ->entity.getOwner()!=null&& entity.getOwner().equals(player)
+                    player.getBoundingBox().expand(attackRange * 4),
+                    entity -> entity.getOwner() != null && entity.getOwner().equals(player)
             );
 
-            if (!missileEntities.isEmpty()){
-                for (MissileEntity missileEntity : missileEntities) {
-                    List<LivingEntity> entities = world.getEntitiesByClass(
-                            LivingEntity.class,
-                            missileEntity.getBoundingBox().expand(5),
-                            entity -> missileEntity.getOwner() != entity && entity.isAlive()
-                    ).stream().limit(8).toList();
-                    if (!entities.isEmpty()){
-                        for (LivingEntity livingEntity : entities) {
-                            MissileEntity missile=getMissileEntity(missileEntity,damage);
-                            missile.setPosition(livingEntity.getEyePos());
-                            world.spawnEntity(missile);
-                            livingEntity.takeKnockback(0.5f,missileEntity.getX()-livingEntity.getX(),missileEntity.getZ()-livingEntity.getZ());
-                        }
-                        player.getWorld().playSound(null, player.getBlockPos(), ModSoundEvents.LANCE_ATTACK,
-                                SoundCategory.PLAYERS, 0.5F, 1.0F);
-                    }
-                }
+            if (missileEntities.isEmpty()) {
+                return;
             }
+            MissileEntity nearestMissile = missileEntities.stream()
+                    .min(Comparator.comparingDouble(m -> m.squaredDistanceTo(player)))
+                    .orElse(null);
+            Optional<LivingEntity> nearestTarget = world.getEntitiesByClass(
+                    LivingEntity.class,
+                    nearestMissile.getBoundingBox().expand(5),
+                    entity -> nearestMissile.getOwner() != entity && entity.isAlive()
+            ).stream().min(Comparator.comparingDouble(entity -> entity.squaredDistanceTo(nearestMissile)));
+
+            nearestTarget.ifPresent(target -> {
+                MissileEntity missile = getMissileEntity(nearestMissile, damage);
+                missile.setPosition(target.getEyePos());
+                world.spawnEntity(missile);
+                target.takeKnockback(0.5f,
+                        nearestMissile.getX() - target.getX(),
+                        nearestMissile.getZ() - target.getZ());
+                player.getWorld().playSound(null, player.getBlockPos(), ModSoundEvents.LANCE_ATTACK,
+                        SoundCategory.PLAYERS, 0.5F, 1.0F);
+            });
         }
     }
 
     private @NotNull MissileEntity getMissileEntity(Entity owner, double damage) {
-        AttackTypes brimstoneType = new AttackTypes(AttackTypes.AttackType.LAZY);
+        AttackTypes brimstoneType = new AttackTypes(AttackTypes.AttackType.HOMING);
         return new MissileEntity(ModEntities.MISSILE,
                 owner.getWorld(),
                 owner,
                 brimstoneType,
                 false,
-                3,
+                40,
                 3,
                 damage);
     }
@@ -142,7 +149,7 @@ public class Lance extends AttackTypeItem {
     @Override
     public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
         super.appendTooltip(stack, world, tooltip, context);
-        Text moreText=Text.of("主攻击：玩家朝自身视野方向的\"范围\"距离(最多8格)获取生物并造成一次\"力量\"的伤害(位移期间为无敌)");
+        Text moreText=Text.of("主攻击：玩家朝自身视野方向的\"范围\"距离(最多8格)获取生物并造成一次\"力量\"伤害");
         Text moreText1=Text.of("次攻击：弹幕持续将周围5格范围内的生物造成\"力量\"的伤害并将该目标相对该弹幕位置击退(可触发特效)");
         if (ShiftKeyHelper.isShiftDown()) {
             tooltip.add(moreText);

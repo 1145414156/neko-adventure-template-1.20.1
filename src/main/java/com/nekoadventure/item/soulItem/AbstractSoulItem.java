@@ -1,7 +1,6 @@
 package com.nekoadventure.item.soulItem;
 
 import com.nekoadventure.client.ShiftKeyHelper;
-import com.nekoadventure.sound.ModSoundEvents;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
@@ -47,38 +46,33 @@ public abstract class AbstractSoulItem extends Item {
         int currentDamage = stack.getDamage();
         int newDamage = Math.max(0, currentDamage - amount);
         stack.setDamage(newDamage);
-
-        // 如果满充能了，显示提示
-        if (newDamage == 0) {
-            if (stack.getHolder() != null) {
-                stack.getHolder().getWorld().playSound(null,stack.getHolder().getBlockPos(), ModSoundEvents.ELECTRICITY_RUN_THROUGH,
-                        SoundCategory.PLAYERS,1.0F,1.0F);
-            }
-            // 物品已满充能，并且播放音效
-        }
     }
     // ========== 物品使用逻辑 ==========
 
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity player, Hand hand) {
-        ItemStack stack = player.getStackInHand(hand);
-
-        if (!world.isClient) {
-            // 检查是否满充能（满耐久）
-            if (!isFullyCharged(stack)) {
-                return TypedActionResult.fail(stack);
-            }
-
-            onUseEffect(world, player, stack);
-
-            stack.decrement(1);
-
-            player.getWorld().playSound(null,player.getBlockPos(), SoundEvents.BLOCK_GLASS_BREAK, SoundCategory.PLAYERS,1.0F,1.0F);
-
-            return TypedActionResult.success(stack);
+        // 只允许主手使用
+        if (hand != Hand.MAIN_HAND) {
+            return TypedActionResult.fail(player.getStackInHand(hand));
         }
 
-        return TypedActionResult.pass(stack);
+        ItemStack stack = player.getStackInHand(hand);
+
+            if (!world.isClient) {
+                // 检查是否满充能（满耐久）
+                if (!isFullyCharged(stack)) {
+                    return TypedActionResult.fail(stack);
+                }
+
+                onUseEffect(world, player, stack);
+
+                stack.decrement(1);
+
+                player.getWorld().playSound(null, player.getBlockPos(), SoundEvents.BLOCK_GLASS_BREAK, SoundCategory.PLAYERS, 1.0F, 1.0F);
+
+                return TypedActionResult.success(stack);
+            }
+        return TypedActionResult.fail(stack);
     }
 
     // ========== 物品显示相关 ==========

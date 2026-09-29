@@ -4,10 +4,11 @@ import com.nekoadventure.NekoAdventure;
 import com.nekoadventure.client.ShiftKeyHelper;
 import com.nekoadventure.item.ModItems;
 import com.nekoadventure.item.nekoItem.AbstractNekoItem;
-import com.nekoadventure.item.nekoItem.attackTypeItem.AttackTypeItem;
-import com.nekoadventure.item.nekoItem.functionTypeItem.functionItems.FunctionItem;
-import com.nekoadventure.network.NekoPackageDataManager;
-import com.nekoadventure.network.NekoPackageDataNetworking;
+import com.nekoadventure.item.nekoItem.attackTypeItem.NekoAttackTypeItem;
+import com.nekoadventure.item.nekoItem.functionTypeItem.functionItems.NekoFunctionItem;
+import com.nekoadventure.other.itemApart.NekoPackageDataManager;
+import com.nekoadventure.network.item.NekoPackageDataNetworking;
+import com.nekoadventure.other.mazeApart.MazeDataManager;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.attribute.EntityAttributeInstance;
@@ -21,6 +22,7 @@ import net.minecraft.nbt.NbtList;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.screen.slot.Slot;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
@@ -38,26 +40,6 @@ public class NekoPackageItem extends Item {
 
     public NekoPackageItem(Settings settings) {
         super(settings.maxCount(1).rarity(Rarity.EPIC));
-    }
-
-    //这里是特殊攻击方式的入口
-    @Override
-    public TypedActionResult<ItemStack> use(World world, PlayerEntity player, Hand hand) {
-        ItemStack stack = player.getStackInHand(hand);
-        if (getIsFinished(stack)==2) {
-            return TypedActionResult.fail(stack);
-        }
-        if (!player.getItemCooldownManager().isCoolingDown(this)) {
-            if (!world.isClient) {
-                if (!NekoPackageItem.getNekoItem(player.getOffHandStack(), false, 3).isEmpty()) {
-                    if (player.getAttackCooldownProgress(0.0f) == 1) {
-                        NekoPackageItem.applyMainAttackTypeItem(player);
-                    }
-                    return TypedActionResult.success(stack);
-                }
-            }
-        }
-        return TypedActionResult.fail(stack);
     }
 
     @Override
@@ -83,9 +65,16 @@ public class NekoPackageItem extends Item {
     @Override
     public void inventoryTick(ItemStack stack, World world, Entity entity, int slot, boolean selected) {
         super.inventoryTick(stack, world, entity, slot, selected);
-        //未通关的纸盒离开迷宫维度时，非创造模式玩家将自动清除（通关后的纸盒保留，但功能被禁用）
-        if (world instanceof ServerWorld && getIsFinished(stack)==1 && !isMazeDimension((ServerWorld) world)
+        //未通关的纸盒离开迷宫维度时，且迷宫内没有玩家的时候，非创造模式玩家将自动清除（通关后的纸盒保留，但功能被禁用）
+        if (world instanceof ServerWorld serverWorld && getIsFinished(stack)==1
+                && !isMazeDimension(serverWorld) && hasNoPlayerInMaze(serverWorld)
                 && entity instanceof PlayerEntity player && !player.isCreative()) {
+            stack.decrement(1);
+            return;
+        }
+        //通过的纸盒进入维度，且玩家为创造模式会被自动清除
+        if (world instanceof ServerWorld serverWorld&& getIsFinished(stack)==2&&
+                entity instanceof PlayerEntity player && !player.isCreative()&& isMazeDimension(serverWorld)){
             stack.decrement(1);
             return;
         }
@@ -107,6 +96,8 @@ public class NekoPackageItem extends Item {
                     if (getIsFinished(player.getOffHandStack())==2) {return;}
                     if (!world.isClient) {
                         NekoPackageDataManager.PlayerNekoData data = NekoPackageDataManager.getOrCreate(player);
+                        //每tick将tickData朝零衰减0.05
+                        NekoPackageDataManager.decayTickData(player);
                         if (data.recycleTime < 100) {
                             data.recycleTime++;
                         }
@@ -157,13 +148,13 @@ public class NekoPackageItem extends Item {
         NekoPackageDataManager.PlayerNekoData data = NekoPackageDataManager.getOrCreate(player);
         //先清除上一轮的数据（没有就会跳过）
         data.recycle = false;
-        data.finalData[0]=data.nekoData[0]+data.otherData[0];
-        data.finalData[1]=data.nekoData[1]+data.otherData[1];
-        data.finalData[2]=data.nekoData[2]+data.otherData[2];
-        data.finalData[3]=data.nekoData[3]+data.otherData[3];
-        data.finalData[4]=data.nekoData[4]+data.otherData[4];
-        data.finalData[5]=data.nekoData[5]+data.otherData[5];
-        data.finalData[6]=data.nekoData[6]+data.otherData[6];
+        data.finalData[0]=data.nekoData[0]+data.otherData[0]+data.tickData[0];
+        data.finalData[1]=data.nekoData[1]+data.otherData[1]+data.tickData[1];
+        data.finalData[2]=data.nekoData[2]+data.otherData[2]+data.tickData[2];
+        data.finalData[3]=data.nekoData[3]+data.otherData[3]+data.tickData[3];
+        data.finalData[4]=data.nekoData[4]+data.otherData[4]+data.tickData[4];
+        data.finalData[5]=data.nekoData[5]+data.otherData[5]+data.tickData[5];
+        data.finalData[6]=data.nekoData[6]+data.otherData[6]+data.tickData[6];
         calculateData(data.finalData);
         clearPlayerAttributeInstance(damageAttr, speedAttr, healthAttr, attackSpeedAttr);
         // 生命值
@@ -200,10 +191,7 @@ public class NekoPackageItem extends Item {
         if (damageAttr != null) {
             damageAttr.addTemporaryModifier(strengthModifier);
         }
-        //攻速值（*0.3）
-        if (data.finalData[3]>12) {
-            data.finalData[3]=12;
-        }
+        //攻速值（*0.2）
         EntityAttributeModifier attackSpeedModifier = new EntityAttributeModifier(
                 UUID.fromString("550e8400-e29b-41d4-a716-446655440003"),
                 "Neko Package AttackSpeed",
@@ -214,31 +202,55 @@ public class NekoPackageItem extends Item {
             attackSpeedAttr.addTemporaryModifier(attackSpeedModifier);
         }
         if (player instanceof ServerPlayerEntity serverPlayer) {
-            NekoPackageDataNetworking.sendToPlayer(serverPlayer, data.finalData);
+            //发送当前楼层数据给client端
+            int level = 1;
+            if (serverPlayer.getWorld() instanceof ServerWorld serverWorld && isMazeDimension(serverWorld)) {
+                MazeDataManager mazeDataManager = MazeDataManager.get(serverWorld);
+                if (mazeDataManager != null) {
+                    level = mazeDataManager.getLevelData();
+                }
+            }
+            NekoPackageDataNetworking.sendToPlayer(serverPlayer, data.finalData, level);
         }
     }
 
     private void calculateData(double[] data) {
         // [0]=health, [1]=speed, [2]=strength，[3]=attackSpeed,
         // [4]=attackRange,[5]=attackMultiplier,[6]=attackSpeedMultiplier
-        data[2]= data[2] * data[5] + data[2];
-        data[3]= data[3] + data[3] * data[6];
-        if (data[3]==0){
-            data[3]= data[3]+ data[6];
+
+        //attackMultiplier
+        if (data[5] >= 0 && data[5] < NekoPackageDataManager.MIN_ATTACK_MULTIPLIER) {
+            data[5] = NekoPackageDataManager.MIN_ATTACK_MULTIPLIER;
         }
-        if (data[3]<-5){
-            data[3]=-5;
+
+        //strength
+        double strength = data[2];
+        double attackMultiplier = data[5];
+        strength = strength * attackMultiplier + strength;
+        if (attackMultiplier < 0 && strength < 0) {
+            strength = Math.abs(strength) * attackMultiplier + strength;
         }
-        if (data[2]==0){
-            data[2]= data[2]+data[5];
+        if (strength == 0) {
+            strength += attackMultiplier;
         }
-        if (data[2]<1){
-            data[2]=1;
+        data[2] = Math.max(strength, 0.1);
+
+        // attackSpeed
+        double attackSpeed = data[3];
+        double attackSpeedMultiplier = data[6];
+
+        attackSpeed = attackSpeed + attackSpeed * attackSpeedMultiplier;
+        if (attackSpeedMultiplier < 0 && attackSpeed < 0) {
+            attackSpeed = Math.abs(attackSpeed) * attackSpeedMultiplier + attackSpeed;
         }
-        if (data[5]<0.5&&data[5]>0){
-            data[5]=0.5;
+        if (attackSpeed == 0) {
+            attackSpeed += attackSpeedMultiplier;
         }
-        data[4]=Math.max(Math.min(data[4],32),4);
+        data[3] = Math.min(NekoPackageDataManager.MAX_ATTACK_SPEED,Math.max(attackSpeed, -12));
+
+
+        //attackRange
+        data[4] = Math.max(Math.min(data[4], NekoPackageDataManager.MAX_ATTACK_RANGE), 4);
     }
 
     private void clearPlayerAttributeInstance(EntityAttributeInstance damageAttr, EntityAttributeInstance speedAttr, EntityAttributeInstance healthAttr, EntityAttributeInstance attackSpeedAttr) {
@@ -278,7 +290,7 @@ public class NekoPackageItem extends Item {
 
     //这个方法是用来应用主攻击方式
     public static void applyMainAttackTypeItem(PlayerEntity player) {
-        AttackTypeItem finalAttackMainItem = null;
+        NekoAttackTypeItem finalAttackMainItem = null;
         ItemStack stack = player.getStackInHand(Hand.OFF_HAND);
         if (getIsFinished(stack)==2) {return;}
         NbtCompound nbt = stack.getOrCreateNbt();
@@ -290,8 +302,8 @@ public class NekoPackageItem extends Item {
 
             for (int i = 0; i < items.size(); i++) {
                 ItemStack itemStack = ItemStack.fromNbt(items.getCompound(i));
-                if (itemStack.getItem() instanceof AttackTypeItem attackTypeItem && !attackTypeItem.getIsSpecific()) {
-                    finalAttackMainItem=attackTypeItem;
+                if (itemStack.getItem() instanceof NekoAttackTypeItem nekoAttackTypeItem && !nekoAttackTypeItem.getIsSpecific()) {
+                    finalAttackMainItem= nekoAttackTypeItem;
                 }
             }
             if (finalAttackMainItem != null) {
@@ -299,9 +311,21 @@ public class NekoPackageItem extends Item {
             }
         }
     }
+    //按键触发的主要攻击入口
+    public static void tryApplyMainAttackType(PlayerEntity player) {
+        ItemStack stack = player.getStackInHand(Hand.OFF_HAND);
+        if (getIsFinished(stack)==2) {return;}
+        if (player.getItemCooldownManager().isCoolingDown(ModItems.NEKO_PACKAGE)) {return;}
+        if (!getNekoItem(stack, false, 3).isEmpty()) {
+            if (player.getAttackCooldownProgress(0.0f) == 1) {
+                applyMainAttackTypeItem(player);
+            }
+        }
+    }
+
     public static void applyOffAttackTypeItem(PlayerEntity player) {
-        AttackTypeItem finalAttackOffItem=null;
-        AttackTypeItem finalAttackMainItem = null;
+        NekoAttackTypeItem finalAttackOffItem=null;
+        NekoAttackTypeItem finalAttackMainItem = null;
         ItemStack stack = player.getStackInHand(Hand.OFF_HAND);
         if (getIsFinished(stack)==2) {return;}
         NbtCompound nbt = stack.getOrCreateNbt();
@@ -313,9 +337,9 @@ public class NekoPackageItem extends Item {
 
             for (int i = 0; i < items.size(); i++) {
                 ItemStack itemStack = ItemStack.fromNbt(items.getCompound(i));
-                if (itemStack.getItem() instanceof AttackTypeItem attackTypeItem && !attackTypeItem.getIsSpecific()) {
+                if (itemStack.getItem() instanceof NekoAttackTypeItem nekoAttackTypeItem && !nekoAttackTypeItem.getIsSpecific()) {
                     finalAttackOffItem=finalAttackMainItem;
-                    finalAttackMainItem=attackTypeItem;
+                    finalAttackMainItem= nekoAttackTypeItem;
                 }
             }
             if (finalAttackOffItem != null) {
@@ -348,11 +372,15 @@ public class NekoPackageItem extends Item {
     public void addOtherData(PlayerEntity player, double[] otherData1) {
         NekoPackageDataManager.addOtherData(player, otherData1);
     }
+    public void addTickData(PlayerEntity player,double[] tickData1) {
+        NekoPackageDataManager.addTickData(player, tickData1);
+    }
 
     //这个方法是用来提取物品的
     //这里的boolean是判断道具是否可重复
     //getType=0:拿全部道具,=1:拿特效类道具,=3:拿改变攻击类道具，=4:拿功能类道具
     public static ArrayList<AbstractNekoItem> getNekoItem(ItemStack stack, boolean isRepeatable,int getType) {
+        if (stack.getItem()!=ModItems.NEKO_PACKAGE){return new ArrayList<>();}
         ArrayList<AbstractNekoItem> nekoItems = new ArrayList<>();
         NbtCompound nbt = stack.getOrCreateNbt();
         if (!nbt.contains("Items")) {nbt.put("Items", new NbtList());}
@@ -366,18 +394,18 @@ public class NekoPackageItem extends Item {
                     }
                 }
                 else if (getType==1) {
-                    if (itemStack.getItem() instanceof AttackTypeItem abstractNekoItem&&abstractNekoItem.getIsSpecific()) {
+                    if (itemStack.getItem() instanceof NekoAttackTypeItem abstractNekoItem&&abstractNekoItem.getIsSpecific()) {
                         nekoItems.add(abstractNekoItem);
                     }
                 }
                 else if (getType==3) {
-                    if (itemStack.getItem() instanceof AttackTypeItem abstractNekoItem&&!abstractNekoItem.getIsSpecific()) {
+                    if (itemStack.getItem() instanceof NekoAttackTypeItem abstractNekoItem&&!abstractNekoItem.getIsSpecific()) {
                         nekoItems.add(abstractNekoItem);
                     }
                 }
                 else if (getType==4) {
-                    if (itemStack.getItem() instanceof FunctionItem functionItem) {
-                        nekoItems.add(functionItem);
+                    if (itemStack.getItem() instanceof NekoFunctionItem nekoFunctionItem) {
+                        nekoItems.add(nekoFunctionItem);
                     }
                 }
             }
@@ -388,6 +416,14 @@ public class NekoPackageItem extends Item {
             return new ArrayList<>(new LinkedHashSet<>(nekoItems));
         }
     }
+    //这个方法是用来获取nekoPackage是否含有指定的物品
+    /**@return true=拥有，false=未拥有
+     **/
+    public boolean isHaveNekoItem(ItemStack stack, AbstractNekoItem scanNekoItem) {
+        ArrayList<AbstractNekoItem> abstractNekoItems=getNekoItem(stack,false,0);
+        return abstractNekoItems.contains(scanNekoItem);
+    }
+
     //这个方法主要是用来调用所有的FunctionItem里面的方法，1代表tickFunction方法，2代表HurtFunctionItem方法
     /**@return true=可以执行免伤效果;false=不能执行免伤效果
      **/
@@ -395,13 +431,13 @@ public class NekoPackageItem extends Item {
         boolean z=false;
         for (int i = 0; i < items.size();) {
             if (choose==1){
-                if (items.get(i) instanceof FunctionItem functionItem) {
-                    functionItem.applyTickFunctionItem(player);
+                if (items.get(i) instanceof NekoFunctionItem nekoFunctionItem) {
+                    nekoFunctionItem.applyTickFunctionItem(player);
                 }
             }
             else if (choose==2){
-                if (items.get(i) instanceof FunctionItem functionItem) {
-                    if (functionItem.applyDamagedFunctionItem(player)) {
+                if (items.get(i) instanceof NekoFunctionItem nekoFunctionItem) {
+                    if (nekoFunctionItem.applyDamagedFunctionItem(player)) {
                         z=true;
                     }
                 }
@@ -442,11 +478,22 @@ public class NekoPackageItem extends Item {
         return nbt.getInt(FINISHED_KEY);
     }
 
-    private boolean isMazeDimension(ServerWorld world) {
+    private static boolean isMazeDimension(ServerWorld world) {
         TagKey<DimensionType> isMazeTag = TagKey.of(
                 RegistryKeys.DIMENSION_TYPE,
                 new Identifier(NekoAdventure.MOD_ID, "is_maze")
         );
         return world.getDimensionEntry().isIn(isMazeTag);
+    }
+
+    //这个方法是用来判断所有的迷宫维度内是否已经没有玩家
+    private static boolean hasNoPlayerInMaze(ServerWorld world) {
+        MinecraftServer server = world.getServer();
+        for (ServerWorld serverWorld : server.getWorlds()) {
+            if (isMazeDimension(serverWorld) && !serverWorld.getPlayers().isEmpty()) {
+                return false;
+            }
+        }
+        return true;
     }
 }

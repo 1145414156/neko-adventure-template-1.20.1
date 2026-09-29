@@ -1,22 +1,24 @@
 {
   "replace": false,
   "values": [
-    "neko-adventure:oxidized_copper_ingot",
+    "neko-adventure:umbrella",
+    "neko-adventure:cloud_boots",
+    "neko-adventure:broken_sword_hilt",
     "neko-adventure:blade",
+    "neko-adventure:quenching_chain",
+    "neko-adventure:boomerang",
+    "neko-adventure:zenith",
+    "neko-adventure:lava_walker",
+    "neko-adventure:lance",
+    "neko-adventure:silver_armor",
+    "neko-adventure:piercing_diamond",
+    "neko-adventure:compress_iron",
+    "neko-adventure:tactical_vest",
     "neko-adventure:damaged_bracer",
     "neko-adventure:tactical_armor",
-    "neko-adventure:piercing_diamond",
-    "neko-adventure:boomerang",
-    "neko-adventure:cat_teacup",
-    "neko-adventure:tactical_vest",
-    "neko-adventure:quenching_chain",
-    "neko-adventure:silver_armor",
-    "neko-adventure:zenith",
-    "neko-adventure:broken_sword_hilt",
     "neko-adventure:skeleton_priest_jewel",
-    "neko-adventure:lance",
-    "neko-adventure:umbrella",
-    "neko-adventure:lava_walker",
-    "neko-adventure:compress_iron"
+    "neko-adventure:cat_teacup",
+    "neko-adventure:short_hook",
+    "neko-adventure:oxidized_copper_ingot"
   ]
 }

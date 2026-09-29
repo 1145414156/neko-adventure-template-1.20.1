@@ -1,4 +1,4 @@
-package com.nekoadventure.network;
+package com.nekoadventure.network.maze;
 
 import com.nekoadventure.NekoAdventure;
 import com.nekoadventure.other.mazeApart.PlayerBlackScreenState;

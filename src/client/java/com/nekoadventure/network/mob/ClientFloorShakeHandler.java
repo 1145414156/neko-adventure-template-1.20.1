@@ -1,6 +1,5 @@
-package com.nekoadventure.screen;
+package com.nekoadventure.network.mob;
 
-import com.nekoadventure.network.FloorShakeNetworking;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;

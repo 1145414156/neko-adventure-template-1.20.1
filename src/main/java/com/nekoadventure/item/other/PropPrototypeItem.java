@@ -55,12 +55,26 @@ public class PropPrototypeItem extends Item {
 
         List<Item> pool = readStoredPool(stack);
 
-        // 第一次使用：尚未储存道具池，扫描附近房间方块并储存打乱后的道具池
         if (pool.isEmpty()) {
             AbstractRoomBlock roomBlock = findNearbyRoomBlock(serverWorld, player);
             if (roomBlock == null) {
-                player.sendMessage(Text.literal("§c附近 7×7×7 范围内没有找到房间方块"), true);
-                return TypedActionResult.fail(stack);
+                if (player.getOffHandStack().getItem() instanceof AbstractSoulPoolItem abstractSoulPoolItem){
+                    List<Item> soulPoolItems=abstractSoulPoolItem.getStoragePoolItems(pool,player);
+                    if (!soulPoolItems.isEmpty()){
+                        player.getOffHandStack().decrement(1);
+                        player.sendMessage(Text.literal("§b已强制读取魂石中存在的道具池"), true);
+                        writeStoredPool(stack,soulPoolItems);
+                        return TypedActionResult.success(stack);
+                    }
+                    else {
+                        player.sendMessage(Text.literal("§c附近 7×7×7 范围内没有找到房间方块"), true);
+                        return TypedActionResult.fail(stack);
+                    }
+                }
+                else {
+                    player.sendMessage(Text.literal("§c附近 7×7×7 范围内没有找到房间方块"), true);
+                    return TypedActionResult.fail(stack);
+                }
             }
             Set<Item> roomPool = spawnRandomNekoItems.getRoomPool(serverWorld, roomBlock);
             List<Item> shuffled = new ArrayList<>(roomPool);
@@ -80,7 +94,7 @@ public class PropPrototypeItem extends Item {
             return TypedActionResult.success(stack);
         }
 
-        if (player.getMainHandStack().getItem().equals(this)&&player.getOffHandStack().isEmpty() ) {
+        if (player.getMainHandStack().getItem().equals(this)) {
             Item drawn = pool.get(world.getRandom().nextInt(pool.size()));
             pool.remove(drawn);
             writeStoredPool(stack, pool);

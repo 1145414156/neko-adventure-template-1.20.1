@@ -10,9 +10,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class FunctionItem extends AbstractNekoItem {
+public class NekoFunctionItem extends AbstractNekoItem {
 
-    public FunctionItem(Settings settings) {
+    public NekoFunctionItem(Settings settings) {
         super(settings);
     }
     public boolean applyDamagedFunctionItem(PlayerEntity player){return false;}

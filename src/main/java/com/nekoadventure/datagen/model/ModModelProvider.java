@@ -109,6 +109,7 @@ public class ModModelProvider extends FabricModelProvider {
         itemModelGenerator.register(ModItems.ACCELERATION, Models.GENERATED);
         itemModelGenerator.register(ModItems.DECELERATION, Models.GENERATED);
         itemModelGenerator.register(ModItems.ZENITH, Models.GENERATED);
+        itemModelGenerator.register(ModItems.SHORT_HOOK, Models.GENERATED);
         itemModelGenerator.register(ModItems.BULLET, Models.GENERATED);
         itemModelGenerator.register(ModItems.THE_THIRD_EYE,Models.GENERATED);
         itemModelGenerator.register(ModItems.BLADE, Models.GENERATED);
@@ -142,6 +143,12 @@ public class ModModelProvider extends FabricModelProvider {
         itemModelGenerator.register(ModItems.COMPRESSED_IRON,Models.GENERATED);
         itemModelGenerator.register(ModItems.CHOCOLATE_BISCUIT,Models.GENERATED);
         itemModelGenerator.register(ModItems.THE_FOURTH_EYE,Models.GENERATED);
+        itemModelGenerator.register(ModItems.RESTOCK,Models.GENERATED);
+        itemModelGenerator.register(ModItems.ABUNDANT_ITEM_BASE,Models.GENERATED);
+        itemModelGenerator.register(ModItems.CLOUD_BOOTS,Models.GENERATED);
+        itemModelGenerator.register(ModItems.ADRENALINE,Models.GENERATED);
+        itemModelGenerator.register(ModItems.BATTERY,Models.GENERATED);
+        itemModelGenerator.register(ModItems.BROKEN_CROWN,Models.GENERATED);
 
         itemModelGenerator.register(ModItems.INSTANCE_HEALTH_SOUL,Models.GENERATED);
         itemModelGenerator.register(ModItems.TP_START_ROOM_SOUL,Models.GENERATED);

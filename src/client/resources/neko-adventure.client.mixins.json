@@ -1,11 +1,13 @@
 {
   "required": true,
-  "package": "com.nekoadventure.mixin.client",
+  "package": "com.nekoadventure.mixin",
   "compatibilityLevel": "JAVA_17",
   "client": [
-    "ClientPlayerInteractionManagerMixin",
-    "DrawContextMixin",
-    "HandledScreenAccessor"
+    "client.ClientPlayerEntityMixin",
+    "client.ClientPlayerInteractionManagerMixin",
+    "client.DrawContextMixin",
+    "client.HandledScreenAccessor",
+    "ui.NekoBossBarMixin"
   ],
   "injectors": {
     "defaultRequire": 1

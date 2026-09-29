@@ -3,9 +3,9 @@ package com.nekoadventure.item.nekoItem.attackTypeItem.attackItems;
 import com.nekoadventure.client.ShiftKeyHelper;
 import com.nekoadventure.entity.ModEntities;
 import com.nekoadventure.entity.missile.MissileEntity;
-import com.nekoadventure.item.nekoItem.attackTypeItem.AttackTypeItem;
+import com.nekoadventure.item.nekoItem.attackTypeItem.NekoAttackTypeItem;
 import com.nekoadventure.item.other.NekoPackageItem;
-import com.nekoadventure.network.NekoPackageDataManager;
+import com.nekoadventure.other.itemApart.NekoPackageDataManager;
 import com.nekoadventure.other.attackApart.AttackTypes;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.Entity;
@@ -18,7 +18,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class Zenith extends AttackTypeItem {
+public class Zenith extends NekoAttackTypeItem {
     public Zenith(Settings settings, double health, double strength, double speed, double attackSpeed, double attackRange, double attackMultiplier, double attackSpeedMultiplier, boolean isSpecific) {
         super(settings, health, strength, speed, attackSpeed, attackRange, attackMultiplier, attackSpeedMultiplier, isSpecific);
     }
@@ -39,7 +39,7 @@ public class Zenith extends AttackTypeItem {
         }
         double[] finalData = NekoPackageDataManager.getFinalData(player);
         double attackSpeed = finalData != null ? finalData[3] : 0;
-        int cooldown = (int) (120 - (attackSpeed / 12.0) * 120);
+        int cooldown = (int) (120 - (attackSpeed / NekoPackageDataManager.MAX_ATTACK_SPEED) * 120);
         cooldown = Math.max(12, Math.min(120, cooldown));
         player.getItemCooldownManager().set(player.getOffHandStack().getItem(), cooldown);
     }

@@ -252,6 +252,7 @@ public class GrandKnightEntityModel extends SinglePartEntityModel<GrandKnightEnt
 	public void setAngles(GrandKnightEntity entity, float limbAngle, float limbDistance, float animationProgress, float headYaw, float headPitch) {
 		this.getPart().traverse().forEach(ModelPart::resetTransform);
 		this.animateMovement(GrandKnightEntityModelAnimation.walk,limbAngle,limbDistance,2f,2.5f);
+		this.updateAnimation(entity.SUMMON_ANI,GrandKnightEntityModelAnimation.summon,animationProgress,1.0f);
 		this.updateAnimation(entity.STAGE_2_START_APART_ANI, GrandKnightEntityModelAnimation.levelTwo,animationProgress,1.0f);
 		this.updateAnimation(entity.GRAB_ANI, GrandKnightEntityModelAnimation.grab,animationProgress,1.0f);
 		this.updateAnimation(entity.SHIELD_SMASH_ANI, GrandKnightEntityModelAnimation.shieldSmash,animationProgress,1.0f);

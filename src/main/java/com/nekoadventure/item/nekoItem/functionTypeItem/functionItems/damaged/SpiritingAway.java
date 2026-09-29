@@ -1,10 +1,10 @@
 package com.nekoadventure.item.nekoItem.functionTypeItem.functionItems.damaged;
 
-import com.nekoadventure.item.nekoItem.functionTypeItem.functionItems.FunctionItem;
+import com.nekoadventure.item.nekoItem.functionTypeItem.functionItems.NekoFunctionItem;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.Text;
 
-public class SpiritingAway extends FunctionItem {
+public class SpiritingAway extends NekoFunctionItem {
     int tick=0;
     public SpiritingAway(Settings settings) {
         super(settings);

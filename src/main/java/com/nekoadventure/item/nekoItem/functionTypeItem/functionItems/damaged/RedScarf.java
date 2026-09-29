@@ -2,7 +2,7 @@ package com.nekoadventure.item.nekoItem.functionTypeItem.functionItems.damaged;
 
 import com.nekoadventure.entity.ModEntities;
 import com.nekoadventure.entity.missile.MissileEntity;
-import com.nekoadventure.item.nekoItem.functionTypeItem.functionItems.FunctionItem;
+import com.nekoadventure.item.nekoItem.functionTypeItem.functionItems.NekoFunctionItem;
 import com.nekoadventure.item.other.NekoPackageItem;
 import com.nekoadventure.other.attackApart.AttackTypes;
 import net.minecraft.entity.Entity;
@@ -17,7 +17,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Comparator;
 import java.util.List;
 
-public class RedScarf extends FunctionItem {
+public class RedScarf extends NekoFunctionItem {
     public RedScarf(Settings settings) {
         super(settings);
         text= Text.of("当附近有生物死亡时，在其位置召唤一个弹幕，锁定最近的生物;同时当玩家受到伤害时，对造成伤害者造成一次\"力量\"/2的伤害");
@@ -48,7 +48,7 @@ public class RedScarf extends FunctionItem {
         if (world.isClient){return;}
         List<LivingEntity> entities = world.getEntitiesByClass(
                 LivingEntity.class,
-                player.getBoundingBox().expand(6),
+                player.getBoundingBox().expand(range),
                 LivingEntity::isDead
         );
         if (!entities.isEmpty()) {

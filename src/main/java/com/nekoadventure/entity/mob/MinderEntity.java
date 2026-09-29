@@ -29,7 +29,7 @@ public class MinderEntity extends HostileEntity implements Monster {
                 .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.33D)
                 .add(EntityAttributes.GENERIC_ARMOR, 2.0D)
                 .add(EntityAttributes.GENERIC_ARMOR_TOUGHNESS, 0.0D)
-                .add(EntityAttributes.GENERIC_ATTACK_DAMAGE, 8.0D)
+                .add(EntityAttributes.GENERIC_ATTACK_DAMAGE, 6.0D)
                 .add(EntityAttributes.GENERIC_ATTACK_KNOCKBACK, 0.0D)
                 .add(EntityAttributes.GENERIC_FOLLOW_RANGE, 32.0D)
                 .add(EntityAttributes.GENERIC_KNOCKBACK_RESISTANCE, 0.0D);

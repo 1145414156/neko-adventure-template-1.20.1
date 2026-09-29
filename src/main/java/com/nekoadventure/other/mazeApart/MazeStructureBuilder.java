@@ -17,7 +17,10 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.packet.s2c.play.ChunkDataS2CPacket;
 import net.minecraft.registry.RegistryKey;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerChunkManager;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.structure.StructurePlacementData;
 import net.minecraft.structure.StructureTemplate;
@@ -27,15 +30,19 @@ import net.minecraft.util.BlockRotation;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
+import net.minecraft.world.chunk.WorldChunk;
 import net.minecraft.world.chunk.light.LightingProvider;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Stream;
 
 //这个类是用来专门放置特殊房间的类（例如藏宝房和商店就在这里）
@@ -67,16 +74,15 @@ public class MazeStructureBuilder {
 
             //这个是处理当死胡同不够的时候的情况
             if (impasseCount < MIN_IMPASSE_COUNT) {
-                List<MazePosNBTCompound> furcation = Stream.concat(calculateRoomType(world, 3).stream(), calculateRoomType(world, 2).stream()).toList();
-                int needRoomCount = MIN_IMPASSE_COUNT - impasseCount;
-                if (furcation.isEmpty()) {
-                    throw new IllegalStateException(String.format("IllegalRoomData:because Impasse count is %d,but need MIN_IMPASSE_COUNT is 3", needRoomCount));
+                System.err.println("Impasse count is less than "+MIN_IMPASSE_COUNT+"!");
+                impasse.addAll(Stream.concat(calculateRoomType(world, 3).stream(), calculateRoomType(world, 2).stream()).toList());
+                impasseCount =impasse.size();
+                if (impasseCount<MIN_IMPASSE_COUNT) {
+                    throw new IllegalStateException(String.format("IllegalRoomDataException:because Impasse count is %d,but need MIN_IMPASSE_COUNT is 3", impasseCount));
                 }
-                for (int i = 0; i < needRoomCount; i++) {
-                    MazePosNBTCompound roomData = furcation.get(i);
-                    impasse.add(roomData);
+                else {
+                    placeBaseSpecialRooms(impasse,world);
                 }
-                placeBaseSpecialRooms(impasse,world);
             }
             //这个是当死胡同刚好的时候
             else if (impasseCount== MIN_IMPASSE_COUNT) {
@@ -87,21 +93,12 @@ public class MazeStructureBuilder {
                 placeBaseSpecialRooms(impasse, world);
                 placeMoreSpecialRooms(impasse, impasseCount - MIN_IMPASSE_COUNT,world);
             }
-
-            //服务端与客户端的光照不同步会让部分房间在客户端渲染成全黑，
-            //所以放置完所有特殊房间后，把impasse中的每一个房间区域逐格重新标记给光照引擎重算
-            MazeDataManager data = MazeDataManager.get(world);
-            List<MazePosNBTCompound> initialRoomData=new ArrayList<>();
-            if (data != null) {
-                initialRoomData = data.getInitialData();
-            }
-            recalculateRoomLight(world, initialRoomData);
         }
     }
 
     //这个方法的作用是在放置完特殊房间后，立刻重新计算所有特殊房间区域的光照
     //服务端光照引擎重算完成后会主动把新的光照数据推送回所有客户端，从而消除全黑房间
-    private void recalculateRoomLight(World world, List<MazePosNBTCompound> rooms) {
+    public void recalculateRoomLight(World world, List<MazePosNBTCompound> rooms) {
         if (!(world instanceof ServerWorld serverWorld) || rooms.isEmpty()) {
             return;
         }
@@ -115,7 +112,7 @@ public class MazeStructureBuilder {
             //水平方向把大门和伪装墙的厚度也算进去，垂直方向按房间高度留出余量
             int margin = 3;
             int minY = Math.max(serverWorld.getBottomY() + 1, center.getY() - 4);
-            int maxY = Math.min(serverWorld.getTopY() - 1, center.getY() + 18);
+            int maxY = Math.min(serverWorld.getTopY() - 1, center.getY() + 32);
             BlockPos minPos = new BlockPos(
                     center.getX() - distance - margin,
                     minY,
@@ -134,6 +131,51 @@ public class MazeStructureBuilder {
             System.out.println("已重新标记特殊房间光照区域: " + center + " 范围: " + minPos + " 到 " + maxPos);
             //开发辅助
         }
+    }
+
+    //这个方法是在光照重算完成后，把每个房间所在区块的完整区块数据（方块+光照快照）
+    //重发给正在观看这些区块的玩家，客户端收到后会整列重建，用于兜底修复个别房间仍全黑的情况
+    public void resendRoomChunks(World world, List<MazePosNBTCompound> rooms) {
+        if (!(world instanceof ServerWorld serverWorld) || rooms.isEmpty()) {
+            return;
+        }
+        //水平范围与 recalculateRoomLight 保持一致（房间半径+3格余量），整列重发不需要垂直范围
+        Set<ChunkPos> chunkPositions = new HashSet<>();
+        for (MazePosNBTCompound room : rooms) {
+            BlockPos center = room.roomCenter();
+            int distance = MazeBlockEntity.detectRoomDistance(serverWorld, center);
+            if (distance <= 0) {
+                distance = 8;
+            }
+            int margin = 3;
+            int minChunkX = (center.getX() - distance - margin) >> 4;
+            int maxChunkX = (center.getX() + distance + margin) >> 4;
+            int minChunkZ = (center.getZ() - distance - margin) >> 4;
+            int maxChunkZ = (center.getZ() + distance + margin) >> 4;
+            for (int chunkX = minChunkX; chunkX <= maxChunkX; chunkX++) {
+                for (int chunkZ = minChunkZ; chunkZ <= maxChunkZ; chunkZ++) {
+                    chunkPositions.add(new ChunkPos(chunkX, chunkZ));
+                }
+            }
+        }
+
+        ServerChunkManager chunkManager = serverWorld.getChunkManager();
+        LightingProvider lightingProvider = chunkManager.getLightingProvider();
+        for (ChunkPos chunkPos : chunkPositions) {
+            WorldChunk worldChunk = chunkManager.getWorldChunk(chunkPos.x, chunkPos.z);
+            if (worldChunk == null) {
+                continue;
+            }
+            //区块与光照位图传 null 代表整列全量下发
+            ChunkDataS2CPacket chunkDataPacket = new ChunkDataS2CPacket(worldChunk, lightingProvider, null, null);
+            for (ServerPlayerEntity player : chunkManager.threadedAnvilChunkStorage.getPlayersWatchingChunk(chunkPos)) {
+                player.sendChunkPacket(chunkPos, chunkDataPacket);
+            }
+        }
+
+        //开发辅助
+        System.out.println("已向观看玩家重发完整区块数据, 区块数量: " + chunkPositions.size());
+        //开发辅助
     }
 
     public void clearRoomItemEntity(World world) {

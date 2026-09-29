@@ -83,7 +83,7 @@ public class PriestSkeletonEntity extends HostileEntity implements Monster {
     public static DefaultAttributeContainer.Builder createPriestSkeletonAttributes() {
         return HostileEntity.createHostileAttributes()
                 .add(EntityAttributes.GENERIC_MAX_HEALTH, 200.0D)
-                .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.33D)
+                .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.3D)
                 .add(EntityAttributes.GENERIC_ARMOR, 8.0D)
                 .add(EntityAttributes.GENERIC_ARMOR_TOUGHNESS, 4.0D)
                 .add(EntityAttributes.GENERIC_ATTACK_DAMAGE, 8.0D)
@@ -171,6 +171,9 @@ public class PriestSkeletonEntity extends HostileEntity implements Monster {
                 return;
             }
             skill=this.random.nextInt(4);
+            if (skill==3){
+                skill=random.nextBoolean()? 4:random.nextInt(3);
+            }
             //0.火球术，1.横扫，2.尖刺，3.弹幕
             switch (skill) {
                 case 0 -> skillTick = FIRE_SKILL_DURATION;
@@ -409,6 +412,11 @@ public class PriestSkeletonEntity extends HostileEntity implements Monster {
         if (this.skillStage != 0 && this.skill >= 0 && this.skill <= 3) {
             this.dataTracker.set(ACTIVE_SKILL, this.skill);
         }
+    }
+
+    @Override
+    protected boolean canStartRiding(Entity entity) {
+        return false;
     }
 
     @Override

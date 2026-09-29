@@ -1,9 +1,10 @@
 package com.nekoadventure.event.maze;
 
 import com.nekoadventure.NekoAdventure;
-import com.nekoadventure.network.ScreenBlackEffectPacket;
+import com.nekoadventure.network.maze.ScreenBlackEffectPacket;
 import com.nekoadventure.other.mazeApart.MazeBuilder;
 import com.nekoadventure.other.mazeApart.MazeDataManager;
+import com.nekoadventure.other.mazeApart.MazePosNBTCompound;
 import com.nekoadventure.other.mazeApart.MazeStructureBuilder;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.registry.RegistryKeys;
@@ -15,6 +16,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.dimension.DimensionType;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -67,6 +69,20 @@ public class PlayerFirstEnterMazeHandler {
                         builder.placeAllSpecialRoom(world);
                         delayedTasks.put(dimensionId, 20);
                         delayedActions.put(dimensionId, () -> {
+
+                            //放置完所有特殊房间后，把每一个房间区域逐格重新标记给光照引擎重算
+                            MazeDataManager data = MazeDataManager.get(world);
+                            List<MazePosNBTCompound> initialRoomData=new ArrayList<>();
+                            if (data != null) {
+                                initialRoomData = data.getInitialData();
+                            }
+                            /*这些是AI写的
+                            作用是:计算，处理全部的房间以及对应的区块光照，防止出现影响游玩体验的情况
+                            */
+                            builder.recalculateRoomLight(world, initialRoomData);
+                            //光照标记完成后，再把房间所在区块的完整区块数据重发给观看玩家，强制客户端整列刷新
+                            builder.resendRoomChunks(world, initialRoomData);
+
                             builder.clearRoomItemEntity(world);
                             finalMazeDataManager.clearInitialData();
                             for (ServerPlayerEntity player : allPlayers) {

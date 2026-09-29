@@ -1,7 +1,7 @@
 package com.nekoadventure.item.nekoItem.attackTypeItem.specificItems;
 
 import com.nekoadventure.client.ShiftKeyHelper;
-import com.nekoadventure.item.nekoItem.attackTypeItem.AttackTypeItem;
+import com.nekoadventure.item.nekoItem.attackTypeItem.NekoAttackTypeItem;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
@@ -15,7 +15,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.Random;
 
-public class Fever extends AttackTypeItem {
+public class Fever extends NekoAttackTypeItem {
 
 
     public Fever(Settings settings, double health, double strength, double speed, double attackSpeed, double attackRange, double attackMultiplier, double attackSpeedMultiplier, boolean isSpecific) {

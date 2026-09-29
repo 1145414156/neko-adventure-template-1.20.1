@@ -1,6 +1,5 @@
-package com.nekoadventure.screen;
+package com.nekoadventure.network.maze;
 
-import com.nekoadventure.network.ScreenBlackEffectPacket;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
@@ -17,7 +16,7 @@ public class ClientScreenEffectHandler {
 
             client.execute(() -> {
                 if (isBlack) {
-                    if (client.player != null) {
+                    if (client.player != null&&!client.player.isSpectator()&&client.player.isCreative()) {
                         client.player.addStatusEffect(new StatusEffectInstance(
                                 StatusEffects.BLINDNESS,
                                 200,

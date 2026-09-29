@@ -7,6 +7,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.network.packet.s2c.play.PositionFlag;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.tag.TagKey;
@@ -29,6 +30,7 @@ import net.minecraft.world.dimension.DimensionType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public class BossRoomBlock extends AbstractRoomBlock {
     public static final BooleanProperty CAN_TELEPORT = BooleanProperty.of("can_teleport");
@@ -46,24 +48,23 @@ public class BossRoomBlock extends AbstractRoomBlock {
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
         if (BossRoomBlock.canTeleport(world.getBlockState(pos))) {
-            List<PlayerEntity> allPlayers=getPlayersInRange(world,pos);
-            for (PlayerEntity p : allPlayers) {
-                BlockPos pPos = p.getBlockPos();
-                int dx = Math.abs(pPos.getX() - pos.getX());
-                int dy = Math.abs(pPos.getY() - pos.getY());
-                int dz = Math.abs(pPos.getZ() - pos.getZ());
-                if (dx > 12 || dy > 12 || dz > 12) {
-                    p.sendMessage(Text.of("玩家 " + p.getName().getString() + " 不在传送范围内！"), true);
+            List<PlayerEntity> allPlayers = getPlayersInRange(world,pos);
+            if (world.getPlayers().size()>allPlayers.size()) {
+                for (PlayerEntity playerEntity : world.getPlayers()) {
+                    playerEntity.sendMessage(Text.of("请所有玩家到齐后再进入boss战！"),true);
                     return ActionResult.FAIL;
                 }
-                p.teleport(0,3,0);
-                return ActionResult.SUCCESS;
             }
+            for (PlayerEntity p : allPlayers) {
+                if (world instanceof ServerWorld serverWorld) {
+                    p.teleport(serverWorld,0,4,4,Set.of(),0,180);
+                }
+            }
+            return ActionResult.SUCCESS;
         }
         else {
             return ActionResult.PASS;
         }
-        return ActionResult.PASS;
     }
 
     @Override

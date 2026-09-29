@@ -6,7 +6,6 @@ import com.nekoadventure.block.blockentity.ModBlockEntityTypes;
 import com.nekoadventure.block.maze.GateBlock;
 import com.nekoadventure.block.maze.MazeRoomStageBlock;
 import com.nekoadventure.effect.ModStatusEffects;
-import com.nekoadventure.item.soulItem.AbstractSoulItem;
 import com.nekoadventure.other.mazeApart.ClearRoomIssueRewardManager;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -15,7 +14,6 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.server.world.ServerWorld;
@@ -54,7 +52,7 @@ public class MazeBlockEntity extends AbstractMazeBlockEntity{
     }
     private Box createDetectionBox() {
         if (pos == null) return new Box(0, 0, 0, 0, 0, 0);
-        int range = detectRoomDistance(world,pos)-1;
+        int range =detectRoomDistance(world,pos)-1;
         double minX = pos.getX() - range-1;
         double minY = pos.getY() - 3;
         double minZ = pos.getZ() - range-1;
@@ -188,12 +186,6 @@ public class MazeBlockEntity extends AbstractMazeBlockEntity{
         if (!players.isEmpty()) {
             for (PlayerEntity player:players) {
                 player.removeStatusEffect(ModStatusEffects.MAZE_CURSE);
-                for (int i = 0; i < player.getInventory().size(); i++) {
-                    ItemStack stack = player.getInventory().getStack(i);
-                    if (stack.getItem() instanceof AbstractSoulItem soulItem) {
-                        soulItem.addCharged(stack, 1);
-                    }
-                }
                 player.sendMessage(Text.of("房间清理完成！"),true);
                 ClearRoomIssueRewardManager clearRoomIssueRewardManager=new ClearRoomIssueRewardManager();
                 clearRoomIssueRewardManager.apply(player, world);
@@ -246,7 +238,12 @@ public class MazeBlockEntity extends AbstractMazeBlockEntity{
         BlockPos sourcePos = gatePos.add(-dx, 5, -dz);
         BlockState sourceState = world.getBlockState(sourcePos);
         if (sourceState.isAir()) {
-            return;
+            sourcePos = gatePos.add(-dx * 2, 5, -dz * 2);
+            sourceState = world.getBlockState(sourcePos);
+            // 如果仍是空气则直接返回(房间错误)
+            if (sourceState.isAir()) {
+                return;
+            }
         }
         BlockPos innerPos = gatePos.add(-dx, 0, -dz);
 
@@ -282,6 +279,10 @@ public class MazeBlockEntity extends AbstractMazeBlockEntity{
                     world.setBlockState(wallPos,Blocks.AIR.getDefaultState());
                 }
                 else if (!currentState.isAir()) {
+                    if (currentState.equals(Blocks.BARRIER.getDefaultState())) {
+                        //如果为屏障，则替换成空气
+                        world.setBlockState(wallPos, Blocks.BARRIER.getDefaultState());
+                    }
                     // 将非空气方块替换为源方块
                     world.setBlockState(wallPos, sourceState);
                 }

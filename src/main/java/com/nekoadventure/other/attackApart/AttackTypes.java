@@ -6,6 +6,7 @@ import com.nekoadventure.entity.missile.MissileModelType;
 import com.nekoadventure.item.other.NekoPackageItem;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.ai.TargetPredicate;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.Vec3d;
@@ -22,7 +23,8 @@ public class AttackTypes {
         LAZY,
         JOYEUSE,
         DELAY,
-        BOOMERANG
+        BOOMERANG,
+        HOMING
     }
 
     private final AttackType type;
@@ -45,6 +47,7 @@ public class AttackTypes {
             case JOYEUSE -> joyeuseMovement(entity, speed);
             case DELAY -> delayMovement(entity, range, speed);
             case BOOMERANG -> boomerangMovement(entity,range,speed);
+            case HOMING -> homingMovement(entity,range,speed);
         }
     }
 
@@ -175,6 +178,19 @@ public class AttackTypes {
         Vec3d currentVelocity = entity.getVelocity();
         Vec3d velocityDelta = targetVelocity.subtract(currentVelocity);
         entity.addVelocity(velocityDelta.x, velocityDelta.y, velocityDelta.z);
+    }
+    private void homingMovement(MissileEntity entity,double range,double speed) {
+        this.delayMovement(entity,range,speed);
+        LivingEntity nearest = entity.getWorld().getClosestEntity(
+                LivingEntity.class,
+                TargetPredicate.DEFAULT,
+                entity.getControllingPassenger(),
+                entity.getX(), entity.getY(), entity.getZ(),
+                entity.getBoundingBox().expand(20)
+        );
+        if (nearest != null) {
+            entity.teleport(nearest.getX(), nearest.getY(), nearest.getZ());
+        }
     }
 
     private @NotNull MissileEntity getMissileEntity(MissileEntity entity) {

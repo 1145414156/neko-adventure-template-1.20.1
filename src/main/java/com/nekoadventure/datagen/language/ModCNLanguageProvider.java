@@ -81,6 +81,7 @@ public class ModCNLanguageProvider extends FabricLanguageProvider {
         translationBuilder.add(ModItems.ACCELERATION,"加速度");
         translationBuilder.add(ModItems.DECELERATION,"减速度");
         translationBuilder.add(ModItems.ZENITH,"天顶剑");
+        translationBuilder.add(ModItems.SHORT_HOOK,"短勾");
         translationBuilder.add(ModItems.BULLET,"弹幕发射器");
         translationBuilder.add(ModItems.PIERCING_DIAMOND,"锐利钻石");
         translationBuilder.add(ModItems.CAT_CLAW,"猫爪");
@@ -116,6 +117,12 @@ public class ModCNLanguageProvider extends FabricLanguageProvider {
         translationBuilder.add(ModItems.CHOCOLATE_BISCUIT,"巧克力饼干");
         translationBuilder.add(ModItems.COMPRESSED_IRON,"压缩铁锭");
         translationBuilder.add(ModItems.THE_FOURTH_EYE,"突变四眼");
+        translationBuilder.add(ModItems.RESTOCK,"补货");
+        translationBuilder.add(ModItems.ABUNDANT_ITEM_BASE,"丰饶底座");
+        translationBuilder.add(ModItems.CLOUD_BOOTS,"云朵靴");
+        translationBuilder.add(ModItems.ADRENALINE,"肾上腺素");
+        translationBuilder.add(ModItems.BATTERY,"电池");
+        translationBuilder.add(ModItems.BROKEN_CROWN,"坏掉的皇冠");
         //物品栏
         translationBuilder.add(ModItemGroups.NEKO_GROUP,"猫的旅途：其他方块和物品");
         translationBuilder.add(ModItemGroups.NUM_ITEM_GROUP,"猫的旅途：全部道具");
@@ -190,5 +197,10 @@ public class ModCNLanguageProvider extends FabricLanguageProvider {
         translationBuilder.add(ModEntities.MUDDY_SPIDER,"泥泞蜘蛛");
         translationBuilder.add(ModEntities.TREASURE_HUNTER,"宝藏猎人");
         translationBuilder.add(ModEntities.TWINE_SOUL,"缠绕冤魂");
+
+        //按键绑定
+        translationBuilder.add("category.neko-adventure","猫的旅途");
+        translationBuilder.add("key.neko-adventure.reset_items","立即刷新属性");
+        translationBuilder.add("key.neko-adventure.main_attack_type","应用主攻击方式");
     }
 }

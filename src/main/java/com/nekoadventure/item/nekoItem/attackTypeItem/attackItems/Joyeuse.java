@@ -4,9 +4,9 @@ import com.nekoadventure.client.ShiftKeyHelper;
 import com.nekoadventure.entity.ModEntities;
 import com.nekoadventure.entity.missile.MissileEntity;
 import com.nekoadventure.entity.missile.MissileModelType;
-import com.nekoadventure.item.nekoItem.attackTypeItem.AttackTypeItem;
+import com.nekoadventure.item.nekoItem.attackTypeItem.NekoAttackTypeItem;
 import com.nekoadventure.item.other.NekoPackageItem;
-import com.nekoadventure.network.NekoPackageDataManager;
+import com.nekoadventure.other.itemApart.NekoPackageDataManager;
 import com.nekoadventure.other.attackApart.AttackTypes;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.Entity;
@@ -19,7 +19,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class Joyeuse extends AttackTypeItem {
+public class Joyeuse extends NekoAttackTypeItem {
     public Joyeuse(Settings settings, double health, double strength, double speed, double attackSpeed, double attackRange, double attackMultiplier, double attackSpeedMultiplier, boolean isSpecific) {
         super(settings, health, strength, speed, attackSpeed, attackRange, attackMultiplier, attackSpeedMultiplier, isSpecific);
     }
@@ -41,7 +41,7 @@ public class Joyeuse extends AttackTypeItem {
         player.getWorld().spawnEntity(missileEntity);
         double[] finalData = NekoPackageDataManager.getFinalData(player);
         double attackSpeed = finalData != null ? finalData[3] : 0;
-        int cooldown = (int) (60 - (attackSpeed / 12.0) * 60);
+        int cooldown = (int) (60 - (attackSpeed / NekoPackageDataManager.MAX_ATTACK_SPEED) * 60);
         cooldown = Math.max(4, Math.min(60, cooldown));
         player.getItemCooldownManager().set(player.getOffHandStack().getItem(), cooldown);
     }
