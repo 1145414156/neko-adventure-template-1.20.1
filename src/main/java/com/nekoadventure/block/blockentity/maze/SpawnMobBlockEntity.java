@@ -46,6 +46,8 @@ public class SpawnMobBlockEntity extends AbstractMazeBlockEntity {
     //创造模式玩家通过右键设置的boss生物ID（命名空间:生物ID），设置后boss按该ID通过代码生成而不是放置结构
     private String customBossEntityId = null;
 
+    private int roomRange;
+
     public SpawnMobBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntityTypes.SPAWN_MOB_ENTITY_BLOCK_ENTITY, pos, state);
     }
@@ -87,7 +89,16 @@ public class SpawnMobBlockEntity extends AbstractMazeBlockEntity {
     }
 
     private @NotNull Box getBox() {
-        int range = MazeBlockEntity.detectRoomDistance(world,pos)-1;
+        if (roomRange<=0){
+            if (this.getWorld() != null) {
+                MazeDataManager mazeDataManager=MazeDataManager.get(this.getWorld());
+                if (mazeDataManager!=null){
+                    roomRange=mazeDataManager.getMazeRange();
+                }
+            }
+
+        }
+        int range = roomRange;
         double minX = pos.getX() - range+0.5;
         double minY = pos.getY() - 2;
         double minZ = pos.getZ() - range+0.5;

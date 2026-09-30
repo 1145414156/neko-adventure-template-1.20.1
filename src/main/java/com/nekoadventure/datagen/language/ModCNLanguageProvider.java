@@ -58,6 +58,7 @@ public class ModCNLanguageProvider extends FabricLanguageProvider {
         translationBuilder.add(ModItems.NATTO,"纳豆");
         translationBuilder.add(ModItems.POPSICLE,"雪糕");
         translationBuilder.add(ModItems.A_PIECE_OF_CAKE,"一块蛋糕");
+        translationBuilder.add(ModItems.JUG,"水壶");
         translationBuilder.add(ModItems.LUNCH_POX,"餐盒");
         translationBuilder.add(ModItems.NIGHT_VISION,"夜视");
         translationBuilder.add(ModItems.CACTUS_BALL,"仙人掌球");

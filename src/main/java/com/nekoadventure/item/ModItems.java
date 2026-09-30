@@ -126,6 +126,8 @@ public class ModItems {
             new NumItem(new Item.Settings().rarity(Rarity.UNCOMMON).food(FoodComponents.MELON_SLICE),3.0,0,0,0.5,0,0,0));
     public static final NumItem A_PIECE_OF_CAKE=register("a_piece_of_cake",
             new NumItem(new Item.Settings().rarity(Rarity.COMMON).food(FoodComponents.COOKIE),1.0,0.2,0,0,0,0,0));
+    public static final NumItem JUG=register("jug",
+            new NumItem(new Item.Settings().rarity(Rarity.COMMON),0,1.0,0.3,0,0,0,0));
 
 
     //功能类道具

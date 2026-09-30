@@ -1,6 +1,5 @@
 package com.nekoadventure.item.soulItem;
 
-import com.nekoadventure.block.ModBlocks;
 import com.nekoadventure.client.ShiftKeyHelper;
 import com.nekoadventure.item.ModItems;
 import net.minecraft.client.item.TooltipContext;

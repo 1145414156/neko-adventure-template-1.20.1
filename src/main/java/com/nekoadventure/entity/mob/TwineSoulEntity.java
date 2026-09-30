@@ -2,6 +2,7 @@ package com.nekoadventure.entity.mob;
 
 import com.nekoadventure.entity.ModEntities;
 import com.nekoadventure.entity.missile.MissileEntity;
+import com.nekoadventure.entity.missile.MissileModelType;
 import com.nekoadventure.other.attackApart.AttackTypes;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.EntityType;
@@ -77,7 +78,7 @@ public class TwineSoulEntity extends HostileEntity implements Monster {
                     5.0);
             double yaw = Math.toDegrees(Math.atan2(-direction.x, direction.z));
             double pitch = Math.toDegrees(Math.atan2(-direction.y, Math.sqrt(direction.x * direction.x + direction.z * direction.z)));
-
+            missile.setMissileModelType(MissileModelType.BULLET);
             missile.setPosition(pos);
             missile.setYaw((float) yaw);
             missile.setPitch((float) pitch);

@@ -1,9 +1,9 @@
 package com.nekoadventure.block.specialroomblock;
 
 import com.nekoadventure.block.ModBlocks;
-import com.nekoadventure.block.blockentity.maze.MazeBlockEntity;
 import com.nekoadventure.block.blockentity.other.ItemBaseBlockEntity;
 import com.nekoadventure.other.itemApart.SpawnRandomSoulItems;
+import com.nekoadventure.other.mazeApart.MazeDataManager;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.LivingEntity;
@@ -17,6 +17,7 @@ import java.util.List;
 
 public class SoulRoomBlock extends AbstractRoomBlock
 {
+    private int roomRange;
     public SoulRoomBlock(Settings settings) {super(settings);}
 
     @Override
@@ -26,7 +27,14 @@ public class SoulRoomBlock extends AbstractRoomBlock
     }
 
     private List<BlockPos> scanItemBase(World world, BlockPos center){
-        int roomDistance= MazeBlockEntity.detectRoomDistance(world, center);
+        if (world==null)return new ArrayList<>();
+        if (roomRange<=0){
+            MazeDataManager mazeDataManager=MazeDataManager.get(world);
+            if (mazeDataManager!=null){
+                roomRange=mazeDataManager.getMazeRange();
+            }
+        }
+        int roomDistance= roomRange;
         Box roomBox=new Box(
                 center.getX()+roomDistance,
                 center.getY()+15,

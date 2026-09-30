@@ -27,7 +27,7 @@ public class SkeletonPriestJewel extends NekoAttackTypeItem {
             if (player.getOffHandStack().getItem() instanceof NekoPackageItem nekoPackage) {
                 strength = nekoPackage.getStrength(player);
             }
-            double randomNum = Math.min(50,rand.nextDouble(strength)/2);
+            double randomNum = Math.min(10,rand.nextDouble(strength)/10);
             if (rand.nextInt(100)<=randomNum) {
                 target.damage(target.getDamageSources().mobAttack(player),target.getHealth());
             }
@@ -37,7 +37,7 @@ public class SkeletonPriestJewel extends NekoAttackTypeItem {
     @Override
     public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
         super.appendTooltip(stack, world, tooltip, context);
-        Text moreText=Text.of("造成伤害时，有\"力量\"*0.5/100的概率直接将目标(血量低于1/3时)斩杀");
+        Text moreText=Text.of("造成伤害时，有\"力量\"*0.1/100(上限1/10)的概率直接将目标(血量低于1/2时)斩杀");
         if (ShiftKeyHelper.isShiftDown()) {
             tooltip.add(moreText);
         }

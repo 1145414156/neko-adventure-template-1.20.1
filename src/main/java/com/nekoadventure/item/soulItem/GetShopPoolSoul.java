@@ -1,6 +1,5 @@
 package com.nekoadventure.item.soulItem;
 
-import com.nekoadventure.item.nekoItem.AbstractNekoItem;
 import com.nekoadventure.other.itemApart.SpawnRandomNekoItems;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;

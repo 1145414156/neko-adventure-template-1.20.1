@@ -14,8 +14,6 @@ import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.particle.ParticleEffect;
-import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -87,18 +85,6 @@ public class MissileEntity extends Entity {
             this.move(MovementType.SELF, this.getVelocity());
             aliveDuration++;
         }
-
-        if (attackTypes != null && attackTypes.getType().equals(AttackTypes.AttackType.BRIMSTONE)) {
-            World world = getWorld();
-            ParticleEffect particle = ParticleTypes.FLAME;
-            if (world.isClient) {
-                world.addParticle(particle, getX(), getY(), getZ(), 0, 0, 0);
-            } else {
-                ((ServerWorld) world).spawnParticles(particle,
-                        getX(), getY(), getZ(), 1, 0, 0, 0, 0);
-            }
-        }
-
         if (this.getOwner()==null) {
             this.kill();
             return;

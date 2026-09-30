@@ -6,8 +6,7 @@ import net.minecraft.util.Identifier;
 
 public class ModEntityModelLayers {
     //missile
-    public static final EntityModelLayer BULLET =
-            new EntityModelLayer(new Identifier(NekoAdventure.MOD_ID, "bullet"), "main");
+
     public static final EntityModelLayer BRIMSTONE=
             new EntityModelLayer(new Identifier(NekoAdventure.MOD_ID, "brimstone"), "main");
     public static final EntityModelLayer JOYEUSE=

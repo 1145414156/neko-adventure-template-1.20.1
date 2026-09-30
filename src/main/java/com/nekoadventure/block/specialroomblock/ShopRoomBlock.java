@@ -1,11 +1,11 @@
 package com.nekoadventure.block.specialroomblock;
 
 import com.nekoadventure.block.ModBlocks;
-import com.nekoadventure.block.blockentity.maze.MazeBlockEntity;
 import com.nekoadventure.block.blockentity.other.ItemBaseBlockEntity;
 import com.nekoadventure.item.ModItems;
 import com.nekoadventure.item.nekoItem.AbstractNekoItem;
 import com.nekoadventure.other.itemApart.SpawnRandomSoulItems;
+import com.nekoadventure.other.mazeApart.MazeDataManager;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.LivingEntity;
@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Random;
 
 public class ShopRoomBlock extends AbstractRoomBlock {
+    private int roomRange;
     private final int[] PROBABILITIES_HEIGHT = {40, 35, 17, 8};
     public ShopRoomBlock(Settings settings) {
         super(settings);
@@ -37,7 +38,14 @@ public class ShopRoomBlock extends AbstractRoomBlock {
 
     //扫描全部的ItemBaseBlock
     private List<BlockPos> scanItemBase(World world,BlockPos pos){
-        int roomDistance= MazeBlockEntity.detectRoomDistance(world,pos);
+        if (world==null)return new ArrayList<>();
+        if (roomRange<=0){
+            MazeDataManager mazeDataManager=MazeDataManager.get(world);
+            if (mazeDataManager!=null){
+                roomRange=mazeDataManager.getMazeRange();
+            }
+        }
+        int roomDistance= roomRange;
         Box roomBox=new Box(
                 pos.getX()+roomDistance,
                 pos.getY()+15,

@@ -1,6 +1,5 @@
 package com.nekoadventure.other.mazeApart;
 
-import net.minecraft.block.Block;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.NotNull;

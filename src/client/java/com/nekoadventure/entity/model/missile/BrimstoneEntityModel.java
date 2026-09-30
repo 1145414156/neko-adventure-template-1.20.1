@@ -6,6 +6,8 @@ import net.minecraft.client.model.*;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.entity.model.SinglePartEntityModel;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.world.ClientWorld;
+import net.minecraft.particle.ParticleTypes;
 
 
 //其实这个是有一个模型的，但是我觉得他变成透明的还挺不错，所以就保留了

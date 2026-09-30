@@ -3,6 +3,7 @@ package com.nekoadventure.entity.boss;
 import com.nekoadventure.effect.ModStatusEffects;
 import com.nekoadventure.entity.ModEntities;
 import com.nekoadventure.entity.missile.MissileEntity;
+import com.nekoadventure.entity.missile.MissileModelType;
 import com.nekoadventure.item.ModItems;
 import com.nekoadventure.network.mob.FloorShakeNetworking;
 import com.nekoadventure.network.mob.ScreenShakeNetworking;
@@ -12,9 +13,6 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.entity.*;
 import net.minecraft.entity.ai.control.MoveControl;
-import net.minecraft.entity.data.DataTracker;
-import net.minecraft.entity.data.TrackedData;
-import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.ai.goal.ActiveTargetGoal;
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
@@ -22,6 +20,9 @@ import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.boss.BossBar;
 import net.minecraft.entity.boss.ServerBossBar;
 import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.data.DataTracker;
+import net.minecraft.entity.data.TrackedData;
+import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.mob.HostileEntity;
@@ -375,7 +376,7 @@ public class HugeSlimeEntity extends HostileEntity implements Monster {
 
     private @NotNull MissileEntity getMissileEntity(Entity owner, double range,int time) {
         AttackTypes bulletType = new AttackTypes(AttackTypes.AttackType.BULLET);
-        return new MissileEntity(ModEntities.MISSILE,
+        MissileEntity missile= new MissileEntity(ModEntities.MISSILE,
                 owner.getWorld(),
                 owner,
                 bulletType,
@@ -383,6 +384,8 @@ public class HugeSlimeEntity extends HostileEntity implements Monster {
                 range,
                 time,
                 this.getDamageAmount());
+        missile.setMissileModelType(MissileModelType.BULLET);
+        return missile;
     }
 
     protected ParticleEffect getParticles() {

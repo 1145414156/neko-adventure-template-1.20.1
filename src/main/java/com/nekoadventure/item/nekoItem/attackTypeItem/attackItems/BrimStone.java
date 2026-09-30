@@ -8,9 +8,9 @@ import com.nekoadventure.item.ModItems;
 import com.nekoadventure.item.nekoItem.AbstractNekoItem;
 import com.nekoadventure.item.nekoItem.attackTypeItem.NekoAttackTypeItem;
 import com.nekoadventure.item.other.NekoPackageItem;
-import com.nekoadventure.other.itemApart.NekoPackageDataManager;
 import com.nekoadventure.network.mob.ScreenShakeNetworking;
 import com.nekoadventure.other.attackApart.AttackTypes;
+import com.nekoadventure.other.itemApart.NekoPackageDataManager;
 import com.nekoadventure.sound.ModSoundEvents;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.Entity;
@@ -145,7 +145,6 @@ public class BrimStone extends NekoAttackTypeItem {
             attackRange = nekoPackage.getAttackRange(player);
             ArrayList<AbstractNekoItem> attackItems=NekoPackageItem.getNekoItem(player.getOffHandStack(),false,3);
             if (attackItems.get(attackItems.size()-1).equals(ModItems.BRIMSTONE)) return;
-
         }
         List<MissileEntity> missileEntities = world.getEntitiesByClass(
                 MissileEntity.class,

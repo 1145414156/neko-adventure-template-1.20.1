@@ -4,6 +4,7 @@ package com.nekoadventure.entity.boss;
 import com.nekoadventure.effect.ModStatusEffects;
 import com.nekoadventure.entity.ModEntities;
 import com.nekoadventure.entity.missile.MissileEntity;
+import com.nekoadventure.entity.missile.MissileModelType;
 import com.nekoadventure.item.ModItems;
 import com.nekoadventure.other.attackApart.AttackTypes;
 import com.nekoadventure.other.itemApart.SpawnRandomSoulItems;
@@ -20,6 +21,9 @@ import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.boss.BossBar;
 import net.minecraft.entity.boss.ServerBossBar;
 import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.data.DataTracker;
+import net.minecraft.entity.data.TrackedData;
+import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.mob.EvokerFangsEntity;
@@ -28,9 +32,6 @@ import net.minecraft.entity.mob.Monster;
 import net.minecraft.entity.passive.IronGolemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.FireballEntity;
-import net.minecraft.entity.data.DataTracker;
-import net.minecraft.entity.data.TrackedData;
-import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundEvent;
@@ -237,7 +238,7 @@ public class PriestSkeletonEntity extends HostileEntity implements Monster {
 
     private @NotNull MissileEntity getMissileEntity(Entity owner, double range, int time) {
         AttackTypes bulletType = new AttackTypes(AttackTypes.AttackType.BULLET);
-        return new MissileEntity(ModEntities.MISSILE,
+        MissileEntity missile=new MissileEntity(ModEntities.MISSILE,
                 owner.getWorld(),
                 owner,
                 bulletType,
@@ -245,6 +246,8 @@ public class PriestSkeletonEntity extends HostileEntity implements Monster {
                 range,
                 time,
                 this.getDamageAmount());
+        missile.setMissileModelType(MissileModelType.BULLET);
+        return missile;
     }
 
     private void spikeSkill(){

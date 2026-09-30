@@ -3,10 +3,10 @@ package com.nekoadventure.block.blockentity.maze;
 import com.nekoadventure.NekoAdventure;
 import com.nekoadventure.block.ModBlocks;
 import com.nekoadventure.block.blockentity.ModBlockEntityTypes;
-import com.nekoadventure.block.maze.GateBlock;
 import com.nekoadventure.block.maze.MazeRoomStageBlock;
 import com.nekoadventure.effect.ModStatusEffects;
 import com.nekoadventure.other.mazeApart.ClearRoomIssueRewardManager;
+import com.nekoadventure.other.mazeApart.MazeDataManager;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
@@ -52,7 +52,7 @@ public class MazeBlockEntity extends AbstractMazeBlockEntity{
     }
     private Box createDetectionBox() {
         if (pos == null) return new Box(0, 0, 0, 0, 0, 0);
-        int range =detectRoomDistance(world,pos)-1;
+        int range =detectRoomDistance(world)-1;
         double minX = pos.getX() - range-1;
         double minY = pos.getY() - 3;
         double minZ = pos.getZ() - range-1;
@@ -65,7 +65,7 @@ public class MazeBlockEntity extends AbstractMazeBlockEntity{
 
 
     private void removeErrorMaze(World world, BlockPos pos) {
-        int detectRange=detectRoomDistance(world,pos);
+        int detectRange=detectRoomDistance(world);
         if (world instanceof ServerWorld serverWorld) {
             if (isMazeDimension(serverWorld)) {
                 if (detectMazeBlockAround(world,pos)) {
@@ -118,16 +118,14 @@ public class MazeBlockEntity extends AbstractMazeBlockEntity{
             }
         return world.getBlockState(pos.up(1)).isAir();
     }
-
-//这个方法是给其他所有涉及到迷宫结构的方块用来检测迷宫半径的
-//这个方法有点违反Java的类的结构了qwq，为了省事嘛
-    public static int detectRoomDistance(World world, BlockPos pos) {
-        for (int i=0;i<=48;i++){
-            if (world.getBlockState(new BlockPos(pos.getX()+i,pos.getY(),pos.getZ())).getBlock() instanceof GateBlock) {
-                return i;
+    private int detectRoomDistance(World world) {
+        if (world!=null){
+            MazeDataManager  mazeDataManager=MazeDataManager.get(world);
+            if (mazeDataManager!=null){
+                return mazeDataManager.getMazeRange();
             }
         }
-        return 8;
+        return 0;
     }
 
     @Override
@@ -199,7 +197,7 @@ public class MazeBlockEntity extends AbstractMazeBlockEntity{
     }
 
     private void removeBedrockForWorld(World world, BlockPos center) {
-        int range = detectRoomDistance(world, center);
+        int range = detectRoomDistance(world);
         if (range <= 0) {
             return;
         }

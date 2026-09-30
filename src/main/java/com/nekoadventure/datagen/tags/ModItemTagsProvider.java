@@ -119,6 +119,7 @@ public class ModItemTagsProvider extends FabricTagProvider<Item> {
         treasurePoolItems.add(ModItems.OXIDIZED_COPPER_INGOT);
         treasurePoolItems.add(ModItems.CLOUD_BOOTS);
         treasurePoolItems.add(ModItems.ADRENALINE);
+        treasurePoolItems.add(ModItems.JUG);
 
         return treasurePoolItems;
     }
@@ -184,6 +185,7 @@ public class ModItemTagsProvider extends FabricTagProvider<Item> {
         shopPoolItems.add(ModItems.RESTOCK);
         shopPoolItems.add(ModItems.ABUNDANT_ITEM_BASE);
         shopPoolItems.add(ModItems.ADRENALINE);
+        shopPoolItems.add(ModItems.JUG);
 
         return shopPoolItems;
     }
@@ -222,6 +224,7 @@ public class ModItemTagsProvider extends FabricTagProvider<Item> {
         bossPoolItems.add(ModItems.NATTO);
         bossPoolItems.add(ModItems.ADRENALINE);
         bossPoolItems.add(ModItems.BROKEN_CROWN);
+        bossPoolItems.add(ModItems.JUG);
 
         return bossPoolItems;
     }

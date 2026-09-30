@@ -11,7 +11,6 @@ import com.nekoadventure.entity.model.boss.HugeSlimeEntityModel;
 import com.nekoadventure.entity.model.boss.PriestSkeletonEntityModel;
 import com.nekoadventure.entity.model.missile.BoomerangEntityModel;
 import com.nekoadventure.entity.model.missile.BrimstoneEntityModel;
-import com.nekoadventure.entity.model.missile.BulletEntityModel;
 import com.nekoadventure.entity.model.missile.JoyeuseEntityModel;
 import com.nekoadventure.entity.model.mob.*;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
@@ -21,7 +20,6 @@ public class ModEntityRenderer {
     public static void register() {
         //missile
         EntityModelLayerRegistry.registerModelLayer(ModEntityModelLayers.BRIMSTONE, BrimstoneEntityModel::getTexturedModelData);
-        EntityModelLayerRegistry.registerModelLayer(ModEntityModelLayers.BULLET, BulletEntityModel::getTexturedModelData);
         EntityModelLayerRegistry.registerModelLayer(ModEntityModelLayers.JOYEUSE, JoyeuseEntityModel::getTexturedModelData);
         EntityModelLayerRegistry.registerModelLayer(ModEntityModelLayers.BOOMERANG, BoomerangEntityModel::getTexturedModelData);
         EntityRendererRegistry.register(ModEntities.MISSILE, MissileEntityRenderer::new);

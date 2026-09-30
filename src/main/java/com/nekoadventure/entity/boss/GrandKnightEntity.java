@@ -847,7 +847,7 @@ public class GrandKnightEntity extends HostileEntity implements Monster {
 
     private @NotNull MissileEntity getMissileEntity(Entity owner, double range, int time) {
         AttackTypes bulletType = new AttackTypes(AttackTypes.AttackType.BULLET);
-        return new MissileEntity(ModEntities.MISSILE,
+        MissileEntity missile=new MissileEntity(ModEntities.MISSILE,
                 owner.getWorld(),
                 owner,
                 bulletType,
@@ -855,10 +855,12 @@ public class GrandKnightEntity extends HostileEntity implements Monster {
                 range,
                 time,
                 this.getDamageAmount());
+        missile.setMissileModelType(MissileModelType.BULLET);
+        return missile;
     }
     private @NotNull MissileEntity getMissileEntity(Entity owner, double range, int time,int skillType) {
         AttackTypes bulletType = new AttackTypes(AttackTypes.AttackType.BULLET);
-        return new MissileEntity(ModEntities.MISSILE,
+        MissileEntity missile= new MissileEntity(ModEntities.MISSILE,
                 owner.getWorld(),
                 owner,
                 bulletType,
@@ -866,6 +868,8 @@ public class GrandKnightEntity extends HostileEntity implements Monster {
                 range,
                 time,
                 this.getDamageAmount());
+        missile.setMissileModelType(MissileModelType.BULLET);
+        return missile;
     }
 
     @Override

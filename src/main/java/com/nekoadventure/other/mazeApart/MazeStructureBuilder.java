@@ -2,7 +2,6 @@ package com.nekoadventure.other.mazeApart;
 
 import com.nekoadventure.NekoAdventure;
 import com.nekoadventure.block.ModBlocks;
-import com.nekoadventure.block.blockentity.maze.MazeBlockEntity;
 import com.nekoadventure.block.specialroomblock.AbstractRoomBlock;
 import com.nekoadventure.block.specialroomblock.BossRoomBlock;
 import com.nekoadventure.block.specialroomblock.ShopRoomBlock;
@@ -37,17 +36,14 @@ import net.minecraft.world.World;
 import net.minecraft.world.chunk.WorldChunk;
 import net.minecraft.world.chunk.light.LightingProvider;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Stream;
 
 //这个类是用来专门放置特殊房间的类（例如藏宝房和商店就在这里）
 public class MazeStructureBuilder {
     public final int MIN_IMPASSE_COUNT = 3;
+
+    private int roomRange;
     private List<MazePosNBTCompound> calculateRoomType(World world, int gateCount) {
         List<MazePosNBTCompound> impasse = new ArrayList<>();
         MazeDataManager data = MazeDataManager.get(world);
@@ -67,6 +63,13 @@ public class MazeStructureBuilder {
     //这个方法是执行放置的入口
     public void placeAllSpecialRoom(World world) {
         if (!world.isClient) {
+            if (roomRange<=0){
+                MazeDataManager mazeDataManager=MazeDataManager.get(world);
+                if (mazeDataManager!=null){
+                    roomRange=mazeDataManager.getMazeRange();
+                }
+            }
+            int range=roomRange;
             List<MazePosNBTCompound> impasse = calculateRoomType(world, 1);
             int impasseCount;
             if (!impasse.isEmpty()) {impasseCount=impasse.size();}
@@ -81,17 +84,17 @@ public class MazeStructureBuilder {
                     System.out.println("错误的房间生成！！！！！");
                 }
                 else {
-                    placeBaseSpecialRooms(impasse,world);
+                    placeBaseSpecialRooms(impasse,world,range);
                 }
             }
             //这个是当死胡同刚好的时候
             else if (impasseCount== MIN_IMPASSE_COUNT) {
-                placeBaseSpecialRooms(impasse, world);
+                placeBaseSpecialRooms(impasse, world,range);
             }
             //这个是死胡同多于正常数的时候（就是正常情况）
             else {
-                placeBaseSpecialRooms(impasse, world);
-                placeMoreSpecialRooms(impasse, impasseCount - MIN_IMPASSE_COUNT,world);
+                placeBaseSpecialRooms(impasse, world,range);
+                placeMoreSpecialRooms(impasse, impasseCount - MIN_IMPASSE_COUNT,world,range);
             }
         }
     }
@@ -99,13 +102,20 @@ public class MazeStructureBuilder {
     //这个方法的作用是在放置完特殊房间后，立刻重新计算所有特殊房间区域的光照
     //服务端光照引擎重算完成后会主动把新的光照数据推送回所有客户端，从而消除全黑房间
     public void recalculateRoomLight(World world, List<MazePosNBTCompound> rooms) {
+        if (world==null)return;
+        if (roomRange<=0){
+            MazeDataManager mazeDataManager=MazeDataManager.get(world);
+            if (mazeDataManager!=null){
+                roomRange=mazeDataManager.getMazeRange();
+            }
+        }
         if (!(world instanceof ServerWorld serverWorld) || rooms.isEmpty()) {
             return;
         }
         LightingProvider lightingProvider = serverWorld.getChunkManager().getLightingProvider();
         for (MazePosNBTCompound room : rooms) {
             BlockPos center = room.roomCenter();
-            int distance = MazeBlockEntity.detectRoomDistance(serverWorld, center);
+            int distance =roomRange;
             if (distance <= 0) {
                 distance = 8;
             }
@@ -136,6 +146,13 @@ public class MazeStructureBuilder {
     //这个方法是在光照重算完成后，把每个房间所在区块的完整区块数据（方块+光照快照）
     //重发给正在观看这些区块的玩家，客户端收到后会整列重建，用于兜底修复个别房间仍全黑的情况
     public void resendRoomChunks(World world, List<MazePosNBTCompound> rooms) {
+        if (world==null)return;
+        if (roomRange<=0){
+            MazeDataManager mazeDataManager=MazeDataManager.get(world);
+            if (mazeDataManager!=null){
+                roomRange=mazeDataManager.getMazeRange();
+            }
+        }
         if (!(world instanceof ServerWorld serverWorld) || rooms.isEmpty()) {
             return;
         }
@@ -143,7 +160,7 @@ public class MazeStructureBuilder {
         Set<ChunkPos> chunkPositions = new HashSet<>();
         for (MazePosNBTCompound room : rooms) {
             BlockPos center = room.roomCenter();
-            int distance = MazeBlockEntity.detectRoomDistance(serverWorld, center);
+            int distance = roomRange;
             if (distance <= 0) {
                 distance = 8;
             }
@@ -172,10 +189,6 @@ public class MazeStructureBuilder {
                 player.sendChunkPacket(chunkPos, chunkDataPacket);
             }
         }
-
-        //开发辅助
-        System.out.println("已向观看玩家重发完整区块数据, 区块数量: " + chunkPositions.size());
-        //开发辅助
     }
 
     public void clearRoomItemEntity(World world) {
@@ -183,7 +196,7 @@ public class MazeStructureBuilder {
         if (data != null) {
             List<MazePosNBTCompound> allRoom= data.getInitialData();
             for(MazePosNBTCompound roomData : allRoom) {
-                int roomDistance = MazeBlockEntity.detectRoomDistance(world, roomData.roomCenter())*2;
+                int roomDistance = data.getMazeRange();
                 BlockPos pos=new BlockPos(roomData.roomCenter());
                 List<ItemEntity> entities= world.getEntitiesByClass(
                         ItemEntity.class,
@@ -199,12 +212,11 @@ public class MazeStructureBuilder {
         }
     }
 
-    private void placeBaseSpecialRooms(List<MazePosNBTCompound> roomData, World world) {
+    private void placeBaseSpecialRooms(List<MazePosNBTCompound> roomData, World world,int roomRange) {
         //生成boss房
-        int roomDistance=MazeBlockEntity.detectRoomDistance(world,roomData.get(0).roomCenter());
         BlockPos bossRoomCenter = roomData.get(0).roomCenter();
-        placeStructure(world, bossRoomCenter, "boss_room");
-        placeGateForRoom(world, bossRoomCenter, roomDistance, false);
+        placeStructure(world, bossRoomCenter, "boss_room",roomRange);
+        placeGateForRoom(world, bossRoomCenter, roomRange, false);
         Block bossBlock = world.getBlockState(bossRoomCenter).getBlock();
         if (bossBlock instanceof BossRoomBlock bossRoomBlock) {
             bossRoomBlock.placeOn(bossRoomCenter, world.getPlayers().get(0));
@@ -212,8 +224,8 @@ public class MazeStructureBuilder {
 
         //生成宝箱房
         BlockPos treasureRoomCenter = roomData.get(1).roomCenter();
-        placeStructure(world, treasureRoomCenter, "treasure_room");
-        placeGateForRoom(world, treasureRoomCenter, roomDistance, false);
+        placeStructure(world, treasureRoomCenter, "treasure_room",roomRange);
+        placeGateForRoom(world, treasureRoomCenter, roomRange, false);
         Block treasureBlock = world.getBlockState(treasureRoomCenter).getBlock();
         if (treasureBlock instanceof TreasureRoomBlock treasureRoomBlock) {
             treasureRoomBlock.placeOn(treasureRoomCenter, world.getPlayers().get(0));
@@ -221,8 +233,8 @@ public class MazeStructureBuilder {
 
         //生成商店
         BlockPos shopRoomCenter = roomData.get(2).roomCenter();
-        placeStructure(world, shopRoomCenter, "shop_room");
-        placeGateForRoom(world, shopRoomCenter, roomDistance, false);
+        placeStructure(world, shopRoomCenter, "shop_room",roomRange);
+        placeGateForRoom(world, shopRoomCenter, roomRange, false);
         Block shopBlock=world.getBlockState(shopRoomCenter).getBlock();
         if (shopBlock instanceof ShopRoomBlock shopRoomBlock){
             shopRoomBlock.placeOn(shopRoomCenter, world.getPlayers().get(0));
@@ -230,8 +242,7 @@ public class MazeStructureBuilder {
     }
 
     //这个是用来额外再生成更多的特殊房间（例如隐藏房，重铸房）
-    private void placeMoreSpecialRooms(List<MazePosNBTCompound> roomData, int roomCount, World world) {
-        int roomDistance = MazeBlockEntity.detectRoomDistance(world, roomData.get(0).roomCenter());
+    private void placeMoreSpecialRooms(List<MazePosNBTCompound> roomData, int roomCount, World world,int roomRange) {
         MazeDataManager mazeDataManager=MazeDataManager.get(world);
         int level=1;
         if (mazeDataManager != null) {
@@ -258,8 +269,8 @@ public class MazeStructureBuilder {
                 if (Random.create().nextInt(100) + 1 <= config.probability()) {
                     BlockPos roomPos = roomData.get(roomIndex).roomCenter();
                     String roomType = config.provider().apply(world);
-                    placeStructure(world, roomPos, roomType);
-                    placeGateForRoom(world, roomPos, roomDistance, roomType.equals("conceal_room"));
+                    placeStructure(world, roomPos, roomType, this.roomRange);
+                    placeGateForRoom(world, roomPos, roomRange, roomType.equals("conceal_room"));
                     if (world.getBlockState(roomPos).getBlock() instanceof AbstractRoomBlock roomBlock){
                         roomBlock.placeOn(roomPos, world.getPlayers().get(0));
                     }
@@ -363,7 +374,7 @@ public class MazeStructureBuilder {
         return "mineral_room";
     }
 
-    public void placeStructure(World world, BlockPos pos, String roomType) {
+    public void placeStructure(World world, BlockPos pos, String roomType,int roomRange) {
         if (!(world instanceof ServerWorld serverWorld)) {
             return;
         }
@@ -372,8 +383,7 @@ public class MazeStructureBuilder {
         StructureTemplateManager structureManager = serverWorld.getStructureTemplateManager();
 
         Optional<StructureTemplate> optional = structureManager.getTemplate(structurePath);
-        int distance = MazeBlockEntity.detectRoomDistance(world, pos.up(1));
-        BlockPos placePos = new BlockPos(pos.getX() - distance, pos.getY() - 1, pos.getZ() - distance);
+        BlockPos placePos = new BlockPos(pos.getX() - roomRange, pos.getY() - 1, pos.getZ() - roomRange);
         if (optional.isPresent()) {
             StructureTemplate template = optional.get();
             StructurePlacementData placementData = new StructurePlacementData()

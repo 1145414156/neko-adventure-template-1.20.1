@@ -2,7 +2,6 @@ package com.nekoadventure.other.mazeApart;
 
 import com.nekoadventure.NekoAdventure;
 import com.nekoadventure.block.ModBlocks;
-import net.minecraft.block.Blocks;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;

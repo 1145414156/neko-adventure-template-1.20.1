@@ -2,6 +2,7 @@ package com.nekoadventure.item.nekoItem.functionTypeItem.functionItems.damaged;
 
 import com.nekoadventure.entity.ModEntities;
 import com.nekoadventure.entity.missile.MissileEntity;
+import com.nekoadventure.entity.missile.MissileModelType;
 import com.nekoadventure.item.nekoItem.functionTypeItem.functionItems.NekoFunctionItem;
 import com.nekoadventure.item.other.NekoPackageItem;
 import com.nekoadventure.other.attackApart.AttackTypes;
@@ -70,7 +71,7 @@ public class RedScarf extends NekoFunctionItem {
     }
     private @NotNull MissileEntity getMissileEntity(PlayerEntity player, double range, double damage) {
         AttackTypes bulletType = new AttackTypes(AttackTypes.AttackType.BULLET);
-        return new MissileEntity(ModEntities.MISSILE,
+        MissileEntity missile= new MissileEntity(ModEntities.MISSILE,
                 player.getWorld(),
                 player,
                 bulletType,
@@ -78,6 +79,8 @@ public class RedScarf extends NekoFunctionItem {
                 range,
                 60,
                 damage);
+        missile.setMissileModelType(MissileModelType.BULLET);
+        return missile;
     }
 
     private LivingEntity getNearestEntity(LivingEntity entity, double range) {

@@ -4,7 +4,6 @@ import com.nekoadventure.block.blockentity.other.RerollFurnaceBlockEntity;
 import com.nekoadventure.item.ModItems;
 import com.nekoadventure.item.nekoItem.AbstractNekoItem;
 import com.nekoadventure.item.soulItem.AbstractSoulItem;
-import com.nekoadventure.item.soulItem.AbstractSoulPoolItem;
 import com.nekoadventure.other.itemApart.SpawnRandomNekoItems;
 import com.nekoadventure.other.itemApart.SpawnRandomSoulItems;
 import net.minecraft.block.Block;

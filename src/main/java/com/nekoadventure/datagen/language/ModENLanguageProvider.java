@@ -55,6 +55,7 @@ public class ModENLanguageProvider extends FabricLanguageProvider {
         translationBuilder.add(ModItems.NATTO,"natto");
         translationBuilder.add(ModItems.POPSICLE,"popsicle");
         translationBuilder.add(ModItems.A_PIECE_OF_CAKE,"a_piece_of_cake");
+        translationBuilder.add(ModItems.JUG,"jug");
         translationBuilder.add(ModItems.LUNCH_POX,"lunch_pox");
         translationBuilder.add(ModItems.NIGHT_VISION,"night_vision");
         translationBuilder.add(ModItems.CACTUS_BALL,"cactus_ball");

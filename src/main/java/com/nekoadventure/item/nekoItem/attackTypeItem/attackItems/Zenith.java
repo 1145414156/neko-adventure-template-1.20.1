@@ -3,10 +3,11 @@ package com.nekoadventure.item.nekoItem.attackTypeItem.attackItems;
 import com.nekoadventure.client.ShiftKeyHelper;
 import com.nekoadventure.entity.ModEntities;
 import com.nekoadventure.entity.missile.MissileEntity;
+import com.nekoadventure.entity.missile.MissileModelType;
 import com.nekoadventure.item.nekoItem.attackTypeItem.NekoAttackTypeItem;
 import com.nekoadventure.item.other.NekoPackageItem;
-import com.nekoadventure.other.itemApart.NekoPackageDataManager;
 import com.nekoadventure.other.attackApart.AttackTypes;
+import com.nekoadventure.other.itemApart.NekoPackageDataManager;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -81,6 +82,7 @@ public class Zenith extends NekoAttackTypeItem {
                 range,
                 60,
                 damage);
+        missileEntity.setMissileModelType(MissileModelType.BULLET);
         missileEntity.setPos(owner.getX(), owner.getEyeY(), owner.getZ());
         missileEntity.setYaw(owner.getYaw());
         missileEntity.setPitch(owner.getPitch());
