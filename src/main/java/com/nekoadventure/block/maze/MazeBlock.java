@@ -2,6 +2,7 @@ package com.nekoadventure.block.maze;
 
 import com.nekoadventure.block.blockentity.maze.MazeBlockEntity;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
@@ -14,7 +15,7 @@ import org.jetbrains.annotations.Nullable;
 
 
 //给玩家效果是在另外一个方块实体类
-public class MazeBlock extends AbstractMazeBlock {
+public class MazeBlock extends AbstractMazeBlock implements BlockEntityProvider {
     public MazeBlock(Settings settings) {
         super(settings);
     }

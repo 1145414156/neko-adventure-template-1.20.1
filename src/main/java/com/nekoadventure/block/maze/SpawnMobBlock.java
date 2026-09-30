@@ -3,6 +3,7 @@ package com.nekoadventure.block.maze;
 import com.nekoadventure.block.ModBlocks;
 import com.nekoadventure.block.blockentity.maze.SpawnMobBlockEntity;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
@@ -20,7 +21,7 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 //开始战斗在另外一个方块实体类
-public class SpawnMobBlock extends AbstractMazeBlock {
+public class SpawnMobBlock extends AbstractMazeBlock implements BlockEntityProvider {
 
     public static final IntProperty RANGE_MODE = IntProperty.of("range_mode", 0, 1);
 

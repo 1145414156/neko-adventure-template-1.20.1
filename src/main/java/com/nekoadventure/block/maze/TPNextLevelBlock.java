@@ -95,33 +95,27 @@ public class TPNextLevelBlock extends Block {
                     }
                 }
                 else {
-
                     Identifier dimensionId = serverWorld.getRegistryKey().getValue();
                     MazeStructureBuilder builder = new MazeStructureBuilder();
                     allPlayers.forEach(serverPlayer-> {
                         serverPlayer.sendMessage(Text.literal("§e正在加载迷宫中，请勿退出游戏"), false);
                         ScreenBlackEffectPacket.send(serverPlayer, true);
                     });
-                    //这里因为这个方块本身并没有tick方法所以用了服务器那里的计时器（人话：我偷懒了）
-                    PlayerFirstEnterMazeHandler.delayedTasks.put(dimensionId, 80);
                     List<ServerPlayerEntity> finalAllPlayers = allPlayers;
+                    //这里因为这个方块本身并没有tick方法所以用了服务器那里的计时器（人话：我偷懒了）
+                    //收敛式感染扫描(PlayerFirstEnterMazeHandler有详细解释)
+                    PlayerFirstEnterMazeHandler.startInfectionScan(serverWorld, dimensionId, () -> {
+                    PlayerFirstEnterMazeHandler.delayedTasks.put(dimensionId, 60);
                     PlayerFirstEnterMazeHandler.delayedActions.put(dimensionId, () -> {
                         builder.placeAllSpecialRoom(serverWorld);
                         PlayerFirstEnterMazeHandler.delayedTasks.put(dimensionId, 20);
                         PlayerFirstEnterMazeHandler.delayedActions.put(dimensionId, () -> {
-
-                            //放置完所有特殊房间后，把每一个房间区域逐格重新标记给光照引擎重算
                             MazeDataManager data = MazeDataManager.get(world);
                             List<MazePosNBTCompound> initialRoomData=new ArrayList<>();
                             if (data != null) {
                                 initialRoomData = data.getInitialData();
                             }
-                            /*这些是AI写的
-                            作用是:计算，处理全部的房间以及对应的区块光照，防止出现影响游玩体验的情况
-                            */
                             builder.recalculateRoomLight(world, initialRoomData);
-                            //光照标记完成后，再把房间所在区块的完整区块数据重发给观看玩家，强制客户端整列刷新
-                            //（兜底保险：即使个别房间重算后仍全黑，客户端也会因为收到完整区块包而整列重建一次）
                             builder.resendRoomChunks(world, initialRoomData);
 
                             builder.clearRoomItemEntity(world);
@@ -133,6 +127,7 @@ public class TPNextLevelBlock extends Block {
                                     ScreenBlackEffectPacket.send(serverPlayer, false);
                                 });
                             }});
+                        });
                     });
                 }
             }

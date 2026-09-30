@@ -1,6 +1,7 @@
 package com.nekoadventure.block.maze;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.state.StateManager;
@@ -8,7 +9,7 @@ import net.minecraft.state.property.IntProperty;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.Nullable;
 
-public class MazeRoomStageBlock extends AbstractMazeBlock {
+public class MazeRoomStageBlock extends AbstractMazeBlock implements BlockEntityProvider {
 
     public static final IntProperty MAZE_STAGE = IntProperty.of("maze_stage", 0, 2);
     public MazeRoomStageBlock(Settings settings) {

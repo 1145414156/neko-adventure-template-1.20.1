@@ -48,6 +48,4 @@ public class GateBlock extends Block implements BlockEntityProvider {
         }
         return null;
     }
-
-
 }

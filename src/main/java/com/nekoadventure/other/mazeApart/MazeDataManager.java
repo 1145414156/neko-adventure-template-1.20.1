@@ -3,6 +3,7 @@ package com.nekoadventure.other.mazeApart;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.PersistentState;
 import net.minecraft.world.World;
 
@@ -16,6 +17,9 @@ public class MazeDataManager extends PersistentState {
     private final List<MazePosNBTCompound> roomData = new ArrayList<>();
     private final List<MazePosNBTCompound> initialData = new ArrayList<>();
     private int level = 1;
+    private MazeCenterNBTCompound mazeCenter = null;
+    private int mazeRange = 0;
+
     @Override
     public NbtCompound writeNbt(NbtCompound nbt) {
         NbtList initialList = new NbtList();
@@ -28,10 +32,14 @@ public class MazeDataManager extends PersistentState {
         for (MazePosNBTCompound marker : roomData) {
             roomList.add(marker.toNbt());
         }
-
         nbt.put("roomData", roomList);
 
         nbt.putInt("Level", level);
+
+        if (mazeCenter != null) {
+            nbt.put("MazeCenter", mazeCenter.toNBT());
+        }
+        nbt.putInt("MazeRange", mazeRange);
 
         return nbt;
     }
@@ -40,6 +48,7 @@ public class MazeDataManager extends PersistentState {
         MazeDataManager data = new MazeDataManager();
 
         data.level = nbt.getInt("Level");
+
         NbtList initialList = nbt.getList("initialData", NbtCompound.COMPOUND_TYPE);
         for (int i = 0; i < initialList.size(); i++) {
             MazePosNBTCompound marker = MazePosNBTCompound.fromNbt(initialList.getCompound(i));
@@ -50,6 +59,10 @@ public class MazeDataManager extends PersistentState {
             MazePosNBTCompound marker = MazePosNBTCompound.fromNbt(roomList.getCompound(i));
             data.roomData.add(marker);
         }
+        if (nbt.contains("MazeCenter", NbtCompound.COMPOUND_TYPE)) {
+            data.mazeCenter = MazeCenterNBTCompound.fromNBT(nbt.getCompound("MazeCenter"));
+        }
+        data.mazeRange = nbt.getInt("MazeRange");
 
         return data;
     }
@@ -66,10 +79,12 @@ public class MazeDataManager extends PersistentState {
         }
         return null;
     }
+
     public void addToInitialData(MazePosNBTCompound marker) {
         initialData.add(marker);
         markDirty();
     }
+
     public void addToRoomData(MazePosNBTCompound marker) {
         roomData.add(marker);
         markDirty();
@@ -89,15 +104,20 @@ public class MazeDataManager extends PersistentState {
         initialData.clear();
         markDirty();
     }
-    public void clearRoomData(){
+
+    public void clearRoomData() {
         roomData.clear();
         markDirty();
     }
+
     public void clearAllData() {
         clearInitialData();
         clearRoomData();
         resetLevelData();
+        clearMazeCenter();
+        resetMazeRange();
     }
+
     public int getLevelData() {
         return level;
     }
@@ -109,6 +129,32 @@ public class MazeDataManager extends PersistentState {
 
     public void resetLevelData() {
         level = 1;
+        markDirty();
+    }
+    public MazeCenterNBTCompound getMazeCenter() {
+        return mazeCenter;
+    }
+    public void setMazeCenter(MazeCenterNBTCompound center) {
+        this.mazeCenter = center;
+        markDirty();
+    }
+    public void setMazeCenter(BlockPos centerPos) {
+        this.mazeCenter = new MazeCenterNBTCompound(centerPos);
+        markDirty();
+    }
+    public void clearMazeCenter() {
+        this.mazeCenter = null;
+        markDirty();
+    }
+    public int getMazeRange() {
+        return mazeRange;
+    }
+    public void setMazeRange(int range) {
+        this.mazeRange = range;
+        markDirty();
+    }
+    public void resetMazeRange() {
+        this.mazeRange = 0;
         markDirty();
     }
 }

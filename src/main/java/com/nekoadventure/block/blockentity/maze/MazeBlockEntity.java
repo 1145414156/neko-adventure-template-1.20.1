@@ -66,7 +66,7 @@ public class MazeBlockEntity extends AbstractMazeBlockEntity{
 
     private void removeErrorMaze(World world, BlockPos pos) {
         int detectRange=detectRoomDistance(world,pos);
-        if (world instanceof  ServerWorld serverWorld) {
+        if (world instanceof ServerWorld serverWorld) {
             if (isMazeDimension(serverWorld)) {
                 if (detectMazeBlockAround(world,pos)) {
                         for (int c=detectRange;c>=-detectRange;c--){
@@ -116,7 +116,7 @@ public class MazeBlockEntity extends AbstractMazeBlockEntity{
                         }
                 }
             }
-        return world.getBlockState(pos.up(1)).getBlock().equals(Blocks.AIR);
+        return world.getBlockState(pos.up(1)).isAir();
     }
 
 //这个方法是给其他所有涉及到迷宫结构的方块用来检测迷宫半径的
@@ -163,7 +163,10 @@ public class MazeBlockEntity extends AbstractMazeBlockEntity{
                 player -> player.isAlive() && !player.isSpectator()
         );
 
-        if (players.isEmpty()&&hasMonstersInRange()&&world.getBlockState(pos.up(1)).equals(ModBlocks.MAZE_ROOM_STAGE_BLOCK.getDefaultState().with(MazeRoomStageBlock.MAZE_STAGE,1))) {
+        if (players.isEmpty()&&hasMonstersInRange()&&
+                world.getBlockState(pos.up(1))
+                                .equals(ModBlocks.MAZE_ROOM_STAGE_BLOCK.getDefaultState()
+                                                .with(MazeRoomStageBlock.MAZE_STAGE,1))) {
             List<LivingEntity> entities= world.getEntitiesByClass(
                     LivingEntity.class,
                     createDetectionBox(),

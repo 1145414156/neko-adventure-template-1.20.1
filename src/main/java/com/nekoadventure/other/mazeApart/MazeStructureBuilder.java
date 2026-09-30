@@ -78,7 +78,7 @@ public class MazeStructureBuilder {
                 impasse.addAll(Stream.concat(calculateRoomType(world, 3).stream(), calculateRoomType(world, 2).stream()).toList());
                 impasseCount =impasse.size();
                 if (impasseCount<MIN_IMPASSE_COUNT) {
-                    throw new IllegalStateException(String.format("IllegalRoomDataException:because Impasse count is %d,but need MIN_IMPASSE_COUNT is 3", impasseCount));
+                    System.out.println("错误的房间生成！！！！！");
                 }
                 else {
                     placeBaseSpecialRooms(impasse,world);
@@ -496,5 +496,4 @@ public class MazeStructureBuilder {
             }
         }
     }
-
 }

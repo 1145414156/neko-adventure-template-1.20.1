@@ -1,10 +1,11 @@
 package com.nekoadventure.other.mazeApart;
 
+import net.minecraft.block.Block;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.NotNull;
 
-//  这个是用来详细处理和作为参考：特殊数据roomData<BlockPos,GateCount,RoomHeight>
+//  这个是用来详细处理和作为参考：特殊数据roomData<BlockPos,GateCount>
 //                                         房间中心   房间门数量
 public record MazePosNBTCompound(BlockPos roomCenter, int gateCount) {
     public NbtCompound toNbt() {
@@ -23,7 +24,6 @@ public record MazePosNBTCompound(BlockPos roomCenter, int gateCount) {
                 nbt.getInt("roomZ")
         );
         int gateCount = nbt.getInt("gateCount");
-
         return new MazePosNBTCompound(pos, gateCount);
     }
 

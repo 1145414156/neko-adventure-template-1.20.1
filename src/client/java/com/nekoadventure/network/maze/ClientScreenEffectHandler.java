@@ -16,7 +16,7 @@ public class ClientScreenEffectHandler {
 
             client.execute(() -> {
                 if (isBlack) {
-                    if (client.player != null&&!client.player.isSpectator()&&client.player.isCreative()) {
+                    if (client.player != null&&!client.player.isSpectator()&&!client.player.isCreative()) {
                         client.player.addStatusEffect(new StatusEffectInstance(
                                 StatusEffects.BLINDNESS,
                                 200,
