@@ -1,15 +1,15 @@
 {
   "replace": false,
   "values": [
-    "neko-adventure:strength_potion_injector",
-    "neko-adventure:enchanted_golden_apple_slice",
-    "neko-adventure:broken_soul",
-    "neko-adventure:strange_potion",
     "neko-adventure:soul_jar",
-    "neko-adventure:pureness_soul",
-    "neko-adventure:battery",
-    "neko-adventure:night_vision",
+    "neko-adventure:broken_soul",
     "neko-adventure:bloodstained_cross",
-    "neko-adventure:spiriting_away"
+    "neko-adventure:spiriting_away",
+    "neko-adventure:night_vision",
+    "neko-adventure:enchanted_golden_apple_slice",
+    "neko-adventure:pureness_soul",
+    "neko-adventure:strength_potion_injector",
+    "neko-adventure:strange_potion",
+    "neko-adventure:battery"
   ]
 }

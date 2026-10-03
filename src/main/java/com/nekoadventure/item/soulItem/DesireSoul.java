@@ -15,7 +15,7 @@ public class DesireSoul extends AbstractSoulItem{
 
     @Override
     public void onUseEffect(World world, PlayerEntity player, ItemStack stack) {
-        int c=world.random.nextInt(8)+1;
+        int c=world.random.nextInt(15)+6;
         for (int z=0;z<c;z++){
             player.giveItemStack(ModItems.BINDING_SOUL_SUBSTANCE.getDefaultStack());
         }

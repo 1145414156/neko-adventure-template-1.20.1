@@ -118,11 +118,13 @@ public class NekoPackageScreen implements HudRenderCallback {
         int y = screenHeight / 2 - panelHeight / 2;
 
         // 绘制当前楼层（面板预留的第一行）
-        int levelY = y + padding;
-        drawContext.drawText(textRenderer,
-                Text.literal("§6楼层: §f" + level),
-                x + padding, levelY,
-                0xFFFFFF, true);
+        if (level>0) {
+            int levelY = y + padding;
+            drawContext.drawText(textRenderer,
+                    Text.literal("§6楼层: §f" + level),
+                    x + padding, levelY,
+                    0xFFFFFF, true);
+        }
 
         // 绘制属性标题
         int titleY = y + padding + lineHeight;

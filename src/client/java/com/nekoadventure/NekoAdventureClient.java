@@ -15,6 +15,7 @@ import com.nekoadventure.network.maze.ClientMonumentCreditsHandler;
 import com.nekoadventure.network.item.ClientNekoPackageDataHandler;
 import com.nekoadventure.network.maze.ClientScreenEffectHandler;
 import com.nekoadventure.network.mob.ClientScreenShakeHandler;
+import com.nekoadventure.particle.ModClientParticle;
 import com.nekoadventure.ui.NekoPackageScreen;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
@@ -41,6 +42,7 @@ public class NekoAdventureClient implements ClientModInitializer {
 		ClientScreenShakeHandler.init();
 		ClientFloorShakeHandler.init();
 		ClientNekoPackageDataHandler.init();
+		ModClientParticle.init();
 
 		ModEntityRenderer.register();
 		BlockRenderLayerMap.INSTANCE.putBlocks(RenderLayer.getTranslucent(),

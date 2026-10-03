@@ -3,6 +3,7 @@ package com.nekoadventure.block.other;
 import com.nekoadventure.block.blockentity.other.RollItemBlockEntity;
 import com.nekoadventure.item.ModItems;
 import com.nekoadventure.item.nekoItem.AbstractNekoItem;
+import com.nekoadventure.item.soulItem.AbstractSoulItem;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
@@ -35,7 +36,7 @@ public class RollItemBlock extends Block implements BlockEntityProvider {
         ItemStack heldItem = player.getStackInHand(hand);
         ItemStack item=new ItemStack(heldItem.getItem());
 
-        if (heldItem.getItem() instanceof AbstractNekoItem) {
+        if (heldItem.getItem() instanceof AbstractNekoItem||heldItem.getItem() instanceof AbstractSoulItem) {
             BlockEntity blockEntity = world.getBlockEntity(pos);
             if (!(blockEntity instanceof RollItemBlockEntity rollItemEntity)) {
                 return ActionResult.PASS;
@@ -57,12 +58,16 @@ public class RollItemBlock extends Block implements BlockEntityProvider {
                 player.sendMessage(Text.literal("§a机器返还了你的道具！"), true);
             } else if (roll < baseProbability + 75) {
                 // 50% 概率：生成随机金币（10~20）
-                int coinCount = world.random.nextInt(16)+11;
+                int coinCount = world.random.nextInt(16)+6;
+                if (heldItem.getItem() instanceof AbstractNekoItem) {
+                    coinCount+=5;
+                }
                 player.getInventory().offerOrDrop(new ItemStack(ModItems.COIN, coinCount));
                 player.sendMessage(Text.literal("§6机器吐出了 " + coinCount + " 个金币！"), true);
             } else {
                 // 剩余概率：机器爆炸并删除方块
-                world.removeBlock(pos, false);
+                world.breakBlock(pos, false);
+                world.addBlockBreakParticles(pos, state);
                 player.sendMessage(Text.literal("§c机器爆炸了！"), true);
                 return ActionResult.SUCCESS;
             }

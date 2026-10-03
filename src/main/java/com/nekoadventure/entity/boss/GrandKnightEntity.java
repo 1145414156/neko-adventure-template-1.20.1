@@ -138,17 +138,18 @@ public class GrandKnightEntity extends HostileEntity implements Monster {
     public static DefaultAttributeContainer.Builder createGrandKnightAttributes() {
         return HostileEntity.createHostileAttributes()
                 .add(EntityAttributes.GENERIC_MAX_HEALTH, 1000.0)
-                .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.25D)
+                .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.26D)
                 .add(EntityAttributes.GENERIC_ARMOR, 10.0D)
-                .add(EntityAttributes.GENERIC_ARMOR_TOUGHNESS, 8.0D)
+                .add(EntityAttributes.GENERIC_ARMOR_TOUGHNESS, 10.0D)
                 .add(EntityAttributes.GENERIC_ATTACK_DAMAGE, 14.0D)
                 .add(EntityAttributes.GENERIC_FOLLOW_RANGE, 42.0D)
-                .add(EntityAttributes.GENERIC_KNOCKBACK_RESISTANCE, 1.0D);
+                .add(EntityAttributes.GENERIC_KNOCKBACK_RESISTANCE, 0.8D);
     }
 
     // ========== AI Goals ==========
     @Override
     protected void initGoals() {
+        this.targetSelector.add(0, new RevengeGoal(this));
         this.targetSelector.add(1, new ActiveTargetGoal<>(this, PlayerEntity.class, 10, false, false,
                 livingEntity -> Math.abs(livingEntity.getY() - this.getY()) <= 8.0));
         this.targetSelector.add(2, new ActiveTargetGoal<>(this, IronGolemEntity.class, false));
@@ -196,7 +197,6 @@ public class GrandKnightEntity extends HostileEntity implements Monster {
         }
     }
 
-    // 把服务端广播的 ACTIVE_SKILL / STAGE_CHANGE 翻译成实例动画的 start/stop（仅客户端调用）
     private void syncClientAnimations() {
         int activeSkill = this.dataTracker.get(ACTIVE_SKILL);
         if (activeSkill != this.playedSkill) {
@@ -830,12 +830,12 @@ public class GrandKnightEntity extends HostileEntity implements Monster {
         int time=-(skillTick-ATTACK_DURATION);
         if (time==23){
             float lostHealth=this.getMaxHealth()-this.getTarget().getHealth();
-            this.damageEntitiesInFront(4.0, 3.0, 3.0, (float) (this.getDamageAmount()+lostHealth*0.01));
+            this.damageEntitiesInFront(3.5, 3.0, 3.0, (float) (this.getDamageAmount()+lostHealth*0.008));
             this.playSound(ModSoundEvents.ENTITY_GRAND_KNIGHT_SWORD_ATTACK,10.0f,1.0f);
         }
         if (time==36){
             float lostHealth=this.getMaxHealth()-this.getTarget().getHealth();
-            this.damageEntitiesInFront(4.0, 3.0, 3.0, (float) (this.getDamageAmount()+lostHealth*0.01));
+            this.damageEntitiesInFront(3.5, 3.0, 3.0, (float) (this.getDamageAmount()+lostHealth*0.008));
             this.playSound(ModSoundEvents.ENTITY_GRAND_KNIGHT_SWORD_ATTACK,10.0f,1.0f);
         }
     }

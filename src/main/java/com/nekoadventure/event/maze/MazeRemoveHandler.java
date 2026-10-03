@@ -65,11 +65,13 @@ public class MazeRemoveHandler {
     public static void removeAllMaze(ServerWorld world,List<ServerPlayerEntity> allPlayers) {
         MazeDataManager mazeDataManager=MazeDataManager.get(world);
         if (mazeDataManager != null) {
+            int roomRange=mazeDataManager.getMazeRange()+1;
+            int roomHeight=mazeDataManager.getMazeHeight();
             List<MazePosNBTCompound> mazeData = mazeDataManager.getRoomData();
             if (!mazeData.isEmpty()) {
                 for (MazePosNBTCompound mazePosNBTCompound : mazeData) {
                     BlockPos center = mazePosNBTCompound.roomCenter();
-                    clearRooms(world, center);
+                    clearRoom(world, center,roomHeight,roomRange);
                 }
                 mazeDataManager.clearAllData();
                 for (ServerPlayerEntity player : allPlayers) {
@@ -84,12 +86,14 @@ public class MazeRemoveHandler {
     public static void removeAllMaze(ServerWorld world, List<MazePosNBTCompound> mazeData,List<ServerPlayerEntity> allPlayers) {
         MazeDataManager mazeDataManager=MazeDataManager.get(world);
         if (mazeDataManager != null) {
+            int roomRange=mazeDataManager.getMazeRange()+1;
+            int roomHeight=mazeDataManager.getMazeHeight();
             for (ServerPlayerEntity player : allPlayers) {
                 player.sendMessage(Text.literal("§a正在移除迷宫中，请勿退出游戏"), false);
             }
             for (MazePosNBTCompound mazePosNBTCompound : mazeData) {
                 BlockPos center = mazePosNBTCompound.roomCenter();
-                clearRooms(world, center);
+                clearRoom(world, center,roomHeight,roomRange);
             }
             if (mazeDataManager.getLevelData()>1){
                 removeBossEntity(world,new BlockPos(0,0,0));
@@ -130,19 +134,17 @@ public class MazeRemoveHandler {
         }
     }
 
-    private static void clearRooms(ServerWorld world, BlockPos center) {
-        // 计算范围：中心点向各个方向延伸 24 格（总共 50 格）
-        int radius = 24;
-        int startX = center.getX() - radius;
-        int endX = center.getX() + radius;
-        int startY = center.getY() - radius;
-        int endY = center.getY() + radius;
-        int startZ = center.getZ() - radius;
-        int endZ = center.getZ() + radius;
-        startY = Math.max(startY, world.getBottomY());
+    private static void clearRoom(ServerWorld world, BlockPos center, int roomHeight, int roomRange) {
+        int startX = center.getX() - roomRange;
+        int endX = center.getX() + roomRange;
+        int startY = center.getY()-2;
+        int endY = center.getY() + roomHeight;
+        int startZ = center.getZ() - roomRange;
+        int endZ = center.getZ() + roomRange;
+        startY = Math.max(center.getY()+startY, world.getBottomY());
         endY = Math.min(endY, world.getTopY() - 1);
         for (int x = startX; x <= endX; x++) {
-            for (int y = startY; y < endY; y++) {
+            for (int y = startY; y <= endY; y++) {
                 for (int z = startZ; z <= endZ; z++) {
                     BlockPos pos = new BlockPos(x, y, z);
                     BlockState blockState = world.getBlockState(pos);

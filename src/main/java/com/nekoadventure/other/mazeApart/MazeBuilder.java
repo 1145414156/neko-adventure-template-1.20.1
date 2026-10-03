@@ -32,6 +32,7 @@ public class MazeBuilder {
     }
     //true=还有迷宫;false=没有迷宫
     public boolean placeMaze(ServerWorld world) {
+        MazeDataManager data = MazeDataManager.get(world);
         int levelData = getLevelData(world);
         BlockPos placePos = new BlockPos((levelData - 1) * 10000-random.nextInt(40)-20, 1, random.nextInt(40)-20);
 
@@ -58,7 +59,7 @@ public class MazeBuilder {
         }
         StructurePoolBasedGenerator.generate(world, poolEntry, jigsawName, size, placePos, false);
         int mazeRange=detectRoomDistanceByStructureName(world);
-        BlockPos roomCenter = findStartRoomCenter(world, placePos, mazeRange);
+        BlockPos roomCenter = findStartRoomCenter(world, placePos, mazeRange,data);
         if (roomCenter == null) {
             roomCenter = placePos;
             System.err.println("maze block not found");
@@ -66,7 +67,6 @@ public class MazeBuilder {
         else {
             System.out.println("find maze center success in"+roomCenter);
         }
-        MazeDataManager data = MazeDataManager.get(world);
         if (data != null) {
             data.setMazeRange(mazeRange);
             data.setMazeCenter(roomCenter);
@@ -79,7 +79,7 @@ public class MazeBuilder {
     }
 
     //返回房间中心(标记方块所在位置)：maze_block上方1格就是转换后的maze_structure_block(力大砖飞了属于是)
-    private BlockPos findStartRoomCenter(ServerWorld world, BlockPos placePos, int mazeRange) {
+    private BlockPos findStartRoomCenter(ServerWorld world, BlockPos placePos, int mazeRange,MazeDataManager data) {
         int horizontal = mazeRange * 2;
         for (int dy = 48; dy >=0; dy--) {
             for (int dx = -horizontal; dx <= horizontal; dx++) {
@@ -89,6 +89,7 @@ public class MazeBuilder {
                         System.out.println("find start room in"+checkPos);
                         for (int ay=1;ay<=48;ay++){
                             if (world.getBlockState(checkPos.down(ay)).getBlock() == ModBlocks.MAZE_BLOCK) {
+                                data.setMazeHeight(ay+2);
                                 return checkPos.down(ay-1);
                             }
                         }

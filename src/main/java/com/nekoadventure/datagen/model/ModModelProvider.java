@@ -150,6 +150,7 @@ public class ModModelProvider extends FabricModelProvider {
         itemModelGenerator.register(ModItems.ADRENALINE,Models.GENERATED);
         itemModelGenerator.register(ModItems.BATTERY,Models.GENERATED);
         itemModelGenerator.register(ModItems.BROKEN_CROWN,Models.GENERATED);
+        itemModelGenerator.register(ModItems.SANDWORM_FANG,Models.GENERATED);
 
         itemModelGenerator.register(ModItems.INSTANCE_HEALTH_SOUL,Models.GENERATED);
         itemModelGenerator.register(ModItems.TP_START_ROOM_SOUL,Models.GENERATED);
@@ -160,9 +161,15 @@ public class ModModelProvider extends FabricModelProvider {
         itemModelGenerator.register(ModItems.GET_THIRD_POOL_SOUL,Models.GENERATED);
         itemModelGenerator.register(ModItems.GET_APART_POOL_SOUL,Models.GENERATED);
         itemModelGenerator.register(ModItems.GET_CHAO_POOL_SOUL,Models.GENERATED);
-        itemModelGenerator.register(ModItems.ORIGIN_SOUL,Models.GENERATED);
+        itemModelGenerator.register(ModItems.STRENGTH_SOUL,Models.GENERATED);
         itemModelGenerator.register(ModItems.DESIRE_SOUL,Models.GENERATED);
         itemModelGenerator.register(ModItems.GREEDY_SOUL,Models.GENERATED);
+        itemModelGenerator.register(ModItems.GET_TREASURE_POOL_SOUL,Models.GENERATED);
+        itemModelGenerator.register(ModItems.GET_FOOD_POOL_SOUL,Models.GENERATED);
+        itemModelGenerator.register(ModItems.GET_BOSS_POOL_SOUL,Models.GENERATED);
+        itemModelGenerator.register(ModItems.RESTORE_SOUL,Models.GENERATED);
+        itemModelGenerator.register(ModItems.FRENZY_SOUL,Models.GENERATED);
+        itemModelGenerator.register(ModItems.GET_CENTROSYMMETRY_SOUL,Models.GENERATED);
         itemModelGenerator.register(ModItems.RESET_SOUL,Models.GENERATED);
 
         itemModelGenerator.register(ModItems.BROKEN_SWORD,Models.GENERATED);

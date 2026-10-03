@@ -5,6 +5,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.AnimationState;
+import net.minecraft.entity.EntityGroup;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.goal.*;
@@ -50,6 +51,7 @@ public class MuddySpiderEntity extends HostileEntity implements Monster {
 
     @Override
     protected void initGoals() {
+        this.targetSelector.add(0, new RevengeGoal(this));
         this.targetSelector.add(1, new ActiveTargetGoal<>(this, PlayerEntity.class, false));
 
         this.goalSelector.add(1, new LeapAttackGoal());
@@ -57,6 +59,11 @@ public class MuddySpiderEntity extends HostileEntity implements Monster {
         this.goalSelector.add(3, new WanderAroundGoal(this, 0.8D));
         this.goalSelector.add(4, new LookAtEntityGoal(this, PlayerEntity.class, 8.0F));
         this.goalSelector.add(5, new LookAroundGoal(this));
+    }
+
+    @Override
+    public EntityGroup getGroup() {
+        return EntityGroup.ARTHROPOD;
     }
 
     @Override

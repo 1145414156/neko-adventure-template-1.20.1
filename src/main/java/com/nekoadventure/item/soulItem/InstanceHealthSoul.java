@@ -1,7 +1,5 @@
 package com.nekoadventure.item.soulItem;
 
-import net.minecraft.entity.effect.StatusEffectInstance;
-import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
@@ -15,7 +13,7 @@ public class InstanceHealthSoul extends AbstractSoulItem{
 
     @Override
     public void onUseEffect(World world, PlayerEntity player, ItemStack stack) {
-        player.addStatusEffect(new StatusEffectInstance(StatusEffects.INSTANT_HEALTH,1,100));
+        player.heal(player.getMaxHealth()-player.getHealth());
     }
 
 }

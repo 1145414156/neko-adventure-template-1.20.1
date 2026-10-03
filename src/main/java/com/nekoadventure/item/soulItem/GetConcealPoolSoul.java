@@ -16,12 +16,11 @@ import java.util.stream.Collectors;
 public class GetConcealPoolSoul extends AbstractSoulPoolItem{
     public GetConcealPoolSoul(Settings settings, int maxCharge) {
         super(settings, maxCharge);
-        text= Text.literal("使用时，提取出道具池中涉及到隐藏房的道具").formatted(Formatting.GOLD);
+        text= Text.literal("使用时，提取出道具池中涉及到隐藏池的道具").formatted(Formatting.GOLD);
     }
 
     @Override
     public List<Item> getStoragePoolItems(List<Item> inputPools, PlayerEntity player) {
-        // 输入池为空时（如附近没有房间方块），直接返回隐藏池标签中的全部物品
         if (inputPools.isEmpty()) {
             return player.getWorld().getRegistryManager()
                     .get(RegistryKeys.ITEM)

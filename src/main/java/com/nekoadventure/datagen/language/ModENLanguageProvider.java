@@ -123,6 +123,7 @@ public class ModENLanguageProvider extends FabricLanguageProvider {
         translationBuilder.add(ModItems.ADRENALINE,"adrenaline");
         translationBuilder.add(ModItems.BATTERY,"battery");
         translationBuilder.add(ModItems.BROKEN_CROWN,"broken_crown");
+        translationBuilder.add(ModItems.SANDWORM_FANG,"sandworm_fang");
 
         translationBuilder.add(ModItems.INSTANCE_HEALTH_SOUL,"instance_health_soul");
         translationBuilder.add(ModItems.TP_START_ROOM_SOUL,"tp_start_room_soul");
@@ -131,9 +132,15 @@ public class ModENLanguageProvider extends FabricLanguageProvider {
         translationBuilder.add(ModItems.GET_THIRD_POOL_SOUL,"get_third_pool_soul");
         translationBuilder.add(ModItems.GET_APART_POOL_SOUL,"get_apart_pool_soul");
         translationBuilder.add(ModItems.GET_CHAO_POOL_SOUL,"get_chao_pool_soul");
-        translationBuilder.add(ModItems.ORIGIN_SOUL,"origin_soul");
+        translationBuilder.add(ModItems.STRENGTH_SOUL,"strength_soul");
         translationBuilder.add(ModItems.DESIRE_SOUL,"desire_soul");
         translationBuilder.add(ModItems.GREEDY_SOUL,"greedy_soul");
+        translationBuilder.add(ModItems.GET_TREASURE_POOL_SOUL,"treasure_pool_soul");
+        translationBuilder.add(ModItems.GET_FOOD_POOL_SOUL,"get_food_pool_soul");
+        translationBuilder.add(ModItems.GET_BOSS_POOL_SOUL,"get_boss_pool_soul");
+        translationBuilder.add(ModItems.RESTORE_SOUL,"restore_soul");
+        translationBuilder.add(ModItems.FRENZY_SOUL,"frenzy_soul");
+        translationBuilder.add(ModItems.GET_CENTROSYMMETRY_SOUL,"get_centrosymmetry_soul");
         translationBuilder.add(ModItems.RESET_SOUL,"reset_soul");
         translationBuilder.add(ModItems.GET_FIRST_POOL_SOUL,"get_first_pool_soul");
         translationBuilder.add(ModItems.GET_LAST_POOL_SOUL,"get_last_pool_soul");

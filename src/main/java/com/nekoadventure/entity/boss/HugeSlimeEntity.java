@@ -15,6 +15,7 @@ import net.minecraft.entity.*;
 import net.minecraft.entity.ai.control.MoveControl;
 import net.minecraft.entity.ai.goal.ActiveTargetGoal;
 import net.minecraft.entity.ai.goal.Goal;
+import net.minecraft.entity.ai.goal.RevengeGoal;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.boss.BossBar;
@@ -50,7 +51,6 @@ import java.util.List;
 
 public class HugeSlimeEntity extends HostileEntity implements Monster {
 
-    // 技能动画为“实例字段 + 客户端驱动”：服务端只同步 ACTIVE_SKILL 编号，客户端收到后播放/停止动画
     @Environment(EnvType.CLIENT)
     public final AnimationState TRAMPLE_SKILL_ANI=new AnimationState();
     private static final int TRAMPLE_SKILL_DURATION=180;
@@ -64,10 +64,8 @@ public class HugeSlimeEntity extends HostileEntity implements Monster {
     public final AnimationState DASH_SKILL_ANI=new AnimationState();
     private static final int DASH_SKILL_DURATION=60;
 
-    // 服务端 -> 客户端 动作同步字段：0三连跳 1召唤 2子弹 3冲刺，-1=空闲
     private static final TrackedData<Integer> ACTIVE_SKILL =
             DataTracker.registerData(HugeSlimeEntity.class, TrackedDataHandlerRegistry.INTEGER);
-    // 仅客户端有意义：记录“已播放到”的技能编号，避免每个tick重复start动画
     private int playedSkill = -1;
 
     private int summonCount = 0;
@@ -100,7 +98,7 @@ public class HugeSlimeEntity extends HostileEntity implements Monster {
                 .add(EntityAttributes.GENERIC_ATTACK_DAMAGE, 8.0D)
                 .add(EntityAttributes.GENERIC_ATTACK_KNOCKBACK, 2.0D)
                 .add(EntityAttributes.GENERIC_FOLLOW_RANGE, 50.0D)
-                .add(EntityAttributes.GENERIC_KNOCKBACK_RESISTANCE, 0.8D);
+                .add(EntityAttributes.GENERIC_KNOCKBACK_RESISTANCE, 0.9D);
     }
 
     @Override
@@ -109,7 +107,7 @@ public class HugeSlimeEntity extends HostileEntity implements Monster {
         this.goalSelector.add(2, new FaceTowardTargetGoal(this));
         this.goalSelector.add(3, new RandomLookGoal(this));
         this.goalSelector.add(5, new MoveGoal(this));
-
+        this.targetSelector.add(0, new RevengeGoal(this));
         this.targetSelector.add(1, new ActiveTargetGoal<>(this, PlayerEntity.class, 10, false, false,
                 livingEntity -> Math.abs(livingEntity.getY() - this.getY()) <= 8.0));
         this.targetSelector.add(3, new ActiveTargetGoal<>(this, IronGolemEntity.class, true));
@@ -144,7 +142,7 @@ public class HugeSlimeEntity extends HostileEntity implements Monster {
             this.playSound(this.getSquishSound(), this.getSoundVolume(),
                     ((this.random.nextFloat() - this.random.nextFloat()) * 0.2F + 1.0F) / 0.8F);
             this.targetStretch = -0.5F;
-            if (jumpCount >= 3) {
+            if (jumpCount >= 2) {
                 setCanJump(false);
             }
         } else if (!this.isOnGround() && this.onGroundLastTick&&canJump) {
@@ -159,7 +157,6 @@ public class HugeSlimeEntity extends HostileEntity implements Monster {
         this.updateStretch();
     }
 
-    // 把服务端广播的 ACTIVE_SKILL 翻译成实例动画的播放/停止（仅客户端调用）
     private void syncClientAnimations() {
         int activeSkill = this.dataTracker.get(ACTIVE_SKILL);
         if (activeSkill != this.playedSkill) {
@@ -207,7 +204,6 @@ public class HugeSlimeEntity extends HostileEntity implements Monster {
             }
         }
         else if (skillStage==0){
-            // 空闲期挑选下一个技能
             if (this.getTarget()==null){
                 setCanJump(true);
                 skillStage=0;
@@ -222,7 +218,6 @@ public class HugeSlimeEntity extends HostileEntity implements Monster {
                 case 3 -> skillTick = DASH_SKILL_DURATION;
             }
             skillStage++;
-            // 起手：把技能编号广播给所有客户端播放动画
             this.dataTracker.set(ACTIVE_SKILL, skill);
         }
         else {
@@ -231,14 +226,16 @@ public class HugeSlimeEntity extends HostileEntity implements Monster {
             skillTick=this.random.nextInt(10)+10;
             skillStage=0;
             skill=-999;
-            // 收尾：通知客户端停止动画
             this.dataTracker.set(ACTIVE_SKILL, -1);
         }
     }
 
     //这些是全部技能
     private void dashSkill(){
-        if (this.getTarget() == null) {return;}
+        if (this.getTarget() == null) {
+            skillTick=0;
+            return;
+        }
         int time=-(skillTick-DASH_SKILL_DURATION);
         Vec3d direction;
         if (time==10){
@@ -268,10 +265,13 @@ public class HugeSlimeEntity extends HostileEntity implements Monster {
     }
 
     private void summonSkill() {
-        if (this.getTarget() == null) {return;}
+        if (this.getTarget() == null) {
+            skillTick=0;
+            return;
+        }
         int time = -(skillTick - SUMMON_SKILL_DURATION);
-        if (time >= 9 && time <= 11) {
-            if (this.summonCount < 12) {
+        if (time >= 10 && time <= 14) {
+            if (this.summonCount < 20) {
                 this.playSound(SoundEvents.ENTITY_SLIME_ATTACK, 2.0F, 0.8F);
                 SlimeEntity slime = new SlimeEntity(EntityType.SLIME, this.getWorld());
                 slime.setSize(this.random.nextInt(4)+1, true);
@@ -294,7 +294,10 @@ public class HugeSlimeEntity extends HostileEntity implements Monster {
     }
 
     private void trampleSkill(){
-        if (this.getTarget()==null&&targetPos==null){return;}
+        if (this.getTarget()==null&&targetPos==null){
+            skillTick=0;
+            return;
+        }
         int times=-(skillTick-TRAMPLE_SKILL_DURATION);
         int cycle=60;
         int time=times;
@@ -341,7 +344,10 @@ public class HugeSlimeEntity extends HostileEntity implements Monster {
     }
 
     private void bulletSkill(){
-        if (this.getTarget() == null) {return;}
+        if (this.getTarget() == null) {
+            skillTick=0;
+            return;
+        }
         int time=-(skillTick-BULLET_SKILL_DURATION);
         if (time>30&&time<100){
             this.playSound(SoundEvents.BLOCK_DISPENSER_LAUNCH, 1.0F, 0.5F);
@@ -419,7 +425,7 @@ public class HugeSlimeEntity extends HostileEntity implements Monster {
 
     protected void damage(LivingEntity target) {
         if (this.isAlive()) {
-            float reach = 3.5F; // 攻击范围
+            float reach = 3.6F; // 攻击范围
             if (this.squaredDistanceTo(target) < reach * reach
                     && this.canSee(target)
                     && target.damage(this.getDamageSources().mobAttack(this), this.getDamageAmount())) {

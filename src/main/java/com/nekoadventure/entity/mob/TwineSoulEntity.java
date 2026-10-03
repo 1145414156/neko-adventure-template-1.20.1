@@ -5,6 +5,7 @@ import com.nekoadventure.entity.missile.MissileEntity;
 import com.nekoadventure.entity.missile.MissileModelType;
 import com.nekoadventure.other.attackApart.AttackTypes;
 import net.minecraft.block.BlockState;
+import net.minecraft.entity.EntityGroup;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.goal.*;
@@ -42,12 +43,18 @@ public class TwineSoulEntity extends HostileEntity implements Monster {
 
         @Override
         protected void initGoals() {
+            this.targetSelector.add(0, new RevengeGoal(this));
             this.targetSelector.add(1, new ActiveTargetGoal<>(this, PlayerEntity.class, false));
 
             this.goalSelector.add(1, new ShootMissileGoal());
             this.goalSelector.add(2, new WanderAroundGoal(this, 0.8D));
             this.goalSelector.add(3, new LookAtEntityGoal(this, PlayerEntity.class, 8.0F));
             this.goalSelector.add(4, new LookAroundGoal(this));
+        }
+
+        @Override
+        public EntityGroup getGroup() {
+            return EntityGroup.UNDEAD;
         }
 
         @Override

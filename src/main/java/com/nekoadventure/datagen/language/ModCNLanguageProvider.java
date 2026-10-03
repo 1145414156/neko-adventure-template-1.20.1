@@ -124,6 +124,7 @@ public class ModCNLanguageProvider extends FabricLanguageProvider {
         translationBuilder.add(ModItems.ADRENALINE,"肾上腺素");
         translationBuilder.add(ModItems.BATTERY,"电池");
         translationBuilder.add(ModItems.BROKEN_CROWN,"坏掉的皇冠");
+        translationBuilder.add(ModItems.SANDWORM_FANG,"沙虫之牙");
         //物品栏
         translationBuilder.add(ModItemGroups.NEKO_GROUP,"猫的旅途：其他方块和物品");
         translationBuilder.add(ModItemGroups.NUM_ITEM_GROUP,"猫的旅途：全部道具");
@@ -162,9 +163,15 @@ public class ModCNLanguageProvider extends FabricLanguageProvider {
         translationBuilder.add(ModItems.GET_THIRD_POOL_SOUL,"三瓣的魂石");
         translationBuilder.add(ModItems.GET_APART_POOL_SOUL,"分裂的魂石");
         translationBuilder.add(ModItems.GET_CHAO_POOL_SOUL,"混乱的魂石");
-        translationBuilder.add(ModItems.ORIGIN_SOUL,"起源之魂石");
+        translationBuilder.add(ModItems.STRENGTH_SOUL,"力量之魂石");
         translationBuilder.add(ModItems.DESIRE_SOUL,"欲望之魂石");
         translationBuilder.add(ModItems.GREEDY_SOUL,"贪婪之魂石");
+        translationBuilder.add(ModItems.GET_TREASURE_POOL_SOUL,"获取宝箱池的魂石");
+        translationBuilder.add(ModItems.GET_FOOD_POOL_SOUL,"获取食物池的魂石");
+        translationBuilder.add(ModItems.GET_BOSS_POOL_SOUL,"获取首领池的魂石");
+        translationBuilder.add(ModItems.RESTORE_SOUL,"恢复之魂石");
+        translationBuilder.add(ModItems.FRENZY_SOUL,"狂乱之魂石");
+        translationBuilder.add(ModItems.GET_CENTROSYMMETRY_SOUL,"中心对称的魂石");
         translationBuilder.add(ModItems.RESET_SOUL,"重置之魂石");
         translationBuilder.add(ModItems.GET_FIRST_POOL_SOUL,"获取首个物品的魂石");
         translationBuilder.add(ModItems.GET_LAST_POOL_SOUL,"获取末尾物品的魂石");

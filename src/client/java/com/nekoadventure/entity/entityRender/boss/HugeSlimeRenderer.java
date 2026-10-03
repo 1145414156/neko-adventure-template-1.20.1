@@ -27,11 +27,6 @@ public class HugeSlimeRenderer extends LivingEntityRenderer<HugeSlimeEntity, Hug
     }
 
     @Override
-    public void render(HugeSlimeEntity livingEntity, float f, float g, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i) {
-        super.render(livingEntity, f, g, matrixStack, vertexConsumerProvider, i);
-    }
-
-    @Override
     public Identifier getTexture(HugeSlimeEntity entity) {
         return TEXTURE;
     }
@@ -43,15 +38,9 @@ public class HugeSlimeRenderer extends LivingEntityRenderer<HugeSlimeEntity, Hug
 
         @Override
         public void render(MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, HugeSlimeEntity entity, float limbAngle, float limbDistance, float tickDelta, float animationProgress, float headYaw, float headPitch) {
-            HugeSlimeEntityModel mainModel = this.getContextModel();
-            mainModel.getPart().copyTransform(outerModel.getPart());
             outerModel.setAngles(entity, limbAngle, limbDistance, animationProgress, headYaw, headPitch);
             VertexConsumer vertexConsumer = vertexConsumers.getBuffer(RenderLayer.getEntityTranslucent(TEXTURE));
-            matrices.push();
-            float scale = 2.5f;
-            matrices.scale(scale, scale, scale);
-            outerModel.getPart().getChild("outer").render(matrices, vertexConsumer, light, getOverlay(entity, 0), 1.0f, 1.0f, 1.0f, 0.8f);
-            matrices.pop();
+            outerModel.render(matrices, vertexConsumer, light, getOverlay(entity, 0), 1.0f, 1.0f, 1.0f, 0.8f);
         }
     }
 }

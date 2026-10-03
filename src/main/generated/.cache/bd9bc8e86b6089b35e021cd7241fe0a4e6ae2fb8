@@ -1,4 +1,4 @@
-// 1.20.1	2026-09-27T20:31:58.0923196	Neko Adventure/Model Definitions
+// 1.20.1	2026-10-01T11:22:21.5020242	Neko Adventure/Model Definitions
 bc89db3b4e016bcdac55995d15a2ce55fd9e8c17 assets\neko-adventure\models\item\get_chao_pool_soul.json
 6a4d24dc6662f07e39d054b613c22548e626c92f assets\neko-adventure\blockstates\start_room_block.json
 5aac8668e2f435a47e4471ab040c29fa5037cdb7 assets\neko-adventure\models\item\strength_potion_injector.json
@@ -42,6 +42,7 @@ e5aa9d2629a138e143196a4c68f9843a68a47001 assets\neko-adventure\models\item\catni
 49e62549ebda38786101351df15c3450145a681d assets\neko-adventure\models\item\naga_scale.json
 7f6742ffde1e84b57bca554698feaae098141eda assets\neko-adventure\models\item\oil_bottle.json
 acfc01365af10b00fd28bbc4c4587f3c5caf4637 assets\neko-adventure\models\item\the_third_eye.json
+393c3cfda8c58e3d1c88130e7fabfb18668d9de0 assets\neko-adventure\models\item\get_boss_pool_soul.json
 f5847c7bf92d1c617e20c903984584e8cc4d3232 assets\neko-adventure\models\item\crushed_ice.json
 26113677665b7b69e8832d471d48113346aecff2 assets\neko-adventure\models\item\maze_block.json
 e1069c3fe741ea199bfe3886a8177c93ecfadc60 assets\neko-adventure\models\item\damaged_bracer.json
@@ -58,12 +59,14 @@ ce45f88ac08bb1c96c84d7890f8b429bbdb8816c assets\neko-adventure\blockstates\soul_
 195a1cfc7b9915f1c76e29d33ff076daad9d79ea assets\neko-adventure\models\block\maze_structure_block.json
 eb398eda557b0c0242ebafaf28af0961b6bc2f2b assets\neko-adventure\models\item\compress_iron.json
 d566eed9e2fa73dd8db3491632f89d335702712a assets\neko-adventure\models\item\gamble_room_block.json
+415a243238e7d87310a84d33daf7038ad440f47f assets\neko-adventure\models\item\strength_soul.json
 955d38322904d77875798106aa24d1efde53bb34 assets\neko-adventure\models\block\start_room_block.json
 6aefa93f39d013572b783bdb9e268be655ff6b3a assets\neko-adventure\models\item\restock.json
 8655c9531872e9717ba41ae7910d6c456c9685b0 assets\neko-adventure\models\item\instance_health_soul.json
 b0d69e59faea427768c4b287dec74a004312189d assets\neko-adventure\models\item\get_conceal_pool_soul.json
 08fa127310d2f5c2745679e6e8c856be3324e136 assets\neko-adventure\models\item\milk.json
 a64391366ecd8cf8c94ba5baf945305fbdb84e3a assets\neko-adventure\models\item\shop_room_block.json
+5ca98d94fc533a57bc78ac270d262486534e87ec assets\neko-adventure\models\item\frenzy_soul.json
 062586f93007e16f2f56e9a02b3985e12e577f71 assets\neko-adventure\models\item\get_first_pool_soul.json
 efd9bf0c76a01e2779b37d9d9e399d6f4499d8f8 assets\neko-adventure\models\item\the_fourth_eye.json
 c83cd36595bd7dc26de512cc8e1171233d0f38ab assets\neko-adventure\models\item\sulfur_block.json
@@ -89,9 +92,11 @@ c03a9b55e570340171049f3732aec81f3a4a5bd2 assets\neko-adventure\models\item\mandr
 e532b10af12747482ffc7e7b3e1c257f4f37088d assets\neko-adventure\models\item\exposed_wire.json
 5ff5228a8516adcb4ab56216d3f35a55b06bfaf7 assets\neko-adventure\models\item\blinder.json
 cb4033222f7d7837cb6448fe5ac1d3683f23460c assets\neko-adventure\blockstates\slot_machine_block.json
+84489e1e33356613220c409b03f9f58b61469c49 assets\neko-adventure\models\item\jug.json
 1015785e77b00845333b8c5c8e37093f5662d2c0 assets\neko-adventure\models\block\forge_room_block.json
 c63c9b55cdab023e3cc9bac5f22cdfe1423fbcbc assets\neko-adventure\models\item\deceleration.json
 b07913582a5fafea3eda9d6b5527e672770cd0c9 assets\neko-adventure\models\item\bandage.json
+33dd736d59eb6cc529ea4cf11c7c82866bf4f4c4 assets\neko-adventure\models\item\get_treasure_pool_soul.json
 c3833730934633898a0766aab63f19a0d1f48132 assets\neko-adventure\models\item\broken_soul.json
 d1a4a69e09440368a87b2c8d00646e7f8a6bd336 assets\neko-adventure\models\item\blood_sacrifice.json
 89198fcaf5daf6555ff2834dc3ca551d56ea9dba assets\neko-adventure\models\item\oxidized_copper_ingot.json
@@ -103,6 +108,7 @@ e169af9d0e5caf1dd3a70b1372b5cfdf090c72da assets\neko-adventure\models\item\batte
 8b4c7aea95c5c3ac482e96cc0302512cb2c9b91e assets\neko-adventure\blockstates\reroll_furnace_block.json
 145a9ead32381d2cd6826dd140ceb49843baaec4 assets\neko-adventure\blockstates\tp_next_level_block.json
 abed478e39de744923c5351cc1297f8871d4011e assets\neko-adventure\models\item\coin.json
+c338792929cf24c743a92da6126d350e6d2715b4 assets\neko-adventure\models\item\get_food_pool_soul.json
 210b64b52b1a4fecef2daa40aa04af4e2080e550 assets\neko-adventure\models\item\broken_mask.json
 0563f20db354027fadc5f0e2dd25420571ae666f assets\neko-adventure\models\item\skeleton_priest_chin.json
 942b6714ca4e60f70805b590736f9673569a9757 assets\neko-adventure\blockstates\food_room_block.json
@@ -119,7 +125,6 @@ a5b72297b1d28b5a98c04950bb56365def2b3396 assets\neko-adventure\models\item\soul_
 4201ee35327b8ffa1fc5ff3e39a3c2c20deb88ee assets\neko-adventure\models\item\wing.json
 6fdbf4a84477af1ef1e1197d75b25c341bd9d933 assets\neko-adventure\models\item\bullet.json
 c59f3806718a168fd873c17be3375d30b357675d assets\neko-adventure\models\item\glove.json
-a5cbee7001ea7cb168b3486f2cad943d35d1d6df assets\neko-adventure\models\item\origin_soul.json
 e68c6011adb00684eeb632fe07144ad49485ebef assets\neko-adventure\blockstates\item_base_block.json
 81d979599cf8ce1b4bdd0b5fceecb3f41bbefd19 assets\neko-adventure\models\item\cactus_ball.json
 81627bdbaab3d34e447ed494f5f15270f43c04bf assets\neko-adventure\models\item\tomato.json
@@ -136,14 +141,16 @@ c5d9aa0870bb06ddd745f70e14234bd0268ae6d5 assets\neko-adventure\models\block\boss
 262fd69b9fb5bdfedc9a2825e06ee82bb7654a54 assets\neko-adventure\blockstates\shop_room_block.json
 7987a68ee420aecebaf60fdefad1161537a28aae assets\neko-adventure\models\item\cullet.json
 778f43c138efa97336dfb684819ef734f760e163 assets\neko-adventure\blockstates\wish_pool_block.json
-c00c06565507e710f05c6b18bc7b3eb40c419e87 assets\neko-adventure\blockstates\maze_block.json
 d758213502c5e1c09e80da30688eb129b4735222 assets\neko-adventure\models\item\crown.json
+c00c06565507e710f05c6b18bc7b3eb40c419e87 assets\neko-adventure\blockstates\maze_block.json
 ef76430e1f12a6631848146c483088813ce8d093 assets\neko-adventure\models\item\poker.json
+8a2c6d185ac22cd88c09afce916313d563be482a assets\neko-adventure\models\item\get_centrosymmetry_soul.json
 be3114fe982acf7fdf63ec12f5f36948959a3569 assets\neko-adventure\models\item\prop_prototype.json
 80831da3c3fa4f91c23a64962c5c09369d605b76 assets\neko-adventure\models\item\twist.json
 95a9b8ab50d95c25f055a0e7fffe872ea3c8ada4 assets\neko-adventure\models\item\forge_room_block.json
 cafb27ccd50aaa1d6215877a7c854cbc501c81c5 assets\neko-adventure\models\item\red_scarf.json
 b67daa091b088cfcde2d696af0034a1c46719135 assets\neko-adventure\models\item\broken_sword.json
+39418e91c170f096569de7c6109f3a1c1664eb27 assets\neko-adventure\models\item\restore_soul.json
 7d8b779cd6ca9acdb4cb5d7885d2b91ac2483f74 assets\neko-adventure\models\item\purple_juice.json
 7aa05064f8d773c64fe2a8c0ab21c4448988fbb2 assets\neko-adventure\models\item\withered_rose_petals.json
 2d7bb8e19736293de2c7f5a7a36b8e0086b4ad46 assets\neko-adventure\models\block\conceal_room_block.json
@@ -164,9 +171,9 @@ ea8ee524a94f23e3507ee4ddd8b71d3313405485 assets\neko-adventure\models\item\cat_t
 856068d4113f20028f3aeb2f6a7eb7aa0ad17c7e assets\neko-adventure\models\item\onion.json
 aca47009f902e7b1d84335aa3ce7da8c05114a44 assets\neko-adventure\models\item\chocolate_biscuit.json
 16f0e635741e3fb2029f3c92e86a84c143d9f43b assets\neko-adventure\models\block\treasure_room_block.json
-c7a7195ca01e27901ba44c959bb0678519712598 assets\neko-adventure\models\item\short_hook.json
-3260ccc988187e4eec3259358ec7e9dcb5678552 assets\neko-adventure\models\block\soul_room_block.json
 af90f63c720f4f3815d8a1c81048c1600de5c4bc assets\neko-adventure\models\item\broken_crown.json
+3260ccc988187e4eec3259358ec7e9dcb5678552 assets\neko-adventure\models\block\soul_room_block.json
+c7a7195ca01e27901ba44c959bb0678519712598 assets\neko-adventure\models\item\short_hook.json
 052c002a3e91869d0b5751f671ffd148a807e77a assets\neko-adventure\models\item\spiriting_away.json
 4349187d2f8cdf1d171265e4728fcdcc5db37d82 assets\neko-adventure\models\item\strange_potion.json
 89620dcc4363c0bbdcd73a71b8386e8c11ac1e6c assets\neko-adventure\blockstates\maze_structure_block.json

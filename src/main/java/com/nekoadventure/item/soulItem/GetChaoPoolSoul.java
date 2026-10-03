@@ -18,10 +18,7 @@ public class GetChaoPoolSoul extends AbstractSoulPoolItem{
 
     @Override
     public List<Item> getStoragePoolItems(List<Item> inputPools, PlayerEntity player) {
-        List<Item> result = new ArrayList<>(inputPools);
-        if (!player.isSneaking()) {
-            Collections.shuffle(result);
-        }
-        return result;
+        Collections.shuffle(inputPools);
+        return inputPools;
     }
 }

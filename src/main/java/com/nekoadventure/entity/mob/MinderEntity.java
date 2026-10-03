@@ -37,7 +37,8 @@ public class MinderEntity extends HostileEntity implements Monster {
 
     @Override
     protected void initGoals() {
-        this.targetSelector.add(0, new ActiveTargetGoal<>(this, PlayerEntity.class, false));
+        this.targetSelector.add(0, new RevengeGoal(this));
+        this.targetSelector.add(1, new ActiveTargetGoal<>(this, PlayerEntity.class, false));
 
         this.goalSelector.add(0, new SwimGoal(this));
         this.goalSelector.add(1, new CustomMeleeAttackGoal(this, 1.0D, false));

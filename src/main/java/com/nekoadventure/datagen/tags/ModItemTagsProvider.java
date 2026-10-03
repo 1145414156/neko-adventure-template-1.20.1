@@ -225,6 +225,7 @@ public class ModItemTagsProvider extends FabricTagProvider<Item> {
         bossPoolItems.add(ModItems.ADRENALINE);
         bossPoolItems.add(ModItems.BROKEN_CROWN);
         bossPoolItems.add(ModItems.JUG);
+        bossPoolItems.add(ModItems.SANDWORM_FANG);
 
         return bossPoolItems;
     }
@@ -304,6 +305,7 @@ public class ModItemTagsProvider extends FabricTagProvider<Item> {
         gamblePoolItems.add(ModItems.BANANA);
         gamblePoolItems.add(ModItems.SKELETON_PRIEST_JEWEL);
         gamblePoolItems.add(ModItems.BROKEN_CROWN);
+        gamblePoolItems.add(ModItems.SANDWORM_FANG);
 
         return gamblePoolItems;
     }
@@ -355,6 +357,7 @@ public class ModItemTagsProvider extends FabricTagProvider<Item> {
         concealPoolItems.add(ModItems.CLOUD_BOOTS);
         concealPoolItems.add(ModItems.ADRENALINE);
         concealPoolItems.add(ModItems.BATTERY);
+        concealPoolItems.add(ModItems.SANDWORM_FANG);
 
         return concealPoolItems;
     }

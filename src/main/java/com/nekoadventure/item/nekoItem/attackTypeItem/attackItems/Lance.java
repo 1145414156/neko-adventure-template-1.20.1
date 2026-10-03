@@ -7,12 +7,14 @@ import com.nekoadventure.item.nekoItem.attackTypeItem.NekoAttackTypeItem;
 import com.nekoadventure.item.other.NekoPackageItem;
 import com.nekoadventure.other.attackApart.AttackTypes;
 import com.nekoadventure.other.itemApart.NekoPackageDataManager;
+import com.nekoadventure.particle.ModParticleTypes;
 import com.nekoadventure.sound.ModSoundEvents;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Box;
@@ -62,10 +64,34 @@ public class Lance extends NekoAttackTypeItem {
         player.getItemCooldownManager().set(player.getOffHandStack().getItem(), cooldown);
     }
 
+    private void spawnSweepParticlesAlongLine(World world, Vec3d start,
+                                              Vec3d horizontalDir, double maxDistance) {
+        if (!(world instanceof ServerWorld serverWorld)) {
+            return;
+        }
+        Vec3d dir = horizontalDir.normalize();
+        Vec3d origin = new Vec3d(start.x, start.y+1.0, start.z);
+        double step = 0.5;
+        int count = (int) (maxDistance / step);
+
+        for (int i = 0; i <= count; i++) {
+            double t = i * step;
+            Vec3d pos = origin.add(dir.multiply(t));
+            serverWorld.spawnParticles(
+                    ModParticleTypes.LANCE_ATTACK,
+                    pos.x, pos.y, pos.z,
+                    1,
+                    0, 0, 0,
+                    0
+            );
+        }
+    }
+
     private List<LivingEntity> getEntitiesOnLine(PlayerEntity player,
                                                  Vec3d start,
                                                  Vec3d horizontalDir,
                                                  double maxDistance) {
+        spawnSweepParticlesAlongLine(player.getWorld(), start, horizontalDir, maxDistance);
         Vec3d startXZ = new Vec3d(start.x, 0, start.z);
         Vec3d dir = horizontalDir.normalize();
         Box searchBox = new Box(
@@ -86,7 +112,7 @@ public class Lance extends NekoAttackTypeItem {
                 return false;
             }
             Vec3d closestPoint = startXZ.add(dir.multiply(projection));
-            return entityXZ.distanceTo(closestPoint) <= 0.7;
+            return entityXZ.distanceTo(closestPoint) <= 1.2;
         }).collect(Collectors.toList());
     }
 

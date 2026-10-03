@@ -53,6 +53,7 @@ public class ShooterEntity extends HostileEntity implements Monster {
 
     @Override
     protected void initGoals() {
+        this.targetSelector.add(0, new RevengeGoal(this));
         this.targetSelector.add(1, new ActiveTargetGoal<>(this, PlayerEntity.class, false));
 
         this.goalSelector.add(1, new ShootMissileGoal());

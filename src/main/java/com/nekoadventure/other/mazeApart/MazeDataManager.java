@@ -20,6 +20,8 @@ public class MazeDataManager extends PersistentState {
     private MazeCenterNBTCompound mazeCenter = null;
     private int mazeRange = 0;
 
+    private int mazeHeight = 0;
+
     @Override
     public NbtCompound writeNbt(NbtCompound nbt) {
         NbtList initialList = new NbtList();
@@ -40,6 +42,7 @@ public class MazeDataManager extends PersistentState {
             nbt.put("MazeCenter", mazeCenter.toNBT());
         }
         nbt.putInt("MazeRange", mazeRange);
+        nbt.putInt("MazeHeight", mazeHeight);
 
         return nbt;
     }
@@ -63,6 +66,7 @@ public class MazeDataManager extends PersistentState {
             data.mazeCenter = MazeCenterNBTCompound.fromNBT(nbt.getCompound("MazeCenter"));
         }
         data.mazeRange = nbt.getInt("MazeRange");
+        data.mazeHeight = nbt.getInt("MazeHeight");
 
         return data;
     }
@@ -134,10 +138,7 @@ public class MazeDataManager extends PersistentState {
     public MazeCenterNBTCompound getMazeCenter() {
         return mazeCenter;
     }
-    public void setMazeCenter(MazeCenterNBTCompound center) {
-        this.mazeCenter = center;
-        markDirty();
-    }
+
     public void setMazeCenter(BlockPos centerPos) {
         this.mazeCenter = new MazeCenterNBTCompound(centerPos);
         markDirty();
@@ -155,6 +156,14 @@ public class MazeDataManager extends PersistentState {
     }
     public void resetMazeRange() {
         this.mazeRange = 0;
+        markDirty();
+    }
+
+    public int getMazeHeight() {
+        return mazeHeight;
+    }
+    public void setMazeHeight(int height) {
+        this.mazeHeight = height;
         markDirty();
     }
 }

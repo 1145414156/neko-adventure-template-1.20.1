@@ -98,7 +98,7 @@ public class SpawnMobBlockEntity extends AbstractMazeBlockEntity {
             }
 
         }
-        int range = roomRange;
+        int range = roomRange-1;
         double minX = pos.getX() - range+0.5;
         double minY = pos.getY() - 2;
         double minZ = pos.getZ() - range+0.5;

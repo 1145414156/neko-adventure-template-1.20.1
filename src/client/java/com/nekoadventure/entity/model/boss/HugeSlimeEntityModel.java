@@ -2,36 +2,23 @@
 package com.nekoadventure.entity.model.boss;
 
 import com.nekoadventure.entity.animation.boss.HugeSlimeEntityModelAnimation;
-import com.nekoadventure.entity.animation.mob.MinderAnimation;
-import com.nekoadventure.entity.animation.mob.MuddySpiderModelAnimation;
-import com.nekoadventure.entity.animation.mob.ShooterAnimation;
-import com.nekoadventure.entity.animation.mob.TreasureHunterAnimation;
 import com.nekoadventure.entity.boss.HugeSlimeEntity;
-import com.nekoadventure.entity.mob.MuddySpiderEntity;
 import net.minecraft.client.model.*;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.entity.model.SinglePartEntityModel;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.AnimationState;
-import org.jetbrains.annotations.NotNull;
 
 public class HugeSlimeEntityModel extends SinglePartEntityModel<HugeSlimeEntity> {
+	private static final float RENDER_SCALE = 2.5F;
+
 	private final ModelPart main;
 	private final ModelPart inner;
-	private final ModelPart eyes;
-	private final ModelPart mouth;
-	private final ModelPart headLayer;
-	private final ModelPart eyes1;
 	private final ModelPart outer;
 	private final boolean isOuterLayer;
 
 	public HugeSlimeEntityModel(ModelPart root, boolean isOuterLayer) {
 		this.main = root.getChild("main");
 		this.inner = main.getChild("inner");
-		this.eyes = inner.getChild("eyes");
-		this.mouth = inner.getChild("mouth");
-		this.headLayer = inner.getChild("headLayer");
-		this.eyes1 = inner.getChild("eyes1");
 		this.outer = main.getChild("outer");
 
 		this.isOuterLayer = isOuterLayer;
@@ -65,9 +52,12 @@ public class HugeSlimeEntityModel extends SinglePartEntityModel<HugeSlimeEntity>
 	@Override
 	public void render(MatrixStack matrices, VertexConsumer vertexConsumer, int light, int overlay, float red, float green, float blue, float alpha) {
 		matrices.push();
-		float scale = 2.5f;
-		matrices.scale(scale, scale, scale);
-		inner.render(matrices, vertexConsumer, light, overlay, red, green, blue, alpha);
+		matrices.scale(RENDER_SCALE, RENDER_SCALE, RENDER_SCALE);
+		if (isOuterLayer) {
+			outer.render(matrices, vertexConsumer, light, overlay, red, green, blue, alpha);
+		} else {
+			inner.render(matrices, vertexConsumer, light, overlay, red, green, blue, alpha);
+		}
 		matrices.pop();
 	}
 

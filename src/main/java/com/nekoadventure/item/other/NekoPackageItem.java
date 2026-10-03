@@ -198,7 +198,7 @@ public class NekoPackageItem extends Item {
         EntityAttributeModifier attackSpeedModifier = new EntityAttributeModifier(
                 UUID.fromString("550e8400-e29b-41d4-a716-446655440003"),
                 "Neko Package AttackSpeed",
-                data.finalData[3]*0.3,
+                data.finalData[3]*0.2,
                 EntityAttributeModifier.Operation.ADDITION
         );
         if (attackSpeedAttr != null) {
@@ -206,7 +206,7 @@ public class NekoPackageItem extends Item {
         }
         if (player instanceof ServerPlayerEntity serverPlayer) {
             //发送当前楼层数据给client端
-            int level = 1;
+            int level = -1;
             if (serverPlayer.getWorld() instanceof ServerWorld serverWorld && isMazeDimension(serverWorld)) {
                 MazeDataManager mazeDataManager = MazeDataManager.get(serverWorld);
                 if (mazeDataManager != null) {
@@ -220,11 +220,6 @@ public class NekoPackageItem extends Item {
     private void calculateData(double[] data) {
         // [0]=health, [1]=speed, [2]=strength，[3]=attackSpeed,
         // [4]=attackRange,[5]=attackMultiplier,[6]=attackSpeedMultiplier
-
-        //attackMultiplier
-        if (data[5] >= 0 && data[5] < NekoPackageDataManager.MIN_ATTACK_MULTIPLIER) {
-            data[5] = NekoPackageDataManager.MIN_ATTACK_MULTIPLIER;
-        }
 
         //strength
         double strength = data[2];

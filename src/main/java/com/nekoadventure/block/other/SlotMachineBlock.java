@@ -2,6 +2,8 @@ package com.nekoadventure.block.other;
 
 import com.nekoadventure.block.blockentity.other.SlotMachineBlockEntity;
 import com.nekoadventure.item.ModItems;
+import com.nekoadventure.other.itemApart.SpawnRandomNekoItems;
+import com.nekoadventure.other.itemApart.SpawnRandomSoulItems;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
@@ -9,6 +11,7 @@ import net.minecraft.block.ShapeContext;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
@@ -45,21 +48,30 @@ public class SlotMachineBlock extends Block implements BlockEntityProvider {
                 world.addBlockBreakParticles(pos, state);
             }
            else if (roll < 80-useCount) {
-                // 20%概率：生成2金币
-                giveCoins(player, 2);
-                player.sendMessage(Text.literal("§a你获得了 2 枚金币！"), true);
+                SpawnRandomSoulItems spawnRandomSoulItems=new SpawnRandomSoulItems();
+                // 20%概率：生成1魂石
+                player.getInventory().offerOrDrop(spawnRandomSoulItems.summonRandomSoulItem(world));
+                player.sendMessage(Text.literal("§a你获得了 1 个魂石！"), true);
             } else if (roll < 85-useCount) {
-                // 5%概率：生成4金币
-                giveCoins(player, 4);
-                player.sendMessage(Text.literal("§a你获得了 4 枚金币！"), true);
+               int z=world.random.nextInt(4)+1;
+                // 5%概率：生成1~4缠魂物质
+                player.getInventory().offerOrDrop(new ItemStack(ModItems.BINDING_SOUL_SUBSTANCE, z));
+                player.sendMessage(Text.literal("§a你获得了 "+z+ "枚金币！"), true);
             } else if (roll<90-useCount){
-                // 5%概率：生成6金币
-                giveCoins(player, 3);
+                SpawnRandomNekoItems spawnRandomNekoItems=new SpawnRandomNekoItems();
+                // 5%概率：生成1道具
+                player.getInventory().offerOrDrop(spawnRandomNekoItems.summonRandomItemFromPool(
+                        (ServerWorld) world,
+                        null,
+                        spawnRandomNekoItems.ALL_POOL_PROBABILITIES_HEIGHT[0],
+                        spawnRandomNekoItems.ALL_POOL_PROBABILITIES_HEIGHT[1],
+                        spawnRandomNekoItems.ALL_POOL_PROBABILITIES_HEIGHT[2],
+                        spawnRandomNekoItems.ALL_POOL_PROBABILITIES_HEIGHT[3]));
                 player.sendMessage(Text.literal("§a你获得了 6 枚金币！"), true);
             }
            else if (roll<91-useCount){
-                // 1%概率：随机生成7~10金币
-               giveCoins(player, world.random.nextInt(3)+8);
+                // 9-useCount%概率：随机生成1~10金币
+               giveCoins(player, world.random.nextInt(10)+1);
                 player.sendMessage(Text.literal("§a你获得了 §c-error- §a枚金币！"), true);
             }
             else {
