@@ -4,5 +4,7 @@ public enum MissileModelType {
     BULLET,
     BRIMSTONE,
     JOYEUSE,
-    BOOMERANG
+    BOOMERANG,
+    ZENITH,
+    NULL
 }

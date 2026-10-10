@@ -44,7 +44,7 @@ public class SlotMachineBlock extends Block implements BlockEntityProvider {
             int roll = world.random.nextInt(100);
 
             if (roll < 60-useCount) {
-                // 基础60%-useCount：什么都不生成
+                // 60%-useCount：什么都不生成
                 world.addBlockBreakParticles(pos, state);
             }
            else if (roll < 80-useCount) {
@@ -56,7 +56,7 @@ public class SlotMachineBlock extends Block implements BlockEntityProvider {
                int z=world.random.nextInt(4)+1;
                 // 5%概率：生成1~4缠魂物质
                 player.getInventory().offerOrDrop(new ItemStack(ModItems.BINDING_SOUL_SUBSTANCE, z));
-                player.sendMessage(Text.literal("§a你获得了 "+z+ "枚金币！"), true);
+                player.sendMessage(Text.literal("§a你获得了 "+z+ "个缠魂物质！"), true);
             } else if (roll<90-useCount){
                 SpawnRandomNekoItems spawnRandomNekoItems=new SpawnRandomNekoItems();
                 // 5%概率：生成1道具
@@ -67,12 +67,12 @@ public class SlotMachineBlock extends Block implements BlockEntityProvider {
                         spawnRandomNekoItems.ALL_POOL_PROBABILITIES_HEIGHT[1],
                         spawnRandomNekoItems.ALL_POOL_PROBABILITIES_HEIGHT[2],
                         spawnRandomNekoItems.ALL_POOL_PROBABILITIES_HEIGHT[3]));
-                player.sendMessage(Text.literal("§a你获得了 6 枚金币！"), true);
+                player.sendMessage(Text.literal("§a你获得了 1 个道具！"), true);
             }
            else if (roll<91-useCount){
                 // 9-useCount%概率：随机生成1~10金币
                giveCoins(player, world.random.nextInt(10)+1);
-                player.sendMessage(Text.literal("§a你获得了 §c-error- §a枚金币！"), true);
+                player.sendMessage(Text.literal("§a你获得了更多的金币！"), true);
             }
             else {
                 world.breakBlock(pos, false);

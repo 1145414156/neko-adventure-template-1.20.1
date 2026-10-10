@@ -13,6 +13,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.Registries;
@@ -151,6 +152,7 @@ public class SpawnMobBlockEntity extends AbstractMazeBlockEntity {
                         if (world.getBlockState(this.getPos().down(1)).equals(
                                 ModBlocks.BOSS_ROOM_BLOCK.getDefaultState()
                                         .with(BossRoomBlock.CAN_TELEPORT, false))) {
+                            clearRoomItemEntity(world);
                             if (!spawnCustomBossEntity(checkPos)) {
                                 placeBossStructure(checkPos);
                             }
@@ -196,7 +198,7 @@ public class SpawnMobBlockEntity extends AbstractMazeBlockEntity {
                 serverWorld.random,
                 2
         ));
-        System.out.println("spawned boss with structure");
+        NekoAdventure.LOGGER.info("spawned boss with structure");
     }
 
     //当玩家设置的生物ID直接生成boss实体，否则使用原逻辑
@@ -211,7 +213,7 @@ public class SpawnMobBlockEntity extends AbstractMazeBlockEntity {
         if (entity == null) return false;
         entity.setPosition(spawnerPos.getX() + 0.5, spawnerPos.getY(), spawnerPos.getZ() + 0.5);
         serverWorld.spawnEntity(entity);
-        System.out.println("Spawned Custom Boss Entity with ID: " + entityId);
+        NekoAdventure.LOGGER.info("Spawned Custom Boss Entity with ID: {}", entityId);
         return true;
     }
 
@@ -306,6 +308,17 @@ public class SpawnMobBlockEntity extends AbstractMazeBlockEntity {
                         if (player != null) {if (!p.equals(player)) {p.teleport(player.getX(),player.getY()+0.1,player.getZ());}}
                     });
                 }
+            }
+        }
+    }
+
+    private void clearRoomItemEntity(World world) {
+        List<ItemEntity> itemEntities=world.getEntitiesByClass(ItemEntity.class,
+                new Box(32,24,32,-32,0,-32),
+                item -> item instanceof ItemEntity);
+        if (!itemEntities.isEmpty()){
+            for (ItemEntity livingEntity : itemEntities) {
+                livingEntity.kill();
             }
         }
     }

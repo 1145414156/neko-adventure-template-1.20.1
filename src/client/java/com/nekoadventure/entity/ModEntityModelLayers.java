@@ -7,12 +7,16 @@ import net.minecraft.util.Identifier;
 public class ModEntityModelLayers {
     //missile
 
-    public static final EntityModelLayer BRIMSTONE=
-            new EntityModelLayer(new Identifier(NekoAdventure.MOD_ID, "brimstone"), "main");
     public static final EntityModelLayer JOYEUSE=
             new EntityModelLayer(new Identifier(NekoAdventure.MOD_ID, "joyeuse"), "main");
     public static final EntityModelLayer BOOMERANG=
             new EntityModelLayer(new Identifier(NekoAdventure.MOD_ID, "boomerang"), "main");
+    public static final EntityModelLayer ZENITH=
+            new EntityModelLayer(new Identifier(NekoAdventure.MOD_ID, "zenith"), "main");
+
+    //particle
+    public static final EntityModelLayer PARTICLE_TEXT=
+            new EntityModelLayer(new Identifier(NekoAdventure.MOD_ID,"particle_text"),"main");
 
     //mob
     public static final EntityModelLayer TWINE_SOUL=

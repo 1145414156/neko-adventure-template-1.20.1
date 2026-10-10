@@ -1,0 +1,32 @@
+{
+  "parent": "neko-adventure:adventure/first_enter_dungeon_structure",
+  "criteria": {
+    "in_dungeon_dimension": {
+      "conditions": {
+        "to": "neko-adventure:dungeon"
+      },
+      "trigger": "minecraft:changed_dimension"
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "text": "第一次进入迷宫——地牢(使用断掉的剑刃右键结构中在塔顶的特殊方块进入)"
+    },
+    "frame": "task",
+    "hidden": false,
+    "icon": {
+      "item": "neko-adventure:broken_sword"
+    },
+    "show_toast": true,
+    "title": {
+      "text": "初入地牢"
+    }
+  },
+  "requirements": [
+    [
+      "in_dungeon_dimension"
+    ]
+  ],
+  "sends_telemetry_event": false
+}

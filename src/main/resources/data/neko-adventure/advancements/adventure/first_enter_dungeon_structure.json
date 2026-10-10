@@ -1,0 +1,42 @@
+{
+  "parent": "neko-adventure:adventure/root",
+  "criteria": {
+    "in_dungeon_structure": {
+      "conditions": {
+        "player": [
+          {
+            "condition": "minecraft:entity_properties",
+            "entity": "this",
+            "predicate": {
+              "location": {
+                "structure": "neko-adventure:dungeon"
+              }
+            }
+          }
+        ]
+      },
+      "trigger": "minecraft:location"
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "text": "找到进入维度——地牢的入口(在平原刷新)"
+    },
+    "frame": "task",
+    "hidden": false,
+    "icon": {
+      "item": "neko-adventure:tp_dungeon_block"
+    },
+    "show_toast": true,
+    "title": {
+      "text": "王国覆灭"
+    }
+  },
+  "requirements": [
+    [
+      "in_dungeon_structure"
+    ]
+  ],
+  "sends_telemetry_event": false
+}

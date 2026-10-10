@@ -10,7 +10,6 @@ import net.minecraft.entity.ai.TargetPredicate;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.Vec3d;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Comparator;
 import java.util.List;
@@ -24,7 +23,8 @@ public class AttackTypes {
         JOYEUSE,
         DELAY,
         BOOMERANG,
-        HOMING
+        HOMING,
+        ZENITH
     }
 
     private final AttackType type;
@@ -48,16 +48,13 @@ public class AttackTypes {
             case DELAY -> delayMovement(entity, range, speed);
             case BOOMERANG -> boomerangMovement(entity,range,speed);
             case HOMING -> homingMovement(entity,range,speed);
+            case ZENITH -> zenithMovement(entity, speed);
         }
     }
-
-    // 坐标抖动方法（检测实体）
     private void lazyMovement(MissileEntity entity) {
         entity.setVelocity(entity.getVelocity().add(0, 0.1, 0));
         entity.setVelocity(entity.getVelocity().add(0, -0.1, 0));
     }
-
-    //与持有者同步移动方法
     public void followOwnerMovement(MissileEntity entity) {
         if (entity.getOwner() == null) return;
 
@@ -69,6 +66,20 @@ public class AttackTypes {
         }
         lastOwnerPos = currentOwnerPos;
         lazyMovement(entity);
+    }
+
+    private void homingMovement(MissileEntity entity,double range,double speed) {
+        this.delayMovement(entity,range,speed);
+        LivingEntity nearest = entity.getWorld().getClosestEntity(
+                LivingEntity.class,
+                TargetPredicate.DEFAULT,
+                entity.getControllingPassenger(),
+                entity.getX(), entity.getY(), entity.getZ(),
+                entity.getBoundingBox().expand(20)
+        );
+        if (nearest != null) {
+            entity.teleport(nearest.getX(), nearest.getY(), nearest.getZ());
+        }
     }
 
     // ==============================================================
@@ -146,7 +157,29 @@ public class AttackTypes {
         if (!entities.isEmpty()) {
             entity.setVelocity(Vec3d.ZERO);
             if (!entity.getWorld().isClient) {
-                MissileEntity missile = getMissileEntity(entity);
+                Vec3d pos = entity.getPos();
+                AttackTypes lazyAttack = new AttackTypes(AttackType.LAZY);
+                double attackRange = 3;
+                double strength = 1;
+                if (entity.getOwner() instanceof PlayerEntity player
+                        && player.getOffHandStack().getItem() instanceof NekoPackageItem nekoPackage) {
+                    attackRange = nekoPackage.getAttackRange(player);
+                    strength = nekoPackage.getStrength(player);
+                }
+                MissileEntity missile =new MissileEntity(
+                        ModEntities.MISSILE,
+                        entity.getWorld(),
+                        entity.getOwner(),
+                        lazyAttack,
+                        true,
+                        attackRange,
+                        80,
+                        strength * 2
+                );
+                missile.setPosition(pos);
+                missile.setMissileModelType(MissileModelType.JOYEUSE);
+                missile.setYaw(0);
+                missile.setPitch(0);
                 missile.setPosition(entity.getPos());
                 LivingEntity target = missile.getWorld().getEntitiesByClass(
                         LivingEntity.class,
@@ -154,7 +187,7 @@ public class AttackTypes {
                         tar -> tar.isAlive() && tar != missile.getOwner()
                 ).stream().min(Comparator.comparingDouble(tar -> tar.distanceTo(missile))).orElse(null);
                 if (target != null) {
-                    Vec3d pos = missile.getPos();
+                    pos = missile.getPos();
                     Vec3d direction = target.getEyePos().subtract(pos).normalize();
                     double yaw = Math.toDegrees(Math.atan2(-direction.x, direction.z));
                     double pitch = Math.toDegrees(Math.atan2(-direction.y, Math.sqrt(direction.x * direction.x + direction.z * direction.z)));
@@ -179,44 +212,25 @@ public class AttackTypes {
         Vec3d velocityDelta = targetVelocity.subtract(currentVelocity);
         entity.addVelocity(velocityDelta.x, velocityDelta.y, velocityDelta.z);
     }
-    private void homingMovement(MissileEntity entity,double range,double speed) {
-        this.delayMovement(entity,range,speed);
-        LivingEntity nearest = entity.getWorld().getClosestEntity(
-                LivingEntity.class,
-                TargetPredicate.DEFAULT,
-                entity.getControllingPassenger(),
-                entity.getX(), entity.getY(), entity.getZ(),
-                entity.getBoundingBox().expand(20)
-        );
-        if (nearest != null) {
-            entity.teleport(nearest.getX(), nearest.getY(), nearest.getZ());
+    private void zenithMovement(MissileEntity entity, double speed) {
+        boolean isLeft=entity.getFlag()<11;
+        int angle=isLeft ? 16:-16;
+        int duration = entity.getAliveDuration();
+        int halfTime = entity.getTime() / 2;
+        if (duration == halfTime) {
+            entity.setYaw(entity.getYaw()+(180-angle*halfTime));
+            entity.setPitch(-entity.getPitch());
         }
-    }
-
-    private @NotNull MissileEntity getMissileEntity(MissileEntity entity) {
-        Vec3d pos = entity.getPos();
-        AttackTypes lazyAttack = new AttackTypes(AttackType.LAZY);
-        double attackRange = 3;
-        double strength = 1;
-        if (entity.getOwner() instanceof PlayerEntity player
-                && player.getOffHandStack().getItem() instanceof NekoPackageItem nekoPackage) {
-            attackRange = nekoPackage.getAttackRange(player);
-            strength = nekoPackage.getStrength(player);
-        }
-        MissileEntity missile = new MissileEntity(
-                ModEntities.MISSILE,
-                entity.getWorld(),
-                entity.getOwner(),
-                lazyAttack,
-                true,
-                attackRange,
-                80,
-                strength * 2
+        Vec3d targetVelocity = Vec3d.fromPolar(entity.getPitch(), entity.getYaw()).multiply(speed);
+        Vec3d currentVelocity = entity.getVelocity();
+        entity.addVelocity(
+                targetVelocity.x - currentVelocity.x,
+                targetVelocity.y - currentVelocity.y,
+                targetVelocity.z - currentVelocity.z
         );
-        missile.setPosition(pos);
-        missile.setMissileModelType(MissileModelType.JOYEUSE);
-        missile.setYaw(0);
-        missile.setPitch(0);
-        return missile;
+        Vec3d leftDir = Vec3d.fromPolar(0F, entity.getYaw() +(isLeft? 90F:-90F));
+        entity.addVelocity(leftDir.x * speed * 0.2, 0, leftDir.z * speed * 0.2);
+        entity.setYaw(entity.getYaw() + angle);
+        followOwnerMovement(entity);
     }
 }

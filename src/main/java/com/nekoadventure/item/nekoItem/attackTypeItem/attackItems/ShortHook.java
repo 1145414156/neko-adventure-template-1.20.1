@@ -3,6 +3,7 @@ package com.nekoadventure.item.nekoItem.attackTypeItem.attackItems;
 import com.nekoadventure.client.ShiftKeyHelper;
 import com.nekoadventure.entity.ModEntities;
 import com.nekoadventure.entity.missile.MissileEntity;
+import com.nekoadventure.entity.missile.MissileModelType;
 import com.nekoadventure.item.nekoItem.attackTypeItem.NekoAttackTypeItem;
 import com.nekoadventure.item.other.NekoPackageItem;
 import com.nekoadventure.other.attackApart.AttackTypes;
@@ -142,7 +143,7 @@ public class ShortHook extends NekoAttackTypeItem {
 
     private @NotNull MissileEntity getMissileEntity(Entity owner, double damage) {
         AttackTypes attackTypes = new AttackTypes(AttackTypes.AttackType.HOMING);
-        return new MissileEntity(ModEntities.MISSILE,
+        MissileEntity missile= new MissileEntity(ModEntities.MISSILE,
                 owner.getWorld(),
                 owner,
                 attackTypes,
@@ -150,6 +151,8 @@ public class ShortHook extends NekoAttackTypeItem {
                 40,
                 3,
                 damage);
+        missile.setMissileModelType(MissileModelType.NULL);
+        return missile;
     }
 
     @Override

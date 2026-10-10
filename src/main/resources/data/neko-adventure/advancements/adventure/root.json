@@ -1,0 +1,30 @@
+{
+  "criteria": {
+    "first_join": {
+      "conditions": {},
+      "trigger": "minecraft:tick"
+    }
+  },
+  "display": {
+    "announce_to_chat": false,
+    "background": "neko-adventure:textures/block/maze_block.png",
+    "description": {
+      "text": "这里有着你的全部故事"
+    },
+    "frame": "task",
+    "hidden": false,
+    "icon": {
+      "item": "neko-adventure:neko_package"
+    },
+    "show_toast": false,
+    "title": {
+      "text": "猫的旅途:你的故事"
+    }
+  },
+  "requirements": [
+    [
+      "first_join"
+    ]
+  ],
+  "sends_telemetry_event": false
+}

@@ -50,20 +50,16 @@ public class BrimStone extends NekoAttackTypeItem {
                 MissileEntity.class,
                 player.getBoundingBox().expand(attackRange*4),
                 entity -> Objects.equals(entity.getOwner(), player) &&entity.getAttackType().equals(AttackTypes.AttackType.BRIMSTONE));
-
-
         if (!world.isClient) {
             if (brimStones.isEmpty()) {
                 double spacing = 1.0;
                 double cubeSize = 0.5;
-
-                for (int length = 1; length < range; length++) {
-                    Vec3d playerPos = player.getPos().add(0,1.5,0);
+                for (int length = 2; length < range; length++) {
+                    Vec3d playerPos = player.getPos().add(0,1.2,0);
                     Vec3d lookDirection = player.getRotationVec(1.0F);
-                    MissileEntity missile = getMissileEntity(player, range, damage);
+                    MissileEntity missile = getMissileEntity(player, range, damage,length);
                     Vec3d spawnPos = playerPos.add(lookDirection.multiply(length * spacing - cubeSize / 2));
                     missile.setPos(spawnPos.x, spawnPos.y, spawnPos.z);
-
                     missile.setYaw(player.getYaw());
                     missile.setPitch(player.getPitch());
 
@@ -100,15 +96,14 @@ public class BrimStone extends NekoAttackTypeItem {
     private void specialAttackWithZenith(PlayerEntity player, int range, double damage, double spacing, double cubeSize, World world) {
         for (int z = 0; z<= 1; z++){
             float yaw= player.getYaw()-15+z*30;
-            for (int length = 1; length < range; length++) {
-                Vec3d playerPos = player.getPos().add(0,1.5,0);
+            for (int length = 2; length < range; length++) {
+                Vec3d playerPos = player.getPos().add(0,1.2,0);
                 Vec3d lookDirection=getRotationVector(player.getPitch(),yaw);
-                MissileEntity missile = getMissileEntity(player, range, damage);
+                MissileEntity missile = getMissileEntity(player, range, damage,length);
                 Vec3d spawnPos = playerPos.add(lookDirection.multiply(length * spacing - cubeSize / 2));
                 missile.setPos(spawnPos.x, spawnPos.y, spawnPos.z);
                 missile.setYaw(yaw);
                 missile.setPitch(0);
-
                 world.spawnEntity(missile);
             }
         }
@@ -117,10 +112,10 @@ public class BrimStone extends NekoAttackTypeItem {
     private void specialAttackWithExportWire(PlayerEntity player, int range, World world, double damage, double spacing, double cubeSize) {
         for (int z = 0; z<= range /5; z++){
             float yaw= world.random.nextInt(360);
-            for (int length = 1; length < range; length++) {
-                Vec3d playerPos = player.getPos().add(0,1.5,0);
+            for (int length = 2; length < range; length++) {
+                Vec3d playerPos = player.getPos().add(0,1.2,0);
                 Vec3d lookDirection=getRotationVector(0,yaw);
-                MissileEntity missile = getMissileEntity(player, range, damage);
+                MissileEntity missile = getMissileEntity(player, range, damage,length);
                 Vec3d spawnPos = playerPos.add(lookDirection.multiply(length * spacing - cubeSize / 2));
                 missile.setPos(spawnPos.x, spawnPos.y, spawnPos.z);
 
@@ -169,7 +164,7 @@ public class BrimStone extends NekoAttackTypeItem {
                             double x = centerPos.x + radius * Math.cos(angle);
                             double z = centerPos.z + radius * Math.sin(angle);
                             double y = centerPos.y;
-                            MissileEntity brimStone = getMissileEntity(missile,attackRange,damage);
+                            MissileEntity brimStone = getMissileEntity(missile,attackRange,damage,-1);
                             brimStone.setPosition(x, y, z);
                             brimStone.setPitch(missile.getPitch());
                             brimStone.setYaw(missile.getYaw());
@@ -180,7 +175,7 @@ public class BrimStone extends NekoAttackTypeItem {
             }
     }
 
-    private @NotNull MissileEntity getMissileEntity(Entity owner, double range, double damage) {
+    private @NotNull MissileEntity getMissileEntity(Entity owner, double range, double damage,int flag) {
         AttackTypes brimstoneType = new AttackTypes(AttackTypes.AttackType.BRIMSTONE);
         MissileEntity missile= new MissileEntity(ModEntities.MISSILE,
                 owner.getWorld(),
@@ -189,7 +184,8 @@ public class BrimStone extends NekoAttackTypeItem {
                 true,
                 range,
                 60,
-                damage /2);
+                damage /2,
+                flag);
         missile.setMissileModelType(MissileModelType.BRIMSTONE);
         return  missile;
     }

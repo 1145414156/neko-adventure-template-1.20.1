@@ -28,30 +28,48 @@ public class MissileEntity extends Entity {
     private static final TrackedData<Integer> MISSILE_MODEL_TYPE =
             DataTracker.registerData(MissileEntity.class, TrackedDataHandlerRegistry.INTEGER);
     private static final TrackedData<Optional<UUID>> OWNER_UUID = DataTracker.registerData(MissileEntity.class, TrackedDataHandlerRegistry.OPTIONAL_UUID);
+    private static final TrackedData<Integer> FLAG =
+            DataTracker.registerData(MissileEntity.class, TrackedDataHandlerRegistry.INTEGER);
+    private static final TrackedData<Integer> TIME =
+            DataTracker.registerData(MissileEntity.class, TrackedDataHandlerRegistry.INTEGER);
+    private static final TrackedData<Integer> ALIVE_DURATION =
+            DataTracker.registerData(MissileEntity.class, TrackedDataHandlerRegistry.INTEGER);
+    private static final TrackedData<Float> RANGE =
+            DataTracker.registerData(MissileEntity.class, TrackedDataHandlerRegistry.FLOAT);
 
     private double speed = 0;
-    private int time=1;
-    private int aliveDuration;
     private AttackTypes attackTypes;
     private Entity owner;
     private boolean isTreadable;
-    private double range;
     private double damage;
     private int skillType=-1;
 
-    // 攻击弹幕构造
+    // 攻击弹幕构造1
     public MissileEntity(EntityType<? extends MissileEntity> entityType, World world, Entity owner,
                         AttackTypes attackTypes, boolean isTreadable, double range,double time,double damage) {
         super(entityType, world);
         this.setOwner(owner);
         this.attackTypes=attackTypes;
         this.isTreadable = isTreadable;
-        this.range = range;
+        this.setRange(range);
         this.damage = damage;
-        this.time= (int) time;
+        this.setTime((int) time);
         this.setNoGravity(true);
         this.speed = range/time;
-        this.setMissileModelType(MissileModelType.BULLET);
+    }
+    // 攻击弹幕构造2
+    public MissileEntity(EntityType<? extends MissileEntity> entityType, World world, Entity owner,
+                         AttackTypes attackTypes, boolean isTreadable, double range,double time,double damage,int flag) {
+        super(entityType, world);
+        this.setOwner(owner);
+        this.attackTypes=attackTypes;
+        this.isTreadable = isTreadable;
+        this.setRange(range);
+        this.damage = damage;
+        this.setTime((int) time);
+        this.setNoGravity(true);
+        this.speed = range/time;
+        this.setFlag(flag);
     }
     //boss特殊弹幕构造
     public MissileEntity(EntityType<? extends MissileEntity> entityType, World world, Entity owner,
@@ -60,12 +78,11 @@ public class MissileEntity extends Entity {
         this.setOwner(owner);
         this.attackTypes=attackTypes;
         this.skillType=skillType;
-        this.range = range;
+        this.setRange(range);
         this.damage = damage;
-        this.time= (int) time;
+        this.setTime((int) time);
         this.setNoGravity(true);
         this.speed = range/time;
-        this.setMissileModelType(MissileModelType.BULLET);
     }
 
     public MissileEntity(EntityType<MissileEntity> entityEntityType, World world) {
@@ -81,16 +98,18 @@ public class MissileEntity extends Entity {
         }
 
         if (attackTypes != null) {
-            attackTypes.executeMovement(this, range , speed);
+            attackTypes.executeMovement(this, this.getRange() , speed);
             this.move(MovementType.SELF, this.getVelocity());
-            aliveDuration++;
+            if (!this.getWorld().isClient) {
+                this.setAliveDuration(this.getAliveDuration() + 1);
+            }
         }
         if (this.getOwner()==null) {
             this.kill();
             return;
         }
         if (this.age>2000){this.kill();}
-        if (aliveDuration==time){this.kill();}
+        if (this.getAliveDuration()==this.getTime()){this.kill();}
         if (entityCheckCollision()) return;
         blockCheckCollision();
     }
@@ -111,7 +130,7 @@ public class MissileEntity extends Entity {
                         if (!(entity instanceof LivingEntity) || entity == directOwner) return false;
                         // 跳过 owner 弹幕的直属发射者，避免误伤玩家
                         if (directOwner instanceof MissileEntity missileOwner && entity.equals(missileOwner.getOwner())) return false;
-                        // 非玩家发射的弹幕（Boss等）只攻击玩家
+                        // 非玩家发射的弹幕只攻击玩家
                         if (!(getRealOwner() instanceof PlayerEntity)) {
                             return entity instanceof PlayerEntity;
                         }
@@ -166,6 +185,10 @@ public class MissileEntity extends Entity {
     protected void initDataTracker() {
         this.dataTracker.startTracking(MISSILE_MODEL_TYPE, MissileModelType.BULLET.ordinal());
         this.dataTracker.startTracking(OWNER_UUID,Optional.empty());
+        this.dataTracker.startTracking(FLAG, 0);
+        this.dataTracker.startTracking(TIME, 1);
+        this.dataTracker.startTracking(ALIVE_DURATION, 0);
+        this.dataTracker.startTracking(RANGE, 0.0f);
     }
 
     @Override
@@ -175,11 +198,12 @@ public class MissileEntity extends Entity {
 
     @Override
     protected void writeCustomDataToNbt(NbtCompound nbt) {
-        nbt.putInt("time", this.time);
-        nbt.putInt("aliveDuration", this.aliveDuration);
+        nbt.putInt("time", this.getTime());
+        nbt.putInt("aliveDuration", this.getAliveDuration());
         nbt.putInt("skillType",skillType);
         nbt.putDouble("speed", this.speed);
-        nbt.putDouble("range", this.range);
+        nbt.putDouble("range", this.getRange());
+        nbt.putInt("flag", this.getFlag());
         nbt.putDouble("damage", this.damage);
 
         nbt.putBoolean("isTreadable", this.isTreadable);
@@ -196,17 +220,18 @@ public class MissileEntity extends Entity {
 
     @Override
     protected void readCustomDataFromNbt(NbtCompound nbt) {
-        this.time = nbt.getInt("time");
-        this.aliveDuration = nbt.getInt("aliveDuration");
+        this.setTime(nbt.getInt("time"));
+        this.setAliveDuration(nbt.getInt("aliveDuration"));
         this.skillType=nbt.getInt("skillType");
+        this.setFlag(nbt.getInt("flag"));
 
-        this.range = nbt.getDouble("range");
+        this.setRange(nbt.getDouble("range"));
         this.damage = nbt.getDouble("damage");
         this.isTreadable = nbt.getBoolean("isTreadable");
         if (nbt.contains("speed", NbtCompound.DOUBLE_TYPE)) {
             this.speed = nbt.getDouble("speed");
-        } else if (this.time > 0) {
-            this.speed = this.range / this.time;
+        } else if (this.getTime() > 0) {
+            this.speed = this.getRange() / this.getTime();
         }
         if (nbt.containsUuid("Owner")) {
             UUID ownerUuid = nbt.getUuid("Owner");
@@ -267,7 +292,8 @@ public class MissileEntity extends Entity {
     public boolean handleFallDamage(float fallDistance, float damageMultiplier, DamageSource damageSource) {
         return false;
     }
-    public int getTime(){return time;}
+    public int getTime(){return this.dataTracker.get(TIME);}
+    public void setTime(int time){this.dataTracker.set(TIME,time);}
     @Nullable
     public Entity getOwner() {
         if (this.owner != null && !this.owner.isRemoved()) {
@@ -312,17 +338,19 @@ public class MissileEntity extends Entity {
         this.owner = owner;
         this.dataTracker.set(OWNER_UUID, owner != null ? Optional.of(owner.getUuid()) : Optional.empty());
     }
-    public void setAliveDuration(int aliveDuration){this.aliveDuration=aliveDuration;}
+    public void setAliveDuration(int aliveDuration){this.dataTracker.set(ALIVE_DURATION,aliveDuration);}
     public void setDamage(double damage){this.damage=damage;}
     public double getDamage(){return damage;}
     public AttackTypes.AttackType getAttackType(){return attackTypes.getType();}
     public void setMissileModelType(MissileModelType type) {
         this.dataTracker.set(MISSILE_MODEL_TYPE, type.ordinal());
     }
-    public MissileModelType getMissileType() {
-        return MissileModelType.values()[this.dataTracker.get(MISSILE_MODEL_TYPE)];
-    }
-    public int getAliveDuration(){return this.aliveDuration;}
+    public MissileModelType getMissileType() {return MissileModelType.values()[this.dataTracker.get(MISSILE_MODEL_TYPE)];}
+    public int getFlag(){return this.dataTracker.get(FLAG);}
+    public void setFlag(int flag){this.dataTracker.set(FLAG,flag);}
+    public int getAliveDuration(){return this.dataTracker.get(ALIVE_DURATION);}
+    public double getRange(){return this.dataTracker.get(RANGE);}
+    public void setRange(double range){this.dataTracker.set(RANGE,(float) range);}
     public int getSkillType(){return this.skillType;}
     public void setAttackType(AttackTypes attackType){
         this.attackTypes=attackType;

@@ -49,7 +49,6 @@ import java.util.List;
 
 public class PriestSkeletonEntity extends HostileEntity implements Monster {
 
-    // 技能动画为“实例字段 + 客户端驱动”：服务端只同步 ACTIVE_SKILL 编号，客户端收到后播放/停止动画
     @Environment(EnvType.CLIENT)
     public final AnimationState FIRE_SKILL =new AnimationState();
     private static final int FIRE_SKILL_DURATION =80;
@@ -62,11 +61,8 @@ public class PriestSkeletonEntity extends HostileEntity implements Monster {
     @Environment(EnvType.CLIENT)
     public final AnimationState BULLET_SKILL =new AnimationState();
     private static final int BULLET_SKILL_DURATION =70;
-
-    // 服务端 -> 客户端 动作同步字段：0火球术 1横扫 2尖刺 3弹幕，-1=空闲
     private static final TrackedData<Integer> ACTIVE_SKILL =
             DataTracker.registerData(PriestSkeletonEntity.class, TrackedDataHandlerRegistry.INTEGER);
-    // 仅客户端有意义：记录“已播放到”的技能编号，避免每个tick重复start动画
     private int playedSkill = -1;
 
     private final ServerBossBar bossBar = new ServerBossBar(this.getDisplayName(), BossBar.Color.PURPLE, BossBar.Style.PROGRESS);
@@ -115,8 +111,6 @@ public class PriestSkeletonEntity extends HostileEntity implements Monster {
     @Override
     public void tick() {
         super.tick();
-
-        // 客户端：动作由服务端通过DataTracker同步过来，这里只把编号翻译成实例动画播放/停止
         if (this.getWorld().isClient) {
             this.syncClientAnimations();
             return;
@@ -135,8 +129,6 @@ public class PriestSkeletonEntity extends HostileEntity implements Monster {
 
         this.applySkill();
     }
-
-    // 把服务端广播的 ACTIVE_SKILL 翻译成实例动画的播放/停止（仅客户端调用）
     private void syncClientAnimations() {
         int activeSkill = this.dataTracker.get(ACTIVE_SKILL);
         if (activeSkill != this.playedSkill) {
@@ -172,7 +164,6 @@ public class PriestSkeletonEntity extends HostileEntity implements Monster {
             }
         }
         else if (skillStage==0){
-            // 空闲期挑选下一个技能
             if (this.getTarget()==null){
                 skillTick=this.random.nextInt(40)+40;
                 skillStage=0;
@@ -190,15 +181,12 @@ public class PriestSkeletonEntity extends HostileEntity implements Monster {
                 case 3 -> skillTick = BULLET_SKILL_DURATION;
             }
             skillStage++;
-            // 起手：把技能编号广播给所有客户端播放动画
             this.dataTracker.set(ACTIVE_SKILL, skill);
         }
         else {
-            // 当前技能结束
             skillTick=this.random.nextInt(30)+30;
             skillStage=0;
             skill=-999;
-            // 收尾：通知客户端停止动画
             this.dataTracker.set(ACTIVE_SKILL, -1);
         }
     }
@@ -417,8 +405,6 @@ public class PriestSkeletonEntity extends HostileEntity implements Monster {
         if (this.hasCustomName()) {
             this.bossBar.setName(this.getDisplayName());
         }
-
-        // 区块重载恢复技能轴后，把当前技能编号补发给客户端，保证动画能接上
         if (this.skillStage != 0 && this.skill >= 0 && this.skill <= 3) {
             this.dataTracker.set(ACTIVE_SKILL, this.skill);
         }

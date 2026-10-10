@@ -12,7 +12,7 @@ public class MonumentCreditsScreen extends Screen {
 
     //感谢人员名单（目前先这样做）
     private static final List<String> CREDITS = List.of(
-            "目前版本：v0.0.2",
+            "目前版本：v0.0.3",
             "材质: 李云川YC/Old_Chen_/Infinitly_",
             "代码: Infinitly_",
             "音效: Infinitly_",

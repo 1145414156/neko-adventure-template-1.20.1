@@ -116,7 +116,6 @@ public class HugeSlimeEntity extends HostileEntity implements Monster {
     @Override
     public void tick() {
         super.tick();
-        // 客户端：把服务端广播的技能编号翻译成实例动画播放（落地/拉伸等渲染逻辑两端照常执行）
         if (this.getWorld().isClient) {
             this.syncClientAnimations();
         }
@@ -128,8 +127,6 @@ public class HugeSlimeEntity extends HostileEntity implements Monster {
         if (!players.isEmpty()){
             players.forEach(p-> p.addStatusEffect(new StatusEffectInstance(ModStatusEffects.BOSS_FIGHT,40,0,false,false,true)));
         }
-
-        // 落地效果：粒子、音效、动画的触发点
         if (this.isOnGround() && !this.onGroundLastTick&&canJump) {
             int particleCount = 12;
             for (int j = 0; j < particleCount; j++) {
@@ -148,7 +145,6 @@ public class HugeSlimeEntity extends HostileEntity implements Monster {
         } else if (!this.isOnGround() && this.onGroundLastTick&&canJump) {
             this.targetStretch = 1.0F;
         }
-        //技能入口（跳跃三次之后会触发的事件轴）
         else if (!canJump){
             applySkill();
         }
@@ -210,7 +206,6 @@ public class HugeSlimeEntity extends HostileEntity implements Monster {
                 return;
             }
             skill=this.random.nextInt(4);
-            //0.三连跳，1.召唤怪物，2.子弹，3.冲刺
             switch (skill) {
                 case 0 -> skillTick = TRAMPLE_SKILL_DURATION;
                 case 1 -> skillTick = SUMMON_SKILL_DURATION;
@@ -221,7 +216,6 @@ public class HugeSlimeEntity extends HostileEntity implements Monster {
             this.dataTracker.set(ACTIVE_SKILL, skill);
         }
         else {
-            // 当前技能结束
             setCanJump(true);
             skillTick=this.random.nextInt(10)+10;
             skillStage=0;
@@ -229,8 +223,6 @@ public class HugeSlimeEntity extends HostileEntity implements Monster {
             this.dataTracker.set(ACTIVE_SKILL, -1);
         }
     }
-
-    //这些是全部技能
     private void dashSkill(){
         if (this.getTarget() == null) {
             skillTick=0;

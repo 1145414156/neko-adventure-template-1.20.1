@@ -8,6 +8,10 @@ import com.nekoadventure.other.mazeApart.MazePosNBTCompound;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.entity.ItemEntity;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.decoration.ArmorStandEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.tag.TagKey;
@@ -15,10 +19,13 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
+
+import java.util.List;
 
 public class MazeStructureBlock extends AbstractMazeBlock {
     public MazeStructureBlock(Settings settings) {
@@ -53,29 +60,30 @@ public class MazeStructureBlock extends AbstractMazeBlock {
                             dataManager.addToRoomData(data);
                             world.setBlockState(pos, ModBlocks.MAZE_ROOM_STAGE_BLOCK.getDefaultState().with(MazeRoomStageBlock.MAZE_STAGE,0));
                             dataManager.markDirty();
-                            System.out.println("detect room type success in"+pos+"type"+data.gateCount());
+                            clearRoomEntity(world,dataManager);
+                            NekoAdventure.LOGGER.info("detect room type success in{}type{}", pos, data.gateCount());
                             //检测房间四个方向的range*2+1的位置，如果说含有MazeStructureBlock，则再次执行这个方块中的apply()操作
                             int offset = roomRange * 2 + 1;
                             for (Direction dir : Direction.Type.HORIZONTAL) {
                                 BlockPos neighborPos = pos.offset(dir, offset);
                                 ChunkPos neighborChunk = new ChunkPos(neighborPos);
-                                //区块未加载时读到的方块状态不可信(会读到空气/虚空)，跳过并交给收敛式重试扫描
+                                //区块未加载时跳过并交给收敛式重试扫描
                                 if (!serverWorld.getChunkManager().isChunkLoaded(neighborChunk.x, neighborChunk.z)) {
-                                    System.out.println("infect skip " + dir + " " + neighborPos.toShortString() + " chunk not loaded");
+                                    NekoAdventure.LOGGER.info("infect skip {} {} chunk not loaded", dir, neighborPos.toShortString());
                                     continue;
                                 }
                                 BlockState neighborState = world.getBlockState(neighborPos);
-                                //房间标记方块由方块实体异步tick转换而来，内联补一次转换，避免因转换时机过早而漏感染
+                                //房间标记方块是由方块实体异步tick转换而来的，先整一次内联转换，避免因转换时机过早而漏感染(tick异步)
                                 if (neighborState.isOf(Blocks.BEDROCK) && world.getBlockState(neighborPos.down()).isOf(ModBlocks.MAZE_BLOCK)) {
                                     world.setBlockState(neighborPos, ModBlocks.MAZE_STRUCTURE_BLOCK.getDefaultState());
                                     neighborState = world.getBlockState(neighborPos);
-                                    System.out.println("infect inline convert " + dir + " " + neighborPos.toShortString());
+                                    NekoAdventure.LOGGER.info("infect inline convert {} {}", dir, neighborPos.toShortString());
                                 }
                                 if (neighborState.getBlock() instanceof MazeStructureBlock mazeBlock) {
                                     mazeBlock.apply(world, neighborPos);
-                                    System.out.println("infect detect room type success " + dir + " " + neighborPos.toShortString());
+                                    NekoAdventure.LOGGER.info("infect detect room type success {} {}", dir, neighborPos.toShortString());
                                 } else {
-                                    System.out.println("infect skip " + dir + " " + neighborPos.toShortString() + " block=" + neighborState.getBlock());
+                                    NekoAdventure.LOGGER.info("infect skip {} {} block={}", dir, neighborPos.toShortString(), neighborState.getBlock());
                                 }
                             }
                         }
@@ -99,6 +107,26 @@ public class MazeStructureBlock extends AbstractMazeBlock {
 
         }
         return count;
+    }
+
+    private void clearRoomEntity(World world,MazeDataManager data) {
+
+        List<LivingEntity> entities=world.getEntitiesByClass(LivingEntity.class,
+                new Box(data.getMazeRange(),data.getMazeHeight(),data.getMazeRange(),-data.getMazeRange(),0,-data.getMazeRange()),
+                e-> !(e instanceof PlayerEntity)&&!(e instanceof ArmorStandEntity)&&e.isAlive());
+        List<ItemEntity> itemEntities=world.getEntitiesByClass(ItemEntity.class,
+                new Box(data.getMazeRange(),data.getMazeHeight(),data.getMazeRange(),-data.getMazeRange(),0,-data.getMazeRange()),
+                item -> item instanceof ItemEntity);
+        if (!entities.isEmpty()){
+            for (LivingEntity livingEntity : entities) {
+                livingEntity.kill();
+            }
+        }
+        if (!itemEntities.isEmpty()){
+            for (ItemEntity livingEntity : itemEntities) {
+                livingEntity.kill();
+            }
+        }
     }
 
     private MazePosNBTCompound settleBlockPos(BlockPos pos,int gateCount){

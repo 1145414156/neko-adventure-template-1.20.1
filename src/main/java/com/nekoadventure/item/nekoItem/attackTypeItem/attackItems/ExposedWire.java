@@ -3,6 +3,7 @@ package com.nekoadventure.item.nekoItem.attackTypeItem.attackItems;
 import com.nekoadventure.client.ShiftKeyHelper;
 import com.nekoadventure.entity.ModEntities;
 import com.nekoadventure.entity.missile.MissileEntity;
+import com.nekoadventure.entity.missile.MissileModelType;
 import com.nekoadventure.item.nekoItem.attackTypeItem.NekoAttackTypeItem;
 import com.nekoadventure.item.other.NekoPackageItem;
 import com.nekoadventure.other.attackApart.AttackTypes;
@@ -57,6 +58,7 @@ public class ExposedWire extends NekoAttackTypeItem {
                 AttackTypes lazyAttack=new AttackTypes(AttackTypes.AttackType.HOMING);
                 MissileEntity missile=new MissileEntity(ModEntities.MISSILE,world,player,
                         lazyAttack,true,attackRange,5, strength);
+                missile.setMissileModelType(MissileModelType.NULL);
                 missile.setPosition(pos);
                 world.spawnEntity(missile);
 
@@ -100,7 +102,6 @@ public class ExposedWire extends NekoAttackTypeItem {
                         .filter(e -> e instanceof LivingEntity&&!Objects.equals(missileEntity.getOwner(), e))
                         .map(e -> (LivingEntity) e)
                         .collect(Collectors.toList());
-
                 entityChooseHandler(missileEntity, livingEntities, world, maxConnect);
                 applyDamageHandler(missileEntity, entities);
             }

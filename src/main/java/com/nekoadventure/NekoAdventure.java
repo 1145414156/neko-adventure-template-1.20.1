@@ -16,6 +16,12 @@ import net.fabricmc.api.ModInitializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * 放一只小猫在这里
+ * 如果说看代码累了（包括我）可以来摸摸这只可爱的小猫qwq
+ *   /\     /\
+ * (≽^ ⦁ ⩊ ⦁ ^≼)
+ **/
 public class NekoAdventure implements ModInitializer {
 	public static final String MOD_ID = "neko-adventure";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);

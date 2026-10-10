@@ -3,6 +3,7 @@ package com.nekoadventure.item.nekoItem.attackTypeItem.attackItems;
 import com.nekoadventure.client.ShiftKeyHelper;
 import com.nekoadventure.entity.ModEntities;
 import com.nekoadventure.entity.missile.MissileEntity;
+import com.nekoadventure.entity.missile.MissileModelType;
 import com.nekoadventure.item.nekoItem.attackTypeItem.NekoAttackTypeItem;
 import com.nekoadventure.item.other.NekoPackageItem;
 import com.nekoadventure.other.attackApart.AttackTypes;
@@ -46,7 +47,7 @@ public class Lance extends NekoAttackTypeItem {
         double attackDistance = Math.min(range / 2.0, 8.0);
         Vec3d look = player.getRotationVec(1.0F);
         Vec3d horizontalLook = new Vec3d(look.x, 0, look.z).normalize();
-        Vec3d startPos = player.getPos();
+        Vec3d startPos = player.getEyePos();
         List<LivingEntity> targets = getEntitiesOnLine(player, startPos, horizontalLook, attackDistance);
         if (!targets.isEmpty()) {
             for (LivingEntity target : targets) {
@@ -162,7 +163,7 @@ public class Lance extends NekoAttackTypeItem {
 
     private @NotNull MissileEntity getMissileEntity(Entity owner, double damage) {
         AttackTypes brimstoneType = new AttackTypes(AttackTypes.AttackType.HOMING);
-        return new MissileEntity(ModEntities.MISSILE,
+        MissileEntity missile=new MissileEntity(ModEntities.MISSILE,
                 owner.getWorld(),
                 owner,
                 brimstoneType,
@@ -170,6 +171,8 @@ public class Lance extends NekoAttackTypeItem {
                 40,
                 3,
                 damage);
+        missile.setMissileModelType(MissileModelType.NULL);
+        return missile;
     }
 
     @Override

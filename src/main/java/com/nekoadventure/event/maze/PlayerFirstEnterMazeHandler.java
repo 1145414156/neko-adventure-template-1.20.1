@@ -11,6 +11,10 @@ import com.nekoadventure.other.mazeApart.MazeStructureBuilder;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.entity.ItemEntity;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.decoration.ArmorStandEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.server.MinecraftServer;
@@ -19,6 +23,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.dimension.DimensionType;
@@ -29,15 +34,18 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-//该类由AI辅助完成
-//主要作用是在玩家第一次进入tag=is_maze的维度的时候生成一个迷宫
+/**该类由AI辅助完成(40%?大概吧，大概框架和流程AI写的，细节与bug我来修复的)
+ * 主要作用是在玩家第一次进入tag=is_maze的维度的时候生成一个迷宫
+ * 同时该类也为该模组的迷宫生成类的总入口的非常重要的部分
+ * 阿巴阿巴总之就是这样
+**/
 public class PlayerFirstEnterMazeHandler {
     public static final Set<Identifier> dimensionHasBeenVisited = ConcurrentHashMap.newKeySet();
 
     public static final Map<Identifier, Integer> delayedTasks = new ConcurrentHashMap<>();
     public static final Map<Identifier, Runnable> delayedActions = new ConcurrentHashMap<>();
 
-    /**感染扫描的间隔tick数与最大轮次(兜底防止个别区块始终不就绪时卡住整个流程)*/
+    //感染扫描的间隔tick数与最大轮次
     private static final int INFECTION_SCAN_INTERVAL = 10;
     private static final int MAX_INFECTION_SCAN_ROUNDS = 15;
 
@@ -86,12 +94,11 @@ public class PlayerFirstEnterMazeHandler {
                             List<MazePosNBTCompound> initialRoomData=new ArrayList<>();
                             if (data != null) {
                                 initialRoomData = data.getInitialData();
+                                builder.recalculateRoomLight(world, initialRoomData,data.getMazeHeight());
                             }
                             /*这些是AI写的
                             作用是:计算，处理全部的房间以及对应的区块光照，防止出现影响游玩体验的情况
                             */
-                            builder.recalculateRoomLight(world, initialRoomData);
-                            //光照标记完成后，再把房间所在区块的完整区块数据重发给观看玩家，强制客户端整列刷新
                             builder.resendRoomChunks(world, initialRoomData);
 
                             builder.clearRoomItemEntity(world);
@@ -111,7 +118,7 @@ public class PlayerFirstEnterMazeHandler {
     public static void getMazeStructureBlockAndApply(ServerWorld world) {
         MazeDataManager data = MazeDataManager.get(world);
         if (data == null || data.getMazeCenter() == null) {
-            System.out.println("center not found");
+            NekoAdventure.LOGGER.error("center not found");
             return;
         }
         BlockPos center = data.getMazeCenter().mazeCenter();
@@ -122,14 +129,14 @@ public class PlayerFirstEnterMazeHandler {
                 mazeStructureBlock.apply(world, checkPos);
             }
         }
-
     }
 
     /**
-     * 收敛式感染扫描：反复对"已记录房间"的四个方向尝试感染扩散（含BEDROCK标记的内联补转换与区块加载检查），
+     * 收敛式感染扫描：反复对"已记录房间"的四个方向尝试感染扩散，
      * 直到某一轮既没有新房间、也没有未就绪的区块为止，然后执行onConverged进入后续流程。
-     * 用于替代原先只调用一次getMazeStructureBlockAndApply的写法：感染依赖方块实体异步tick转换，
+     * 用于替代原先只调用一次getMazeStructureBlockAndApply的写法：感染依赖方块实体异步tick转换(本人早期开发知识存量不足导致的漏洞)，
      * 一次性快照会因转换/加载时机而随机漏掉房间，因而采用这种反复进行的操作
+     * 作用为:上传在MazeBuilder创造的迷宫的全部房间数据并且打上对应的房间类型
      */
     public static void startInfectionScan(ServerWorld world, Identifier dimensionId, Runnable onConverged) {
         delayedTasks.put(dimensionId, 30);
@@ -144,7 +151,7 @@ public class PlayerFirstEnterMazeHandler {
         boolean pendingChunk = infectRecordedRooms(world, data, roomRange);
         int after = data != null ? data.getRoomData().size() : 0;
         boolean changed = after > before;
-        System.out.println("感染扫描第" + round + "轮：房间数 " + before + " -> " + after + "，区块未就绪=" + pendingChunk);
+        NekoAdventure.LOGGER.info("infect scan round{}：room count {} -> {}，chunk?={}", round, before, after, pendingChunk);
 
         boolean needRetry = changed || pendingChunk || after == 0;
         if (needRetry && round < MAX_INFECTION_SCAN_ROUNDS) {
@@ -153,17 +160,17 @@ public class PlayerFirstEnterMazeHandler {
             return;
         }
         if (after == 0) {
-            System.out.println("感染扫描失败：始终没有找到房间标记方块，请检查迷宫生成与mazeRange");
+            NekoAdventure.LOGGER.error("infect error：room center block not found,checking room spawn!");
         } else if (needRetry) {
-            System.out.println("感染扫描达到最大轮次" + MAX_INFECTION_SCAN_ROUNDS + "，仍有房间未就绪，继续后续流程");
+            NekoAdventure.LOGGER.error("infect round out bound:" + MAX_INFECTION_SCAN_ROUNDS + "，skip to special room spawning");
         }
         onConverged.run();
     }
 
-    /**对全部已记录房间的四个方向尝试感染扩散；返回是否仍存在未加载的区块(需要下一轮重试)*/
+    //对全部已记录房间的四个方向尝试感染扩散；返回是否仍存在未加载的区块(需要下一轮重试)
     private static boolean infectRecordedRooms(ServerWorld world, MazeDataManager data, int roomRange) {
         if (data == null || roomRange <= 0) {
-            System.out.println("感染扫描跳过：data=" + (data != null) + "，roomRange=" + roomRange);
+            NekoAdventure.LOGGER.info("感染扫描跳过：data={}，roomRange={}", data != null, roomRange);
             return false;
         }
         int offset = roomRange * 2 + 1;
@@ -178,11 +185,10 @@ public class PlayerFirstEnterMazeHandler {
                     continue;
                 }
                 BlockState neighborState = world.getBlockState(neighborPos);
-                //房间标记方块由方块实体异步tick转换而来，这里内联补一次转换，避免因转换时机过早而漏感染(MazeBlockEntity的转换)
+                //房间标记方块由方块实体异步tick转换而来，这里要先内联补一次转换，防止因为转换时机过早而漏感染(MazeBlockEntity的转换)
                 if (neighborState.isOf(Blocks.BEDROCK) && world.getBlockState(neighborPos.down()).isOf(ModBlocks.MAZE_BLOCK)) {
                     world.setBlockState(neighborPos, ModBlocks.MAZE_STRUCTURE_BLOCK.getDefaultState());
                     neighborState = world.getBlockState(neighborPos);
-                    System.out.println("感染扫描内联转换 " + dir + " " + neighborPos.toShortString());
                 }
                 if (neighborState.getBlock() instanceof MazeStructureBlock mazeStructureBlock) {
                     mazeStructureBlock.apply(world, neighborPos);

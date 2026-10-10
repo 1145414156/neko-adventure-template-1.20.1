@@ -1,0 +1,40 @@
+{
+  "parent": "neko-adventure:adventure/first_enter_dungeon_dimension",
+  "criteria": {
+    "kill_grand_knight": {
+      "conditions": {
+        "entity": [
+          {
+            "condition": "minecraft:entity_properties",
+            "entity": "this",
+            "predicate": {
+              "type": "minecraft:ender_dragon"
+            }
+          }
+        ]
+      },
+      "trigger": "minecraft:player_killed_entity"
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "text": "击败boss——大骑士"
+    },
+    "frame": "goal",
+    "hidden": false,
+    "icon": {
+      "item": "neko-adventure:broken_sword_hilt"
+    },
+    "show_toast": true,
+    "title": {
+      "text": "堂吉诃德的落幕"
+    }
+  },
+  "requirements": [
+    [
+      "kill_grand_knight"
+    ]
+  ],
+  "sends_telemetry_event": false
+}

@@ -6,6 +6,7 @@ import com.nekoadventure.entity.boss.HugeSlimeEntity;
 import com.nekoadventure.entity.boss.PriestSkeletonEntity;
 import com.nekoadventure.entity.missile.MissileEntity;
 import com.nekoadventure.entity.mob.*;
+import com.nekoadventure.entity.particle.AbstractParticleEntity;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
 import net.minecraft.entity.EntityDimensions;
@@ -23,6 +24,16 @@ public class ModEntities  {
             FabricEntityTypeBuilder.create(SpawnGroup.MISC,
                             (EntityType<MissileEntity> entityType, World world) -> new MissileEntity(entityType, world))
                     .dimensions(EntityDimensions.fixed(0.2f, 0.2f))
+                    .build()
+    );
+    public static final EntityType<AbstractParticleEntity> PARTICLE_ENTITY = Registry.register(
+            Registries.ENTITY_TYPE,
+            new Identifier(NekoAdventure.MOD_ID, "animation"),
+            FabricEntityTypeBuilder.create(SpawnGroup.MISC,
+                            (EntityType<AbstractParticleEntity> entityType, World world) -> new AbstractParticleEntity(entityType, world))
+                    // 碰撞箱置零（不显示）且不可用 /summon 指令生成
+                    .dimensions(EntityDimensions.fixed(0.0f, 0.0f))
+                    .disableSummon()
                     .build()
     );
     public static final EntityType<TwineSoulEntity> TWINE_SOUL = Registry.register(

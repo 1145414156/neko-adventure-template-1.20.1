@@ -102,10 +102,10 @@ public class TPNextLevelBlock extends Block {
                         ScreenBlackEffectPacket.send(serverPlayer, true);
                     });
                     List<ServerPlayerEntity> finalAllPlayers = allPlayers;
-                    //这里因为这个方块本身并没有tick方法所以用了服务器那里的计时器（人话：我偷懒了）
-                    //收敛式感染扫描(PlayerFirstEnterMazeHandler有详细解释)
+                    /**这里因为这个方块本身并没有tick方法所以用了服务器那里的计时器（人话：我偷懒了）
+                     * 去PlayerFirstEnterMazeHandler类就可以知道全部过程了
+                    **/
                     PlayerFirstEnterMazeHandler.startInfectionScan(serverWorld, dimensionId, () -> {
-
                     PlayerFirstEnterMazeHandler.delayedTasks.put(dimensionId, 60);
                     PlayerFirstEnterMazeHandler.delayedActions.put(dimensionId, () -> {
                         builder.placeAllSpecialRoom(serverWorld);
@@ -115,8 +115,8 @@ public class TPNextLevelBlock extends Block {
                             List<MazePosNBTCompound> initialRoomData=new ArrayList<>();
                             if (data != null) {
                                 initialRoomData = data.getInitialData();
+                                builder.recalculateRoomLight(world, initialRoomData,data.getMazeHeight());
                             }
-                            builder.recalculateRoomLight(world, initialRoomData);
                             builder.resendRoomChunks(world, initialRoomData);
 
                             builder.clearRoomItemEntity(world);

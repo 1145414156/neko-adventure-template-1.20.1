@@ -81,7 +81,7 @@ public class MazeStructureBuilder {
                 impasse.addAll(Stream.concat(calculateRoomType(world, 3).stream(), calculateRoomType(world, 2).stream()).toList());
                 impasseCount =impasse.size();
                 if (impasseCount<MIN_IMPASSE_COUNT) {
-                    System.out.println("错误的房间生成！！！！！");
+                    throw new RuntimeException("Impasse count is less than " + MIN_IMPASSE_COUNT + "!");
                 }
                 else {
                     placeBaseSpecialRooms(impasse,world,range);
@@ -101,7 +101,7 @@ public class MazeStructureBuilder {
 
     //这个方法的作用是在放置完特殊房间后，立刻重新计算所有特殊房间区域的光照
     //服务端光照引擎重算完成后会主动把新的光照数据推送回所有客户端，从而消除全黑房间
-    public void recalculateRoomLight(World world, List<MazePosNBTCompound> rooms) {
+    public void recalculateRoomLight(World world, List<MazePosNBTCompound> rooms,int roomHeight) {
         if (world==null)return;
         if (roomRange<=0){
             MazeDataManager mazeDataManager=MazeDataManager.get(world);
@@ -122,7 +122,7 @@ public class MazeStructureBuilder {
             //水平方向把大门和伪装墙的厚度也算进去，垂直方向按房间高度留出余量
             int margin = 3;
             int minY = Math.max(serverWorld.getBottomY() + 1, center.getY() - 4);
-            int maxY = Math.min(serverWorld.getTopY() - 1, center.getY() + 32);
+            int maxY = Math.min(serverWorld.getTopY() - 1, center.getY() + roomHeight);
             BlockPos minPos = new BlockPos(
                     center.getX() - distance - margin,
                     minY,
@@ -138,13 +138,12 @@ public class MazeStructureBuilder {
             }
 
             //开发辅助
-            System.out.println("已重新标记特殊房间光照区域: " + center + " 范围: " + minPos + " 到 " + maxPos);
+            NekoAdventure.LOGGER.info("calculating room light:center: {} range: {} to {}", center, minPos, maxPos);
             //开发辅助
         }
     }
 
     //这个方法是在光照重算完成后，把每个房间所在区块的完整区块数据（方块+光照快照）
-    //重发给正在观看这些区块的玩家，客户端收到后会整列重建，用于兜底修复个别房间仍全黑的情况
     public void resendRoomChunks(World world, List<MazePosNBTCompound> rooms) {
         if (world==null)return;
         if (roomRange<=0){
@@ -156,7 +155,6 @@ public class MazeStructureBuilder {
         if (!(world instanceof ServerWorld serverWorld) || rooms.isEmpty()) {
             return;
         }
-        //水平范围与 recalculateRoomLight 保持一致（房间半径+3格余量），整列重发不需要垂直范围
         Set<ChunkPos> chunkPositions = new HashSet<>();
         for (MazePosNBTCompound room : rooms) {
             BlockPos center = room.roomCenter();
@@ -183,7 +181,6 @@ public class MazeStructureBuilder {
             if (worldChunk == null) {
                 continue;
             }
-            //区块与光照位图传 null 代表整列全量下发
             ChunkDataS2CPacket chunkDataPacket = new ChunkDataS2CPacket(worldChunk, lightingProvider, null, null);
             for (ServerPlayerEntity player : chunkManager.threadedAnvilChunkStorage.getPlayersWatchingChunk(chunkPos)) {
                 player.sendChunkPacket(chunkPos, chunkDataPacket);
@@ -213,7 +210,7 @@ public class MazeStructureBuilder {
     }
 
     private void placeBaseSpecialRooms(List<MazePosNBTCompound> roomData, World world,int roomRange) {
-        //生成boss房
+        //boss房
         BlockPos bossRoomCenter = roomData.get(0).roomCenter();
         placeStructure(world, bossRoomCenter, "boss_room",roomRange);
         placeGateForRoom(world, bossRoomCenter, roomRange, false);
@@ -222,7 +219,7 @@ public class MazeStructureBuilder {
             bossRoomBlock.placeOn(bossRoomCenter, world.getPlayers().get(0));
         }
 
-        //生成宝箱房
+        //宝箱房
         BlockPos treasureRoomCenter = roomData.get(1).roomCenter();
         placeStructure(world, treasureRoomCenter, "treasure_room",roomRange);
         placeGateForRoom(world, treasureRoomCenter, roomRange, false);
@@ -231,7 +228,7 @@ public class MazeStructureBuilder {
             treasureRoomBlock.placeOn(treasureRoomCenter, world.getPlayers().get(0));
         }
 
-        //生成商店
+        //商店
         BlockPos shopRoomCenter = roomData.get(2).roomCenter();
         placeStructure(world, shopRoomCenter, "shop_room",roomRange);
         placeGateForRoom(world, shopRoomCenter, roomRange, false);
@@ -280,8 +277,6 @@ public class MazeStructureBuilder {
         }
     }
 
-    //这一部分是用来生成更多特殊房间的
-    //奇异房或者赌博房
     private String placeStrangeRoomOrGambleRoom(World world){
         String room = "strange_room";
         if (world instanceof ServerWorld serverWorld) {
@@ -302,7 +297,6 @@ public class MazeStructureBuilder {
         }
         return room;
     }
-    //隐藏房或者魂石房
     private String placeConcealRoomOrSoulRoom(World world) {
         String room = "conceal_room";
         boolean haveSoul =false;
@@ -321,7 +315,6 @@ public class MazeStructureBuilder {
         }
         return room;
     }
-    //重铸房或者熔炼房
     private String placeResetRoomOrSmeltRoom(World world) {
         String room = "reset_room";
         if (world instanceof ServerWorld serverWorld) {
@@ -344,7 +337,6 @@ public class MazeStructureBuilder {
         }
         return room;
     }
-    //锻造房或者食物房
     private String placeForgeRoomOrFoodRoom(World world) {
         String room = "forge_room";
         if (world instanceof ServerWorld serverWorld) {
@@ -355,11 +347,8 @@ public class MazeStructureBuilder {
                         foodCount += itemStack.getCount();
                     }
                 }
-                if (foodCount < 16) {
-                    int missingFood = 16 - foodCount;
-                    int probability = Math.min(25 + missingFood * 5, 80);
-
-                    if (Random.create().nextInt(100) + 1 <= probability) {
+                if (foodCount > 64) {
+                    if (world.random.nextBoolean()) {
                         room = "food_room";
                         break;
                     }
@@ -396,7 +385,7 @@ public class MazeStructureBuilder {
             template.place(serverWorld, placePos, placePos, placementData, Random.create(), 2);
 
             //开发辅助
-            System.out.println("成功放置结构: " + structurePath + " 在位置: " + pos);
+            NekoAdventure.LOGGER.info("place special room : {} in: {}", structurePath, pos);
             //开发辅助
 
         }
@@ -412,7 +401,7 @@ public class MazeStructureBuilder {
             if (optional.isEmpty()) {
 
                 //开发辅助
-                System.out.println("房间只有一个类型");
+                NekoAdventure.LOGGER.warn("room type has simple template for specific room");
                 //开发辅助
 
                 path=dimensionPath + "/specific_room/" + roomType+"/"+roomType;
@@ -427,10 +416,6 @@ public class MazeStructureBuilder {
                     path=dimensionPath + "/specific_room/" + roomType+"/"+roomType+a;
                 }
                 path=allPath.get(Random.create().nextInt(allPath.size()));
-
-                //开发辅助
-                System.out.println(path);
-                //开发辅助
 
             }
         }

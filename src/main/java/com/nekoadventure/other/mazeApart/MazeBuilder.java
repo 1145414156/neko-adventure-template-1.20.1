@@ -2,6 +2,10 @@ package com.nekoadventure.other.mazeApart;
 
 import com.nekoadventure.NekoAdventure;
 import com.nekoadventure.block.ModBlocks;
+import net.minecraft.entity.ItemEntity;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.decoration.ArmorStandEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
@@ -16,6 +20,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 
@@ -30,11 +35,14 @@ public class MazeBuilder {
         }
         return 1;
     }
-    //true=还有迷宫;false=没有迷宫
+    /**这个方法存在很多for()循环，优化做的其实不太好....
+     * 但是毕竟数据还没有传入，这个维度也处于一种空的状态，所以说....我反正想不到其他的办法了qwq
+     * @return  true=还有迷宫;false=没有迷宫
+     **/
     public boolean placeMaze(ServerWorld world) {
         MazeDataManager data = MazeDataManager.get(world);
         int levelData = getLevelData(world);
-        BlockPos placePos = new BlockPos((levelData - 1) * 10000-random.nextInt(40)-20, 1, random.nextInt(40)-20);
+        BlockPos placePos = new BlockPos((levelData - 1) * 10000 - random.nextInt(40) - 20, 1, random.nextInt(40) - 20);
 
         Identifier poolId = getPoolPath(world);
 
@@ -43,7 +51,7 @@ public class MazeBuilder {
         Registry<StructurePool> poolRegistry = world.getRegistryManager()
                 .get(RegistryKeys.TEMPLATE_POOL);
 
-        if (!poolRegistry.containsId(poolId)){
+        if (!poolRegistry.containsId(poolId)) {
             System.err.println("pool not found");
             return false;
         }
@@ -51,34 +59,32 @@ public class MazeBuilder {
         RegistryKey<StructurePool> poolKey = RegistryKey.of(RegistryKeys.TEMPLATE_POOL, poolId);
         RegistryEntry<StructurePool> poolEntry = poolRegistry.entryOf(poolKey);
         int size;
-        if (getLevelData(world)%2==0){
-            size=5;
-        }
-        else {
-            size=4;
+        if (getLevelData(world) % 2 == 0) {
+            size = 5;
+        } else {
+            size = 4;
         }
         StructurePoolBasedGenerator.generate(world, poolEntry, jigsawName, size, placePos, false);
-        int mazeRange=detectRoomDistanceByStructureName(world);
-        BlockPos roomCenter = findStartRoomCenter(world, placePos, mazeRange,data);
-        if (roomCenter == null) {
-            roomCenter = placePos;
-            System.err.println("maze block not found");
-        }
-        else {
-            System.out.println("find maze center success in"+roomCenter);
+        int mazeRange = detectRoomDistanceByStructureName(world);
+        BlockPos mazeCenter = findStartRoomCenter(world, placePos, mazeRange, data);
+        if (mazeCenter == null) {
+            mazeCenter = placePos;
+            NekoAdventure.LOGGER.error("maze block not found");
+        } else {
+            NekoAdventure.LOGGER.info("find maze center success in{}", mazeCenter);
         }
         if (data != null) {
             data.setMazeRange(mazeRange);
-            data.setMazeCenter(roomCenter);
-            System.out.println("write maze center data success");
+            data.setMazeCenter(mazeCenter);
+            NekoAdventure.LOGGER.info("write maze base data success");
         }
-        BlockPos teleportCenter = roomCenter;
-        world.getPlayers().forEach(player -> player.teleport(teleportCenter.getX(), placePos.getY()+2, teleportCenter.getZ()));
-        System.out.println("place maze success");
+        BlockPos teleportCenter = mazeCenter;
+        world.getPlayers().forEach(player -> player.teleport(teleportCenter.getX(), placePos.getY() + 2, teleportCenter.getZ()));
+        NekoAdventure.LOGGER.info("place base maze successful");
         return true;
     }
 
-    //返回房间中心(标记方块所在位置)：maze_block上方1格就是转换后的maze_structure_block(力大砖飞了属于是)
+    //返回房间中心(标记方块所在位置)：maze_block上方1格就是转换后的maze_structure_block(力大砖飞了属于是)(没招毕竟我的世界原版生成结构随机我找不到具体位置就算要去找也得去改无敌多的代码(起码目前的我是这样))
     private BlockPos findStartRoomCenter(ServerWorld world, BlockPos placePos, int mazeRange,MazeDataManager data) {
         int horizontal = mazeRange * 2;
         for (int dy = 48; dy >=0; dy--) {
@@ -86,7 +92,7 @@ public class MazeBuilder {
                 for (int dz = -horizontal; dz <= horizontal; dz++) {
                     BlockPos checkPos = placePos.add(dx, dy, dz);
                     if (world.getBlockState(checkPos).getBlock()==ModBlocks.START_ROOM_BLOCK){
-                        System.out.println("find start room in"+checkPos);
+                        NekoAdventure.LOGGER.info("find start room in{}", checkPos+",checking room height");
                         for (int ay=1;ay<=48;ay++){
                             if (world.getBlockState(checkPos.down(ay)).getBlock() == ModBlocks.MAZE_BLOCK) {
                                 data.setMazeHeight(ay+2);
@@ -111,13 +117,13 @@ public class MazeBuilder {
         StructureTemplateManager templateManager = serverWorld.getStructureTemplateManager();
         Optional<StructureTemplate> optional = templateManager.getTemplate(structureId);
         if (optional.isEmpty()) {
-            System.err.println("detect room distance by structure failed, structure not found: " + structureId);
+            NekoAdventure.LOGGER.error("detect room distance by structure failed, structure not found: {}", structureId);
             return 8;
         }
         Vec3i size = optional.get().getSize();
         int width = Math.min(size.getX(), size.getZ());
         if (width <= 1) {
-            System.err.println("detect room distance by structure failed, structure too short: " + structureId);
+            NekoAdventure.LOGGER.info("detect room distance by structure failed, structure too short: {}", structureId);
             return 8;
         }
         return (width - 1) / 2;
