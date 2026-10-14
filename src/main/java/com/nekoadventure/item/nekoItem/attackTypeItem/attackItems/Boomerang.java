@@ -25,6 +25,7 @@ import java.util.Comparator;
 import java.util.List;
 
 public class Boomerang extends NekoAttackTypeItem {
+    AttackTypes attackTypes=new AttackTypes(AttackTypes.AttackType.BOOMERANG);
     public Boomerang(Settings settings, double health, double strength, double speed, double attackSpeed, double attackRange, double attackMultiplier, double attackSpeedMultiplier, boolean isSpecific) {
         super(settings, health, strength, speed, attackSpeed, attackRange, attackMultiplier, attackSpeedMultiplier, isSpecific);
     }

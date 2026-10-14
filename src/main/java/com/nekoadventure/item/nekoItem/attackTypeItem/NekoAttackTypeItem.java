@@ -3,6 +3,7 @@ package com.nekoadventure.item.nekoItem.attackTypeItem;
 import com.nekoadventure.item.nekoItem.AbstractNekoItem;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.math.Vec3d;
 
 import java.util.HashMap;
 import java.util.Map;

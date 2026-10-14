@@ -37,5 +37,8 @@ public class JoyeuseEntityModel extends SinglePartEntityModel<MissileEntity> {
 
 	@Override
 	public void setAngles(MissileEntity entity, float limbAngle, float limbDistance, float animationProgress, float headYaw, float headPitch) {
+		this.getPart().traverse().forEach(ModelPart::resetTransform);
+		this.main.yaw = -headYaw * (float) (Math.PI / 180.0);
+		this.main.pitch = headPitch * (float) (Math.PI / 180.0);
 	}
 }

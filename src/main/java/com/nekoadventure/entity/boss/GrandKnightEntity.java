@@ -660,8 +660,8 @@ public class GrandKnightEntity extends HostileEntity implements Monster {
             int range=12;
             double spacing = 1.0;
             double cubeSize = 0.5;
-            for (int length = 1; length < range; length++) {
-                Vec3d mobPos = this.getEyePos().add(0,-0.7,0);
+            for (int length = 1; length <= range; length++) {
+                Vec3d mobPos = this.getEyePos().add(0,-0.9,0);
                 Vec3d lookDirection = this.getRotation(this.getYaw());
                 MissileEntity missile=getMissileEntity(this,10,40);
                 AttackTypes brimstoneType = new AttackTypes(AttackTypes.AttackType.BRIMSTONE);

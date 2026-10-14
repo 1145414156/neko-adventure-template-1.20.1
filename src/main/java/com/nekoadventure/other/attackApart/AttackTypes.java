@@ -3,6 +3,8 @@ package com.nekoadventure.other.attackApart;
 import com.nekoadventure.entity.ModEntities;
 import com.nekoadventure.entity.missile.MissileEntity;
 import com.nekoadventure.entity.missile.MissileModelType;
+import com.nekoadventure.item.nekoItem.AbstractNekoItem;
+import com.nekoadventure.item.nekoItem.attackTypeItem.NekoAttackTypeItem;
 import com.nekoadventure.item.other.NekoPackageItem;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -24,6 +26,7 @@ public class AttackTypes {
         DELAY,
         BOOMERANG,
         HOMING,
+        ELLIPSE,
         ZENITH
     }
 
@@ -48,7 +51,8 @@ public class AttackTypes {
             case DELAY -> delayMovement(entity, range, speed);
             case BOOMERANG -> boomerangMovement(entity,range,speed);
             case HOMING -> homingMovement(entity,range,speed);
-            case ZENITH -> zenithMovement(entity, speed);
+            case ELLIPSE -> ellipsoidMovement(entity,range);
+            case ZENITH -> zenithMovement(entity, range);
         }
     }
     private void lazyMovement(MissileEntity entity) {
@@ -134,6 +138,7 @@ public class AttackTypes {
                 );
             }
         }
+
     }
 
     private void brimstoneMovement(MissileEntity entity) {
@@ -212,25 +217,46 @@ public class AttackTypes {
         Vec3d velocityDelta = targetVelocity.subtract(currentVelocity);
         entity.addVelocity(velocityDelta.x, velocityDelta.y, velocityDelta.z);
     }
-    private void zenithMovement(MissileEntity entity, double speed) {
-        boolean isLeft=entity.getFlag()<11;
-        int angle=isLeft ? 16:-16;
-        int duration = entity.getAliveDuration();
-        int halfTime = entity.getTime() / 2;
-        if (duration == halfTime) {
-            entity.setYaw(entity.getYaw()+(180-angle*halfTime));
-            entity.setPitch(-entity.getPitch());
+
+    private void ellipsoidMovement(MissileEntity entity,double range) {
+        int time =  entity.getTime();
+        int t = entity.getAliveDuration();
+        double a = range / 2.0;
+        double b = 3;
+        double omega = 2 * Math.PI / time;
+        boolean isLeft = entity.getFlag() < 11;
+        double sign = isLeft ? 1.0 : -1.0;
+        double offsetPrev = 0.0;
+        if (t > 0) {
+            double thetaPrev = omega * (t - 1);
+            offsetPrev = Math.atan2(b * Math.cos(thetaPrev), -a * Math.sin(thetaPrev) * sign);
         }
-        Vec3d targetVelocity = Vec3d.fromPolar(entity.getPitch(), entity.getYaw()).multiply(speed);
+        float baseYaw = (t == 0)
+                ? (float) (entity.getYaw() + (isLeft ? 180.0 : 0.0))
+                : (float) (entity.getYaw() - Math.toDegrees(offsetPrev));
+        double bYRad = Math.toRadians(baseYaw);
+        Vec3d forward = new Vec3d(-Math.sin(bYRad), 0, Math.cos(bYRad));
+        Vec3d right = new Vec3d(-forward.z, 0, forward.x);
+        double theta = omega * t;
+        double thetaNext = omega * (t + 1);
+        Vec3d step = forward.multiply(a * sign * (Math.cos(thetaNext) - Math.cos(theta)))
+                .add(right.multiply(b * (Math.sin(thetaNext) - Math.sin(theta))));
+
         Vec3d currentVelocity = entity.getVelocity();
         entity.addVelocity(
-                targetVelocity.x - currentVelocity.x,
-                targetVelocity.y - currentVelocity.y,
-                targetVelocity.z - currentVelocity.z
+                step.x - currentVelocity.x,
+                step.y - currentVelocity.y,
+                step.z - currentVelocity.z
         );
-        Vec3d leftDir = Vec3d.fromPolar(0F, entity.getYaw() +(isLeft? 90F:-90F));
-        entity.addVelocity(leftDir.x * speed * 0.2, 0, leftDir.z * speed * 0.2);
-        entity.setYaw(entity.getYaw() + angle);
+        double sinT = Math.sin(theta) * sign;
+        double cosT = Math.cos(theta);
+        Vec3d tangent = forward.multiply(-a * sinT * omega)
+                .add(right.multiply(b * cosT * omega));
+        float displayYaw = (float) Math.toDegrees(Math.atan2(-tangent.x, tangent.z));
+        entity.setYaw(displayYaw);
+    }
+    private void zenithMovement(MissileEntity entity, double range) {
+        ellipsoidMovement(entity,range);
         followOwnerMovement(entity);
     }
 }

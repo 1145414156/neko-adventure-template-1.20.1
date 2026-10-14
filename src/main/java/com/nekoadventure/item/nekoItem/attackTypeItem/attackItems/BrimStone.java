@@ -54,7 +54,7 @@ public class BrimStone extends NekoAttackTypeItem {
             if (brimStones.isEmpty()) {
                 double spacing = 1.0;
                 double cubeSize = 0.5;
-                for (int length = 2; length < range; length++) {
+                for (int length = 1; length <= range; length++) {
                     Vec3d playerPos = player.getPos().add(0,1.2,0);
                     Vec3d lookDirection = player.getRotationVec(1.0F);
                     MissileEntity missile = getMissileEntity(player, range, damage,length);
@@ -66,13 +66,9 @@ public class BrimStone extends NekoAttackTypeItem {
                     world.spawnEntity(missile);
                 }
 
-                //特殊兼容
                 if (player.getOffHandStack().getItem() instanceof NekoPackageItem nekoPackage) {
                     if(nekoPackage.isHaveNekoItem(player.getOffHandStack(), ModItems.EXPOSED_WIRE)){
                         specialAttackWithExportWire(player, range, world, damage, spacing, cubeSize);
-                    }
-                    if (nekoPackage.isHaveNekoItem(player.getOffHandStack(), ModItems.ZENITH)) {
-                        specialAttackWithZenith(player, range, damage, spacing, cubeSize, world);
                     }
                 }
                 player.getWorld().playSound(null, player.getBlockPos(), ModSoundEvents.BRIMSTONE_ATTACK,
@@ -81,7 +77,7 @@ public class BrimStone extends NekoAttackTypeItem {
                         player.getWorld().playSound(null, player.getBlockPos(), ModSoundEvents.BRIMSTONE_FIERCE_ATTACK,
                                 SoundCategory.PLAYERS, 20.0F, 1.0F);
                         if (player instanceof ServerPlayerEntity) {
-                            ScreenShakeNetworking.sendToPlayer((ServerPlayerEntity) player,30,0.1f);
+                            ScreenShakeNetworking.sendToPlayer((ServerPlayerEntity) player,30,0.3f);
                         }
                 }
             }
@@ -91,22 +87,6 @@ public class BrimStone extends NekoAttackTypeItem {
         int cooldown = (int) (200 - (attackSpeed / NekoPackageDataManager.MAX_ATTACK_SPEED) * 200);
         cooldown = Math.max(60, Math.min(200, cooldown));
         player.getItemCooldownManager().set(player.getOffHandStack().getItem(), cooldown);
-    }
-
-    private void specialAttackWithZenith(PlayerEntity player, int range, double damage, double spacing, double cubeSize, World world) {
-        for (int z = 0; z<= 1; z++){
-            float yaw= player.getYaw()-15+z*30;
-            for (int length = 2; length < range; length++) {
-                Vec3d playerPos = player.getPos().add(0,1.2,0);
-                Vec3d lookDirection=getRotationVector(player.getPitch(),yaw);
-                MissileEntity missile = getMissileEntity(player, range, damage,length);
-                Vec3d spawnPos = playerPos.add(lookDirection.multiply(length * spacing - cubeSize / 2));
-                missile.setPos(spawnPos.x, spawnPos.y, spawnPos.z);
-                missile.setYaw(yaw);
-                missile.setPitch(0);
-                world.spawnEntity(missile);
-            }
-        }
     }
 
     private void specialAttackWithExportWire(PlayerEntity player, int range, World world, double damage, double spacing, double cubeSize) {

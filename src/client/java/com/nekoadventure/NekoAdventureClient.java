@@ -19,10 +19,13 @@ import com.nekoadventure.particle.ModClientParticle;
 import com.nekoadventure.ui.NekoPackageScreen;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
+import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
+import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactories;
+import net.minecraft.util.Identifier;
 
 public class NekoAdventureClient implements ClientModInitializer {
 	@Override
@@ -45,6 +48,12 @@ public class NekoAdventureClient implements ClientModInitializer {
 		ModClientParticle.init();
 
 		ModEntityRenderer.register();
+		ModelLoadingPlugin.register(context -> {
+			for (int i = 0; i <= 20; i++) {
+				context.addModels(new Identifier(NekoAdventure.MOD_ID, "item/zenith_sword_" + i));
+			}
+		});
+
 		BlockRenderLayerMap.INSTANCE.putBlocks(RenderLayer.getTranslucent(),
 				ModBlocks.ROLL_ITEM_BLOCK, ModBlocks.SLOT_MACHINE_BLOCK,
 				ModBlocks.WISH_POOL_BLOCK,ModBlocks.SPAWN_MOB_BLOCK,

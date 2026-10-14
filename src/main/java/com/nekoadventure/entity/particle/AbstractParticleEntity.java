@@ -177,10 +177,9 @@ public class AbstractParticleEntity extends Entity {
     }
     @Override
     public boolean shouldRender(double distance) {
-        return distance < 4096.0;
+        return distance < 64.0*64.0;
     }
 
-    // ========== owner ==========
     @Nullable
     public Entity getOwner() {
         if (this.owner != null && !this.owner.isRemoved()) {

@@ -1,9 +1,7 @@
 package com.nekoadventure.particle;
 
 import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry;
-import net.minecraft.client.particle.FlameParticle;
-import net.minecraft.client.particle.SquidInkParticle;
-import net.minecraft.client.particle.SweepAttackParticle;
+import net.minecraft.client.particle.*;
 
 public class ModClientParticle {
     public static void init() {
@@ -13,6 +11,10 @@ public class ModClientParticle {
         );
         ParticleFactoryRegistry.getInstance().register(
                 ModParticleTypes.BRIMSTONE_ATTACK1,
+                FlameParticle.Factory::new
+        );
+        ParticleFactoryRegistry.getInstance().register(
+                ModParticleTypes.BRIMSTONE_ATTACK2,
                 FlameParticle.Factory::new
         );
     }

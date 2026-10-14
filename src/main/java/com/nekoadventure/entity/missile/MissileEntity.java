@@ -97,12 +97,10 @@ public class MissileEntity extends Entity {
             NekoPackageItem.applyOffAttackTypeItem(player);
         }
 
-        if (attackTypes != null) {
+        if (!this.getWorld().isClient&&attackTypes != null) {
             attackTypes.executeMovement(this, this.getRange() , speed);
             this.move(MovementType.SELF, this.getVelocity());
-            if (!this.getWorld().isClient) {
-                this.setAliveDuration(this.getAliveDuration() + 1);
-            }
+            this.setAliveDuration(this.getAliveDuration() + 1);
         }
         if (this.getOwner()==null) {
             this.kill();
@@ -110,7 +108,7 @@ public class MissileEntity extends Entity {
         }
         if (this.age>2000){this.kill();}
         if (this.getAliveDuration()==this.getTime()){this.kill();}
-        if (entityCheckCollision()) return;
+        if (entityCheckCollision()) this.kill();
         blockCheckCollision();
     }
 
@@ -159,10 +157,7 @@ public class MissileEntity extends Entity {
                             }
                         }
                     }
-                    if (!isTreadable) {
-                        this.kill();
-                        return true;
-                    }
+                    if (!isTreadable) {return true;}
                 }
             }
         }
@@ -257,7 +252,6 @@ public class MissileEntity extends Entity {
         }
         this.setNoGravity(true);
     }
-
     @Override
     public boolean damage(DamageSource source, float amount) {
         return false;
@@ -288,6 +282,10 @@ public class MissileEntity extends Entity {
         return true;
     }
 
+    @Override
+    public boolean shouldRender(double distance) {
+        return distance < 64.0*64.0;
+    }
     @Override
     public boolean handleFallDamage(float fallDistance, float damageMultiplier, DamageSource damageSource) {
         return false;
