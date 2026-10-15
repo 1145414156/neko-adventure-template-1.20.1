@@ -44,6 +44,10 @@ public class ModEntityRenderer {
         EntityRendererRegistry.register(ModEntities.SHOOTER, ShooterRenderer::new);
         EntityModelLayerRegistry.registerModelLayer(ModEntityModelLayers.SHOOTER, ShooterEntityModel::getTexturedModelData);
 
+        EntityRendererRegistry.register(ModEntities.SCARAB_BEETLE, ScarabBeetleRenderer::new);
+        EntityModelLayerRegistry.registerModelLayer(ModEntityModelLayers.SCARAB_BEETLE, ScarabBeetleEntityModel::getTexturedModelData);
+
+
         //boss
         EntityRendererRegistry.register(ModEntities.HUGE_SLIME, HugeSlimeRenderer::new);
         EntityModelLayerRegistry.registerModelLayer(ModEntityModelLayers.HUGE_SLIME_INNER, HugeSlimeEntityModel::getTexturedModelData);

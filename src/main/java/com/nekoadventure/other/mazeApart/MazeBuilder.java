@@ -37,7 +37,6 @@ public class MazeBuilder {
     }
     /**这个方法存在很多for()循环，优化做的其实不太好....
      * 但是毕竟数据还没有传入，这个维度也处于一种空的状态，所以说....我反正想不到其他的办法了qwq
-     * @return  true=还有迷宫;false=没有迷宫
      **/
     public boolean placeMaze(ServerWorld world) {
         MazeDataManager data = MazeDataManager.get(world);

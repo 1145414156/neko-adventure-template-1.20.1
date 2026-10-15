@@ -134,9 +134,10 @@ public class PlayerFirstEnterMazeHandler {
     /**
      * 收敛式感染扫描：反复对"已记录房间"的四个方向尝试感染扩散，
      * 直到某一轮既没有新房间、也没有未就绪的区块为止，然后执行onConverged进入后续流程。
-     * 用于替代原先只调用一次getMazeStructureBlockAndApply的写法：感染依赖方块实体异步tick转换(本人早期开发知识存量不足导致的漏洞)，
-     * 一次性快照会因转换/加载时机而随机漏掉房间，因而采用这种反复进行的操作
+     * 用于替代原先只调用一次getMazeStructureBlockAndApply的写法：感染依赖方块实体的tick转换(本人早期开发知识存量不足导致的漏洞)，
+     * 一次性计算可能会因转换/加载时机而随机漏掉房间，因而采用这种反复进行的操作
      * 作用为:上传在MazeBuilder创造的迷宫的全部房间数据并且打上对应的房间类型
+     * 写这么长一串希望现在在看这些方法的时候不会感觉到疑惑了（为什么blockEntity和这里连续写了两个功能差不多的东西）
      */
     public static void startInfectionScan(ServerWorld world, Identifier dimensionId, Runnable onConverged) {
         delayedTasks.put(dimensionId, 30);

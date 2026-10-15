@@ -1,5 +1,7 @@
 package com.nekoadventure.network.maze;
 
+import com.nekoadventure.other.mazeApart.PlayerBlackScreenState;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
@@ -15,6 +17,10 @@ public class ClientScreenEffectHandler {
             boolean isBlack = buf.readBoolean();
 
             client.execute(() -> {
+                //玩家移动由客户端主导：锁定状态必须写进本客户端的JVM，PlayerEntityMixin的封锁判定才会在本地生效
+                if (client.player != null) {
+                    PlayerBlackScreenState.setBlackScreen(client.player.getUuid(), isBlack);
+                }
                 if (isBlack) {
                     if (client.player != null&&!client.player.isSpectator()&&!client.player.isCreative()) {
                         client.player.addStatusEffect(new StatusEffectInstance(
@@ -35,6 +41,10 @@ public class ClientScreenEffectHandler {
                 }
             });
         });
+
+        //断线/退出世界时清理本地锁定，防止静态Map残留导致重进后依然无法移动
+        ClientPlayConnectionEvents.DISCONNECT.register((handler, client) ->
+                PlayerBlackScreenState.setBlackScreen(handler.getProfile().getId(), false));
     }
 
 }

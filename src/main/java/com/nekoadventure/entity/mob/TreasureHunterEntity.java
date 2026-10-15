@@ -42,7 +42,6 @@ public class TreasureHunterEntity extends HostileEntity implements Monster {
                 .add(EntityAttributes.GENERIC_ATTACK_DAMAGE, 6.0D)
                 .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.25D)
                 .add(EntityAttributes.GENERIC_FOLLOW_RANGE, 32.0D)
-                .add(EntityAttributes.GENERIC_ARMOR, 4.0D)
                 .add(EntityAttributes.GENERIC_KNOCKBACK_RESISTANCE, 0.0D);
     }
 

@@ -9,7 +9,6 @@ import java.util.concurrent.ConcurrentHashMap;
 public class NekoPackageDataManager {
     public static final double MAX_ATTACK_SPEED=24;
     public static final double MAX_ATTACK_RANGE=36;
-    public static final double MIN_ATTACK_MULTIPLIER=0.5;
     private static final ConcurrentHashMap<UUID, PlayerNekoData> SERVER_DATA = new ConcurrentHashMap<>();
     // 按玩家存储的道具状态标记（key为道具标识，如道具注册名），与SERVER_DATA同生命周期
     private static final ConcurrentHashMap<UUID, Set<String>> ITEM_STATE = new ConcurrentHashMap<>();

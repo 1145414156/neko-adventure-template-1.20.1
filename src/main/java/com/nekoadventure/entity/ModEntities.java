@@ -18,24 +18,28 @@ import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 
 public class ModEntities  {
+
+    //other
     public static final EntityType<MissileEntity> MISSILE = Registry.register(
             Registries.ENTITY_TYPE,
             new Identifier(NekoAdventure.MOD_ID, "missile"),
             FabricEntityTypeBuilder.create(SpawnGroup.MISC,
                             (EntityType<MissileEntity> entityType, World world) -> new MissileEntity(entityType, world))
                     .dimensions(EntityDimensions.fixed(0.2f, 0.2f))
+                    .disableSummon()
                     .build()
     );
-    public static final EntityType<AbstractParticleEntity> PARTICLE_ENTITY = Registry.register(
+    public static final EntityType<AbstractParticleEntity> NEKO_PARTICLE_ENTITY = Registry.register(
             Registries.ENTITY_TYPE,
-            new Identifier(NekoAdventure.MOD_ID, "animation"),
+            new Identifier(NekoAdventure.MOD_ID, "neko_particle"),
             FabricEntityTypeBuilder.create(SpawnGroup.MISC,
                             (EntityType<AbstractParticleEntity> entityType, World world) -> new AbstractParticleEntity(entityType, world))
-                    // 碰撞箱置零（不显示）且不可用 /summon 指令生成
                     .dimensions(EntityDimensions.fixed(0.0f, 0.0f))
                     .disableSummon()
                     .build()
     );
+
+    //mob
     public static final EntityType<TwineSoulEntity> TWINE_SOUL = Registry.register(
             Registries.ENTITY_TYPE,
             new Identifier(NekoAdventure.MOD_ID,"twine_soul"),
@@ -80,6 +84,17 @@ public class ModEntities  {
                             ShooterEntity::new)
                     .dimensions(EntityDimensions.fixed(0.6f, 1.99f)).build()
     );
+    public static final EntityType<ScarabBeetleEntity> SCARAB_BEETLE=Registry.register(
+            Registries.ENTITY_TYPE,
+            new Identifier(NekoAdventure.MOD_ID,"scarab_beetle"),
+            FabricEntityTypeBuilder.create(SpawnGroup.MONSTER,
+                    ScarabBeetleEntity::new)
+                    .dimensions(EntityDimensions.fixed(1.0f,0.5f)).build()
+    );
+
+
+
+    //boss
     public static final EntityType<HugeSlimeEntity> HUGE_SLIME=Registry.register(
             Registries.ENTITY_TYPE,
             new Identifier(NekoAdventure.MOD_ID,"huge_slime"),
@@ -109,6 +124,8 @@ public class ModEntities  {
         FabricDefaultAttributeRegistry.register(ModEntities.STONE_GOLEM,StoneGolemEntity.createStoneGolemAttributes());
         FabricDefaultAttributeRegistry.register(ModEntities.MINDER,MinderEntity.createMinderAttributes());
         FabricDefaultAttributeRegistry.register(ModEntities.SHOOTER, ShooterEntity.createShooterAttributes());
+        FabricDefaultAttributeRegistry.register(ModEntities.SCARAB_BEETLE,ScarabBeetleEntity.createScarabBeetleAttributes());
+
         FabricDefaultAttributeRegistry.register(ModEntities.HUGE_SLIME,HugeSlimeEntity.createHugeSlimeAttributes());
         FabricDefaultAttributeRegistry.register(ModEntities.PRIEST_SKELETON,PriestSkeletonEntity.createPriestSkeletonAttributes());
         FabricDefaultAttributeRegistry.register(ModEntities.GRAND_KNIGHT,GrandKnightEntity.createGrandKnightAttributes());

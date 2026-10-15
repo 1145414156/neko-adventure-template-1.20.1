@@ -11,8 +11,6 @@ public class ModEntityModelLayers {
             new EntityModelLayer(new Identifier(NekoAdventure.MOD_ID, "joyeuse"), "main");
     public static final EntityModelLayer BOOMERANG=
             new EntityModelLayer(new Identifier(NekoAdventure.MOD_ID, "boomerang"), "main");
-    public static final EntityModelLayer ZENITH=
-            new EntityModelLayer(new Identifier(NekoAdventure.MOD_ID, "zenith"), "main");
 
     //particle
     public static final EntityModelLayer PARTICLE_TEXT=
@@ -31,6 +29,10 @@ public class ModEntityModelLayers {
             new EntityModelLayer(new Identifier(NekoAdventure.MOD_ID,"minder"),"main");
     public static final EntityModelLayer SHOOTER=
             new EntityModelLayer( new Identifier(NekoAdventure.MOD_ID,"shooter"),"main");
+    public static final EntityModelLayer SCARAB_BEETLE=
+            new EntityModelLayer(new Identifier(NekoAdventure.MOD_ID,"scarab_beetle"),"main");
+
+
 
     //boss
     public static final EntityModelLayer HUGE_SLIME_INNER =
