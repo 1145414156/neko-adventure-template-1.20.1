@@ -142,18 +142,12 @@ public class MissileEntity extends Entity {
                     DamageSource damageSource = finalOwner instanceof LivingEntity livingOwner
                             ? this.getDamageSources().mobProjectile(this, livingOwner)
                             : this.getDamageSources().mobProjectile(this, null);
-
-                    livingTarget.damage(damageSource, (float) damage);
-                    if (this.getOwner() instanceof PlayerEntity player) {
+                    if (this.getOwner() instanceof PlayerEntity player&&livingTarget.damage(damageSource, (float) damage)) {
                         if (player.getOffHandStack().getItem() instanceof NekoPackageItem
                                 && NekoPackageItem.getIsFinished(player.getOffHandStack())!=2) {
                             ArrayList specificItems=NekoPackageItem.getNekoItem(player.getOffHandStack(),true,1);
                             for (Object specificItem:specificItems){
-                                for (Entity livingEntity:entities){
-                                    if (livingEntity instanceof LivingEntity){
-                                        ((NekoAttackTypeItem) specificItem).applySpecificItem(player, (LivingEntity) livingEntity);
-                                    }
-                                }
+                                ((NekoAttackTypeItem) specificItem).applySpecificItem(player,livingTarget);
                             }
                         }
                     }

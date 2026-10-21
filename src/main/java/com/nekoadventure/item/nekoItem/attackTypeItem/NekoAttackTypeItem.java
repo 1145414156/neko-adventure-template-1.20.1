@@ -1,15 +1,15 @@
 package com.nekoadventure.item.nekoItem.attackTypeItem;
 
 import com.nekoadventure.item.nekoItem.AbstractNekoItem;
+import com.nekoadventure.other.attackApart.NekoAttackMovingCompatibility;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.math.Vec3d;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public abstract class NekoAttackTypeItem extends AbstractNekoItem {
+public abstract class NekoAttackTypeItem extends AbstractNekoItem implements NekoAttackMovingCompatibility {
     boolean isSpecific;
     private final Map<UUID, Long> lastOffAttackTimes = new HashMap<>();
     public NekoAttackTypeItem(Settings settings, double health, double strength, double speed, double attackSpeed,
@@ -42,4 +42,6 @@ public abstract class NekoAttackTypeItem extends AbstractNekoItem {
         }
         return false;
     }
+
+
 }

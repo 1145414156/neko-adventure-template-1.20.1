@@ -32,7 +32,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class ExposedWire extends NekoAttackTypeItem {
-    int maxConnect=8;
+    final int MAX_CONNECT =8;
     public ExposedWire(Settings settings, double health, double strength, double speed, double attackSpeed, double attackRange, double attackMultiplier, double attackSpeedMultiplier, boolean isSpecific) {
         super(settings, health, strength, speed, attackSpeed, attackRange, attackMultiplier, attackSpeedMultiplier, isSpecific);
     }
@@ -48,16 +48,16 @@ public class ExposedWire extends NekoAttackTypeItem {
             attackRange = nekoPackage.getAttackRange(player);
             strength = nekoPackage.getStrength(player);
         }
-        List<Entity> entities = getEntitiesInRange(player, world,attackRange<=8? (int) attackRange :8);
-        entityChooseHandler(player, entities, world,maxConnect);
+        List<Entity> entities = getEntitiesInRange(player, player.getWorld() ,(int) attackRange);
+        entities=entityChooseHandler(player, entities, world, MAX_CONNECT);
 
         //这里是伤害部分
         if (!entities.isEmpty()) {
             for (Entity entity : entities) {
                 Vec3d pos=new Vec3d(entity.getX(),entity.getEyeY(),entity.getZ());
-                AttackTypes lazyAttack=new AttackTypes(AttackTypes.AttackType.HOMING);
+                AttackTypes lazyAttack=new AttackTypes(AttackTypes.AttackType.LAZY);
                 MissileEntity missile=new MissileEntity(ModEntities.MISSILE,world,player,
-                        lazyAttack,true,attackRange,5, strength);
+                        lazyAttack,false,attackRange,5, strength);
                 missile.setMissileModelType(MissileModelType.NULL);
                 missile.setPosition(pos);
                 world.spawnEntity(missile);
@@ -66,7 +66,6 @@ public class ExposedWire extends NekoAttackTypeItem {
             player.getWorld().playSound(null, player.getBlockPos(), ModSoundEvents.ELECTRICITY_RUN_THROUGH,
                     SoundCategory.PLAYERS, 1.0F, 1.0F);
         }
-        maxConnect=8;
         double[] finalData = NekoPackageDataManager.getFinalData(player);
         double attackSpeed = finalData != null ? finalData[3] : 0;
         int cooldown = (int) (60 - (attackSpeed / NekoPackageDataManager.MAX_ATTACK_SPEED) * 60);
@@ -102,7 +101,7 @@ public class ExposedWire extends NekoAttackTypeItem {
                         .filter(e -> e instanceof LivingEntity&&!Objects.equals(missileEntity.getOwner(), e))
                         .map(e -> (LivingEntity) e)
                         .collect(Collectors.toList());
-                entityChooseHandler(missileEntity, livingEntities, world, maxConnect);
+                entityChooseHandler(missileEntity, livingEntities, world, MAX_CONNECT);
                 applyDamageHandler(missileEntity, entities);
             }
         }
@@ -152,15 +151,12 @@ public class ExposedWire extends NekoAttackTypeItem {
     }
 
 
-    private <T extends Entity> void entityChooseHandler(
-            Entity owner, List<T> entities, World world, int count) {
+    private <T extends Entity> List<Entity> entityChooseHandler(Entity owner, List<T> entities, World world, int count) {
         if (!entities.isEmpty()) {
-
-            List<LivingEntity> livingEntities = entities.stream()
+            List<Entity> livingEntities = entities.stream()
                     .filter(e -> e instanceof LivingEntity)
                     .map(e -> (LivingEntity) e)
                     .collect(Collectors.toList());
-
             //为实体排序
             Vec3d pos = owner.getPos();
             livingEntities.sort(Comparator.comparingDouble(e ->
@@ -209,7 +205,9 @@ public class ExposedWire extends NekoAttackTypeItem {
             for (int i = 0; i < chain.size() - 1; i++) {
                 spawnLightingParticle(world, chain.get(i), chain.get(i + 1));
             }
+        return livingEntities;
         }
+        return new ArrayList<>();
     }
 
     private void spawnLightingParticle(World world, Entity from, Entity to) {

@@ -240,7 +240,7 @@ public class ModItems {
     public static final CrushedIce CRUSHED_ICE=register("crushed_ice",
             new CrushedIce(new Item.Settings().rarity(Rarity.RARE),0,0,0,0.2,0,-0.1,0,true));
     public static final Banana BANANA=register("banana",
-            new Banana(new Item.Settings().rarity(Rarity.UNCOMMON),3,1.2,0,0.0,0,0,0,true));
+            new Banana(new Item.Settings().rarity(Rarity.UNCOMMON).food(FoodComponents.APPLE),3,1.2,0,0.0,0,0,0,true));
     public static final BrokenCrown BROKEN_CROWN=register("broken_crown",
             new BrokenCrown(new Item.Settings().rarity(Rarity.RARE),2.0,0,0.3,0,0,0,0,true));
     public static final SandwormFang SANDWORM_FANG=register("sandworm_fang",

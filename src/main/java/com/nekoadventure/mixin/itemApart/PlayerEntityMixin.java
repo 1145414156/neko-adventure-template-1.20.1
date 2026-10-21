@@ -100,11 +100,13 @@ public abstract class PlayerEntityMixin extends LivingEntity {
     //这里是所有攻击特效注入原版的方法
 	@Inject(at = @At(value = "HEAD"), method = "attack")
 	private void disableAttack(Entity target, CallbackInfo info) {
-        if (target instanceof LivingEntity) {
+        if (target instanceof LivingEntity&&target.isAttackable()) {
             PlayerEntity player = (PlayerEntity) (Object) this;
-            if (NekoPackageItem.getIsFinished(player.getOffHandStack())!=2 &&!NekoPackageItem.getNekoItem(player.getOffHandStack(), false, 1).isEmpty()) {
+            if (NekoPackageItem.getIsFinished(player.getOffHandStack())!=2 &&
+                    !NekoPackageItem.getNekoItem(player.getOffHandStack(), false, 1).isEmpty()) {
                 if (player.getAttackCooldownProgress(0.0f) == 1) {
-                    ArrayList specificItems = NekoPackageItem.getNekoItem(player.getOffHandStack(), false, 1);
+                    ArrayList specificItems = NekoPackageItem.getNekoItem(player.getOffHandStack(),
+                            false, 1);
                     for (int i = specificItems.size(); i >= 1; i--) {
                         NekoAttackTypeItem nekoAttackTypeItem = (NekoAttackTypeItem) specificItems.get(i - 1);
                         nekoAttackTypeItem.applySpecificItem(player, (LivingEntity) target);

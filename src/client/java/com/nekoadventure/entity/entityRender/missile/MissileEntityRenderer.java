@@ -6,7 +6,6 @@ import com.nekoadventure.entity.missile.MissileEntity;
 import com.nekoadventure.entity.missile.MissileModelType;
 import com.nekoadventure.entity.ModEntityModelLayers;
 import com.nekoadventure.entity.model.missile.BoomerangEntityModel;
-import com.nekoadventure.entity.model.missile.JoyeuseEntityModel;
 import com.nekoadventure.item.ModItems;
 import com.nekoadventure.particle.ModParticleTypes;
 import net.minecraft.client.MinecraftClient;
@@ -22,12 +21,14 @@ import net.minecraft.client.render.model.json.ModelTransformationMode;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.particle.DustParticleEffect;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.*;
 import org.joml.Matrix3f;
 import org.joml.Matrix4f;
+import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 public class MissileEntityRenderer extends EntityRenderer<MissileEntity> {
@@ -42,11 +43,14 @@ public class MissileEntityRenderer extends EntityRenderer<MissileEntity> {
             new Identifier(NekoAdventure.MOD_ID, "textures/entity/missile/boomerang.png");
     //zenith弹幕剑以物品模型渲染，需要一个非空的载体堆（实际模型通过参数显式指定）
     private static final ItemStack ZENITH_STACK = new ItemStack(ModItems.ZENITH);
-    private final JoyeuseEntityModel modelJoyeuse;
+    private static final ItemStack JOYEUSE_STACK = new ItemStack(ModItems.JOYEUSE);
+
+    //joyeuse物品贴图里剑身沿 45° 对角线绘制（左下剑柄、右上剑尖），模型空间中剑尖方向为归一化的 (1,1,0)
+    private static final Vector3f ITEM_BLADE_AXIS = new Vector3f(0.70710678f, 0.70710678f, 0.0f);
+
     private final BoomerangEntityModel modelBoomerang;
     public MissileEntityRenderer(EntityRendererFactory.Context ctx) {
         super(ctx);
-        this.modelJoyeuse=new JoyeuseEntityModel(ctx.getPart(ModEntityModelLayers.JOYEUSE));
         this.modelBoomerang=new BoomerangEntityModel(ctx.getPart(ModEntityModelLayers.BOOMERANG));
     }
 
@@ -121,7 +125,7 @@ public class MissileEntityRenderer extends EntityRenderer<MissileEntity> {
                 float jx2 = MathHelper.cos(roll + 1.5707964f) * inner;
                 float jz2 = MathHelper.sin(roll + 1.5707964f) * inner;
                 int t= entity.getAliveDuration() %5/2;
-                Identifier texture=new Identifier(NekoAdventure.MOD_ID, "textures/entity/missile/brimstone"+t+".png");;
+                Identifier texture=new Identifier(NekoAdventure.MOD_ID, "textures/entity/missile/brimstone"+t+".png");
                 if (entity.getFlag()==1){
                    texture  = new Identifier(NekoAdventure.MOD_ID, "textures/entity/missile/brimstone_start"+t+".png");
                 } else if (entity.getFlag()==entity.getRange()) {
@@ -173,11 +177,44 @@ public class MissileEntityRenderer extends EntityRenderer<MissileEntity> {
         }
 
         else if (entity.getMissileType() == MissileModelType.JOYEUSE) {
-            this.modelJoyeuse.setAngles(entity, 0, 0, entity.age, yaw, entity.getPitch());
-            var vertexConsumer = vertexConsumers.getBuffer(
-                    modelJoyeuse.getLayer(TEXTURE_JOYEUSE));
-            modelJoyeuse.render(matrices, vertexConsumer, light,
-                    OverlayTexture.DEFAULT_UV, red, green, blue, 1.0f);
+            BakedModel model = MinecraftClient.getInstance().getItemRenderer()
+                    .getModel(JOYEUSE_STACK, entity.getWorld(), null, entity.getId());
+            if (model != null) {
+                //物品贴图是单层平面，必须让贴图里 45° 的剑身轴线对准弹幕朝向，
+                //再绕剑轴 roll 到尽量正对镜头，否则平面与视线共面会被压成一条线（表现为不渲染）
+                Vec3d look = entity.getRotationVec(tickDelta);
+                Vec3d toCamera = this.dispatcher.camera.getPos().subtract(entity.getLerpedPos(tickDelta));
+                Vec3d faceDir = toCamera.subtract(look.multiply(toCamera.dotProduct(look)));
+                if (faceDir.lengthSquared() < 1.0E-4) {
+                    //视线几乎与剑轴共线时退化，用竖直平面兜底
+                    faceDir = new Vec3d(0.0, 1.0, 0.0).crossProduct(look);
+                }
+                faceDir = faceDir.normalize();
+
+                Vector3f lookVec = new Vector3f((float) look.x, (float) look.y, (float) look.z);
+                Quaternionf orientation = new Quaternionf().rotationTo(ITEM_BLADE_AXIS, lookVec);
+                Vector3f normal = new Vector3f(0.0f, 0.0f, 1.0f).rotate(orientation);
+                Vector3f faceVec = new Vector3f((float) faceDir.x, (float) faceDir.y, (float) faceDir.z);
+                Vector3f cross = normal.cross(faceVec, new Vector3f());
+                float roll = (float) Math.atan2(cross.dot(lookVec), normal.dot(faceVec));
+                orientation.premul(new Quaternionf().setAngleAxis(roll, lookVec.x, lookVec.y, lookVec.z));
+
+                matrices.push();
+                matrices.multiply(orientation);
+                float size = 1.5f;
+                matrices.scale(size, size, size);
+                MinecraftClient.getInstance().getItemRenderer().renderItem(
+                        JOYEUSE_STACK,
+                        ModelTransformationMode.NONE,
+                        false,
+                        matrices,
+                        vertexConsumers,
+                        LightmapTextureManager.MAX_LIGHT_COORDINATE,
+                        OverlayTexture.DEFAULT_UV,
+                        model
+                );
+                matrices.pop();
+            }
         }
 
         else if (entity.getMissileType() == MissileModelType.BOOMERANG) {

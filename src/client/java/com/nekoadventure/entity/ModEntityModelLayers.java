@@ -6,9 +6,6 @@ import net.minecraft.util.Identifier;
 
 public class ModEntityModelLayers {
     //missile
-
-    public static final EntityModelLayer JOYEUSE=
-            new EntityModelLayer(new Identifier(NekoAdventure.MOD_ID, "joyeuse"), "main");
     public static final EntityModelLayer BOOMERANG=
             new EntityModelLayer(new Identifier(NekoAdventure.MOD_ID, "boomerang"), "main");
 

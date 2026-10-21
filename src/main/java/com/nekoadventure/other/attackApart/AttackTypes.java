@@ -11,10 +11,12 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.TargetPredicate;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 
 //全部攻击方法的移动方法
 public class AttackTypes {
@@ -47,7 +49,7 @@ public class AttackTypes {
             case BULLET -> bulletMovement(entity, speed);
             case BRIMSTONE -> brimstoneMovement(entity);
             case LAZY -> lazyMovement(entity);
-            case JOYEUSE -> joyeuseMovement(entity, speed);
+            case JOYEUSE -> joyeuseMovement(entity,range,speed);
             case DELAY -> delayMovement(entity, range, speed);
             case BOOMERANG -> boomerangMovement(entity,range,speed);
             case HOMING -> homingMovement(entity,range,speed);
@@ -79,7 +81,7 @@ public class AttackTypes {
                 TargetPredicate.DEFAULT,
                 entity.getControllingPassenger(),
                 entity.getX(), entity.getY(), entity.getZ(),
-                entity.getBoundingBox().expand(20)
+                entity.getBoundingBox().expand(8)
         );
         if (nearest != null) {
             entity.teleport(nearest.getX(), nearest.getY(), nearest.getZ());
@@ -101,11 +103,11 @@ public class AttackTypes {
 
     private void delayMovement(MissileEntity entity,double range,double speed) {
         lazyMovement(entity);
-        if (entity.getAliveDuration() == range / speed / 2) {
+        if (entity.getAliveDuration() == entity.getTime()/ 2) {
             if (entity.getOwner() != null) {
                 List<LivingEntity> targets = entity.getWorld().getEntitiesByClass(
                         LivingEntity.class,
-                        entity.getOwner().getBoundingBox().expand(range * 3),
+                        entity.getOwner().getBoundingBox().expand(range),
                         z -> z instanceof LivingEntity &&
                                 z != entity.getOwner()
                 );
@@ -127,10 +129,10 @@ public class AttackTypes {
                 }
             }
         }
-        else if (entity.getAliveDuration()==(range / speed / 2)+1){
+        else if (entity.getAliveDuration()==(entity.getTime()/ 2)+1){
             if (lastTargetPos!=null){
                 Vec3d direction = lastTargetPos.subtract(entity.getPos()).normalize();
-                Vec3d desiredVelocity = direction.multiply(speed*2.0);
+                Vec3d desiredVelocity = direction.multiply(speed*3.0);
                 entity.addVelocity(
                         (desiredVelocity.x - entity.getVelocity().x) * 0.5,
                         (desiredVelocity.y - entity.getVelocity().y) * 0.5,
@@ -146,62 +148,24 @@ public class AttackTypes {
         followOwnerMovement(entity);
     }
 
-    private void joyeuseMovement(MissileEntity entity, double speed) {
-
-        if (entity.getAliveDuration()==1) {
-            Vec3d direction = Vec3d.fromPolar(entity.getPitch(), entity.getYaw()).normalize();
-            entity.addVelocity(direction.multiply(speed));
-        }
-
-        var entities = entity.getWorld().getOtherEntities(
-                entity,
-                entity.getBoundingBox().expand(0.7),
-                e -> e instanceof LivingEntity && e != entity.getOwner()
-        );
-
-        if (!entities.isEmpty()) {
-            entity.setVelocity(Vec3d.ZERO);
-            if (!entity.getWorld().isClient) {
-                Vec3d pos = entity.getPos();
-                AttackTypes lazyAttack = new AttackTypes(AttackType.LAZY);
-                double attackRange = 3;
-                double strength = 1;
-                if (entity.getOwner() instanceof PlayerEntity player
-                        && player.getOffHandStack().getItem() instanceof NekoPackageItem nekoPackage) {
-                    attackRange = nekoPackage.getAttackRange(player);
-                    strength = nekoPackage.getStrength(player);
-                }
-                MissileEntity missile =new MissileEntity(
-                        ModEntities.MISSILE,
-                        entity.getWorld(),
-                        entity.getOwner(),
-                        lazyAttack,
-                        true,
-                        attackRange,
-                        80,
-                        strength * 2
-                );
-                missile.setPosition(pos);
-                missile.setMissileModelType(MissileModelType.JOYEUSE);
-                missile.setYaw(0);
-                missile.setPitch(0);
-                missile.setPosition(entity.getPos());
-                LivingEntity target = missile.getWorld().getEntitiesByClass(
-                        LivingEntity.class,
-                        missile.getBoundingBox().expand(4),
-                        tar -> tar.isAlive() && tar != missile.getOwner()
-                ).stream().min(Comparator.comparingDouble(tar -> tar.distanceTo(missile))).orElse(null);
-                if (target != null) {
-                    pos = missile.getPos();
-                    Vec3d direction = target.getEyePos().subtract(pos).normalize();
-                    double yaw = Math.toDegrees(Math.atan2(-direction.x, direction.z));
-                    double pitch = Math.toDegrees(Math.atan2(-direction.y, Math.sqrt(direction.x * direction.x + direction.z * direction.z)));
-                    missile.setYaw((float) yaw);
-                    missile.setPitch((float) pitch);
-                }
-                entity.getWorld().spawnEntity(missile);
+    private void joyeuseMovement(MissileEntity entity,double range ,double speed) {
+        delayMovement(entity,range,speed);
+        if (entity.getAliveDuration() < entity.getTime() / 2) {
+            Entity owner = entity.getOwner();
+            if (owner == null) {
+                return;
             }
-            entity.remove(Entity.RemovalReason.KILLED);
+            double yawRad = Math.toRadians(owner.getYaw());
+            Vec3d forwardH = new Vec3d(-Math.sin(yawRad), 0, Math.cos(yawRad));
+            Vec3d rightH = new Vec3d(-forwardH.z, 0, forwardH.x);
+            int flag = MathHelper.clamp(entity.getFlag(), 0, 5);
+            double spacing = 1.0;
+            Vec3d center = owner.getEyePos();
+            double lateral = (flag - 2.5) * spacing;
+            Vec3d target = center.add(rightH.multiply(lateral));
+            entity.setPosition(target.x, target.y, target.z);
+            entity.setYaw(owner.getYaw());
+            entity.setPitch(owner.getPitch());
         }
     }
 

@@ -2,10 +2,12 @@ package com.nekoadventure.item.itemGroup;
 
 import com.nekoadventure.NekoAdventure;
 import com.nekoadventure.block.ModBlocks;
+import com.nekoadventure.datagen.tags.ModItemTagsProvider;
 import com.nekoadventure.item.ModItems;
 import com.nekoadventure.item.nekoItem.AbstractNekoItem;
 import com.nekoadventure.item.other.NekoPackageItem;
 import com.nekoadventure.item.soulItem.AbstractSoulItem;
+import com.nekoadventure.other.itemApart.SpawnRandomNekoItems;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
@@ -92,7 +94,7 @@ public class ModItemGroups {
         Registry.register(
                 Registries.ITEM_GROUP,
                 SOUL_ITEM_GROUP,
-                ItemGroup.create(ItemGroup.Row.TOP, 8)
+                ItemGroup.create(ItemGroup.Row.TOP, 9)
                         .displayName(Text.translatable("itemgroup.soul_item_group"))
                         .icon(() -> new ItemStack(ModItems.INSTANCE_HEALTH_SOUL))
                         .entries((displayContext, entries) ->
@@ -114,7 +116,7 @@ public class ModItemGroups {
         Registry.register(
                 Registries.ITEM_GROUP,
                 MAZE_GROUP,
-                ItemGroup.create(ItemGroup.Row.TOP, 8)
+                ItemGroup.create(ItemGroup.Row.TOP, 10)
                         .displayName(Text.translatable("itemgroup.maze_group"))
                         .icon(() -> new ItemStack(ModItems.BROKEN_SWORD))
                         .entries((displayContext, entries) -> {

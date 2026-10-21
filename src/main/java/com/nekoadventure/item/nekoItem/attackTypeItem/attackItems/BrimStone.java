@@ -92,7 +92,7 @@ public class BrimStone extends NekoAttackTypeItem {
     private void specialAttackWithExportWire(PlayerEntity player, int range, World world, double damage, double spacing, double cubeSize) {
         for (int z = 0; z<= range /5; z++){
             float yaw= world.random.nextInt(360);
-            for (int length = 2; length < range; length++) {
+            for (int length = 1; length <= range; length++) {
                 Vec3d playerPos = player.getPos().add(0,1.2,0);
                 Vec3d lookDirection=getRotationVector(0,yaw);
                 MissileEntity missile = getMissileEntity(player, range, damage,length);
@@ -118,12 +118,12 @@ public class BrimStone extends NekoAttackTypeItem {
         if (player.getOffHandStack().getItem() instanceof NekoPackageItem nekoPackage){
             damage=nekoPackage.getStrength(player);
             attackRange = nekoPackage.getAttackRange(player);
-            ArrayList<AbstractNekoItem> attackItems=NekoPackageItem.getNekoItem(player.getOffHandStack(),false,3);
+            ArrayList<AbstractNekoItem> attackItems=NekoPackageItem.getNekoItem(player.getOffHandStack(),true,3);
             if (attackItems.get(attackItems.size()-1).equals(ModItems.BRIMSTONE)) return;
         }
         List<MissileEntity> missileEntities = world.getEntitiesByClass(
                 MissileEntity.class,
-                player.getBoundingBox().expand(attackRange*8),
+                player.getBoundingBox().expand(attackRange*4),
                 entity -> Objects.equals(entity.getOwner(), player)
         );
             int count = 16;

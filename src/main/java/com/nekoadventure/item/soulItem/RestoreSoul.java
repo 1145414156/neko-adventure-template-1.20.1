@@ -15,6 +15,6 @@ public class RestoreSoul extends AbstractSoulItem{
 
     @Override
     public void onUseEffect(World world, PlayerEntity player, ItemStack stack) {
-        player.addStatusEffect(new StatusEffectInstance(StatusEffects.REGENERATION,10,2));
+        player.addStatusEffect(new StatusEffectInstance(StatusEffects.REGENERATION,10*20,2));
     }
 }
