@@ -1,22 +1,15 @@
 package com.nekoadventure.other.attackApart;
 
-import com.nekoadventure.entity.ModEntities;
 import com.nekoadventure.entity.missile.MissileEntity;
-import com.nekoadventure.entity.missile.MissileModelType;
-import com.nekoadventure.item.nekoItem.AbstractNekoItem;
-import com.nekoadventure.item.nekoItem.attackTypeItem.NekoAttackTypeItem;
-import com.nekoadventure.item.other.NekoPackageItem;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.TargetPredicate;
 import net.minecraft.entity.mob.HostileEntity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
 
 //全部攻击方法的移动方法
 public class AttackTypes {
