@@ -4,9 +4,9 @@ import com.nekoadventure.client.ShiftKeyHelper;
 import com.nekoadventure.entity.ModEntities;
 import com.nekoadventure.entity.missile.MissileEntity;
 import com.nekoadventure.entity.missile.MissileModelType;
-import com.nekoadventure.item.nekoItem.attackTypeItem.NekoAttackTypeItem;
+import com.nekoadventure.item.nekoItem.attackTypeItem.AbstractNekoSpecificItem;
 import com.nekoadventure.item.other.NekoPackageItem;
-import com.nekoadventure.other.attackApart.AttackTypes;
+import com.nekoadventure.other.mobApart.AttackTypes;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -19,7 +19,9 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.Random;
 
-public class CrushedIce extends NekoAttackTypeItem {
+public class CrushedIce extends AbstractNekoSpecificItem {
+
+
     public CrushedIce(Settings settings, double health, double strength, double speed, double attackSpeed, double attackRange, double attackMultiplier, double attackSpeedMultiplier, boolean isSpecific) {
         super(settings, health, strength, speed, attackSpeed, attackRange, attackMultiplier, attackSpeedMultiplier, isSpecific);
     }

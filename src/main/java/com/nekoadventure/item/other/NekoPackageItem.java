@@ -4,8 +4,9 @@ import com.nekoadventure.NekoAdventure;
 import com.nekoadventure.client.ShiftKeyHelper;
 import com.nekoadventure.item.ModItems;
 import com.nekoadventure.item.nekoItem.AbstractNekoItem;
-import com.nekoadventure.item.nekoItem.attackTypeItem.NekoAttackTypeItem;
-import com.nekoadventure.item.nekoItem.functionTypeItem.functionItems.NekoFunctionItem;
+import com.nekoadventure.item.nekoItem.attackTypeItem.AbstractNekoAttackItem;
+import com.nekoadventure.item.nekoItem.attackTypeItem.AbstractNekoSpecificItem;
+import com.nekoadventure.item.nekoItem.functionTypeItem.functionItems.AbstractNekoFunctionItem;
 import com.nekoadventure.network.item.NekoPackageDataNetworking;
 import com.nekoadventure.other.itemApart.NekoPackageDataManager;
 import com.nekoadventure.other.mazeApart.MazeDataManager;
@@ -99,8 +100,7 @@ public class NekoPackageItem extends Item {
                     if (getIsFinished(player.getOffHandStack())==2) {return;}
                     if (!world.isClient) {
                         NekoPackageDataManager.PlayerNekoData data = NekoPackageDataManager.getOrCreate(player);
-                        //每tick将tickData朝零衰减0.05
-                        NekoPackageDataManager.decayTickData(player);
+
                         if (data.recycleTime < 100) {
                             data.recycleTime++;
                         }
@@ -110,9 +110,10 @@ public class NekoPackageItem extends Item {
                             applyData(player, damageAttr, speedAttr, healthAttr, attackSpeedAttr);
                         }
                     }
-                    //这里用来执行FunctionItem的方法
                     NekoPackageItem.applyFunction(NekoPackageItem.getNekoItem(player.getOffHandStack(), false, 4), player, 1);
-
+                    NekoPackageDataManager.decayTickData(player);
+                    List<AbstractNekoItem> nekoSpecificItems=NekoPackageItem.getNekoItem(player.getOffHandStack(),false,1);
+                    nekoSpecificItems.forEach(item->{if (item instanceof AbstractNekoSpecificItem abstractNekoSpecificItem){abstractNekoSpecificItem.calculateOnTick(player);}});
                 }
                 else {
                     if (!world.isClient) {
@@ -288,7 +289,7 @@ public class NekoPackageItem extends Item {
 
     //这个方法是用来应用主攻击方式
     public static void applyMainAttackTypeItem(PlayerEntity player) {
-        NekoAttackTypeItem finalAttackMainItem = null;
+        AbstractNekoAttackItem finalAttackMainItem = null;
         ItemStack stack = player.getStackInHand(Hand.OFF_HAND);
         if (getIsFinished(stack)==2) {return;}
         NbtCompound nbt = stack.getOrCreateNbt();
@@ -300,7 +301,7 @@ public class NekoPackageItem extends Item {
 
             for (int i = 0; i < items.size(); i++) {
                 ItemStack itemStack = ItemStack.fromNbt(items.getCompound(i));
-                if (itemStack.getItem() instanceof NekoAttackTypeItem nekoAttackTypeItem && !nekoAttackTypeItem.getIsSpecific()) {
+                if (itemStack.getItem() instanceof AbstractNekoAttackItem nekoAttackTypeItem) {
                     finalAttackMainItem= nekoAttackTypeItem;
                 }
             }
@@ -322,8 +323,8 @@ public class NekoPackageItem extends Item {
     }
 
     public static void applyOffAttackTypeItem(PlayerEntity player) {
-        NekoAttackTypeItem finalAttackOffItem=null;
-        NekoAttackTypeItem finalAttackMainItem = null;
+        AbstractNekoAttackItem finalAttackOffItem=null;
+        AbstractNekoAttackItem finalAttackMainItem = null;
         ItemStack stack = player.getStackInHand(Hand.OFF_HAND);
         if (getIsFinished(stack)==2) {return;}
         NbtCompound nbt = stack.getOrCreateNbt();
@@ -335,7 +336,7 @@ public class NekoPackageItem extends Item {
 
             for (int i = 0; i < items.size(); i++) {
                 ItemStack itemStack = ItemStack.fromNbt(items.getCompound(i));
-                if (itemStack.getItem() instanceof NekoAttackTypeItem nekoAttackTypeItem && !nekoAttackTypeItem.getIsSpecific()) {
+                if (itemStack.getItem() instanceof AbstractNekoAttackItem nekoAttackTypeItem) {
                     finalAttackOffItem=finalAttackMainItem;
                     finalAttackMainItem= nekoAttackTypeItem;
                 }
@@ -392,17 +393,17 @@ public class NekoPackageItem extends Item {
                     }
                 }
                 else if (getType==1) {
-                    if (itemStack.getItem() instanceof NekoAttackTypeItem abstractNekoItem&&abstractNekoItem.getIsSpecific()) {
+                    if (itemStack.getItem() instanceof AbstractNekoSpecificItem abstractNekoItem) {
                         nekoItems.add(abstractNekoItem);
                     }
                 }
                 else if (getType==3) {
-                    if (itemStack.getItem() instanceof NekoAttackTypeItem abstractNekoItem&&!abstractNekoItem.getIsSpecific()) {
+                    if (itemStack.getItem() instanceof AbstractNekoAttackItem abstractNekoItem) {
                         nekoItems.add(abstractNekoItem);
                     }
                 }
                 else if (getType==4) {
-                    if (itemStack.getItem() instanceof NekoFunctionItem nekoFunctionItem) {
+                    if (itemStack.getItem() instanceof AbstractNekoFunctionItem nekoFunctionItem) {
                         nekoItems.add(nekoFunctionItem);
                     }
                 }
@@ -429,13 +430,13 @@ public class NekoPackageItem extends Item {
         boolean z=false;
         for (int i = 0; i < items.size();) {
             if (choose==1){
-                if (items.get(i) instanceof NekoFunctionItem nekoFunctionItem) {
-                    nekoFunctionItem.applyTickFunctionItem(player);
+                if (items.get(i) instanceof AbstractNekoFunctionItem nekoFunctionItem) {
+                    nekoFunctionItem.applyTickFunction(player);
                 }
             }
             else if (choose==2){
-                if (items.get(i) instanceof NekoFunctionItem nekoFunctionItem) {
-                    if (nekoFunctionItem.applyDamagedFunctionItem(player)) {
+                if (items.get(i) instanceof AbstractNekoFunctionItem nekoFunctionItem) {
+                    if (nekoFunctionItem.applyDamagedFunction(player)) {
                         z=true;
                     }
                 }

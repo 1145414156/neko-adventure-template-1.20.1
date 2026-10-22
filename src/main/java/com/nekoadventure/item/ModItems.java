@@ -172,31 +172,31 @@ public class ModItems {
 
     //攻击方式类道具
     public static final ExposedWire EXPOSED_WIRE=register("exposed_wire",
-            new ExposedWire(new Item.Settings().rarity(Rarity.EPIC),0,0.5,0,0,4,0.1,-0.3,false));
+            new ExposedWire(new Item.Settings().rarity(Rarity.EPIC),0,0.5,0,0,4,0.1,-0.3));
     public static final Bullet BULLET=register("bullet",
-            new Bullet(new Item.Settings().rarity(Rarity.RARE),0,0,0,0,4,0,0,false));
+            new Bullet(new Item.Settings().rarity(Rarity.RARE),0,0,0,0,4,0,0));
     public static final BrimStone BRIMSTONE=register("brimstone",
-            new BrimStone(new Item.Settings().rarity(Rarity.EPIC),0,-3,0,0,5,0.4,0,false));
+            new BrimStone(new Item.Settings().rarity(Rarity.EPIC),0,-3,0,0,5,0.4,0));
     public static final Joyeuse JOYEUSE=register("joyeuse",
-            new Joyeuse(new Item.Settings().rarity(Rarity.EPIC),0,1.5,0,0,3,0.2,0.0,false));
+            new Joyeuse(new Item.Settings().rarity(Rarity.EPIC),0,1.5,0,0,3,0.2,0.0));
     public static final Lance LANCE=register("lance",
-            new Lance(new Item.Settings().rarity(Rarity.RARE),0,1.5,0,-0.3,4,0,-0.2,false));
+            new Lance(new Item.Settings().rarity(Rarity.RARE),0,1.5,0,-0.3,4,0,-0.2));
     public static final Parry PARRY=register("parry",
-            new Parry(new Item.Settings().rarity(Rarity.UNCOMMON),0,0.4,1.3,0.1,0,0,0,false));
+            new Parry(new Item.Settings().rarity(Rarity.UNCOMMON),0,0.4,1.3,0.1,0,0,0));
     public static final Swirl SWIRL=register("swirl",
-            new Swirl(new Item.Settings().rarity(Rarity.COMMON),0,0,0,0,0,0,0,false));
+            new Swirl(new Item.Settings().rarity(Rarity.COMMON),0,0,0,0,0,0,0));
     public static final Twist TWIST=register("twist",
-            new Twist(new Item.Settings().rarity(Rarity.COMMON),0,0,0,0,0,0,0,false));
+            new Twist(new Item.Settings().rarity(Rarity.COMMON),0,0,0,0,0,0,0));
     public static final Boomerang BOOMERANG=register("boomerang",
-            new Boomerang(new Item.Settings().rarity(Rarity.RARE),0,0,0.5,0.5,5,0,0,false));
+            new Boomerang(new Item.Settings().rarity(Rarity.RARE),0,0,0.5,0.5,5,0,0));
     public static final Acceleration ACCELERATION=register("acceleration",
-            new Acceleration(new Item.Settings().rarity(Rarity.COMMON),0,0,0,0,0,0,0,false));
+            new Acceleration(new Item.Settings().rarity(Rarity.COMMON),0,0,0,0,0,0,0));
     public static final Deceleration DECELERATION=register("deceleration",
-            new Deceleration(new Item.Settings().rarity(Rarity.COMMON),0,0,0,0,0,0,0,false));
+            new Deceleration(new Item.Settings().rarity(Rarity.COMMON),0,0,0,0,0,0,0));
     public static final Zenith ZENITH=register("zenith",
-            new Zenith(new Item.Settings().rarity(Rarity.EPIC),0,1.5,0.5,0,0,0.3,0,false));
+            new Zenith(new Item.Settings().rarity(Rarity.EPIC),0,1.5,0.5,0,0,0.3,0));
     public static final ShortHook SHORT_HOOK=register("short_hook",
-            new ShortHook(new Item.Settings().rarity(Rarity.UNCOMMON),0,0.2,0.5,-0.3,-1,0,0,false));
+            new ShortHook(new Item.Settings().rarity(Rarity.UNCOMMON),0,0.2,0.5,-0.3,-1,0,0));
 
     //特效类道具
     public static final Fever FEVER=register("fever",

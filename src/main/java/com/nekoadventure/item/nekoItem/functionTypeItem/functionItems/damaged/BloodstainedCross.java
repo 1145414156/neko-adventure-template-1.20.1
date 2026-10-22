@@ -1,17 +1,17 @@
 package com.nekoadventure.item.nekoItem.functionTypeItem.functionItems.damaged;
 
-import com.nekoadventure.item.nekoItem.functionTypeItem.functionItems.NekoFunctionItem;
+import com.nekoadventure.item.nekoItem.functionTypeItem.functionItems.AbstractNekoFunctionItem;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.Text;
 
-public class BloodstainedCross extends NekoFunctionItem {
+public class BloodstainedCross extends AbstractNekoFunctionItem {
     public BloodstainedCross(Settings settings) {
         super(settings);
         text= Text.of("受到伤害时，有当前已损生命值/100概率免疫此次伤害");
     }
 
     @Override
-    public boolean applyDamagedFunctionItem(PlayerEntity player) {
+    public boolean applyDamagedFunction(PlayerEntity player) {
         float currentHealth = player.getHealth();
         float maxHealth = player.getMaxHealth();
         float lostHealth = maxHealth - currentHealth;

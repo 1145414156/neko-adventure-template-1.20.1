@@ -6,10 +6,10 @@ import com.nekoadventure.entity.missile.MissileEntity;
 import com.nekoadventure.entity.missile.MissileModelType;
 import com.nekoadventure.item.ModItems;
 import com.nekoadventure.item.nekoItem.AbstractNekoItem;
-import com.nekoadventure.item.nekoItem.attackTypeItem.NekoAttackTypeItem;
+import com.nekoadventure.item.nekoItem.attackTypeItem.AbstractNekoAttackItem;
 import com.nekoadventure.item.other.NekoPackageItem;
 import com.nekoadventure.network.mob.ScreenShakeNetworking;
-import com.nekoadventure.other.attackApart.AttackTypes;
+import com.nekoadventure.other.mobApart.AttackTypes;
 import com.nekoadventure.other.itemApart.NekoPackageDataManager;
 import com.nekoadventure.sound.ModSoundEvents;
 import net.minecraft.client.item.TooltipContext;
@@ -29,9 +29,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class BrimStone extends NekoAttackTypeItem {
-    public BrimStone(Settings settings, double health, double strength, double speed, double attackSpeed, double attackRange, double attackMultiplier, double attackSpeedMultiplier, boolean isSpecific) {
-        super(settings, health, strength, speed, attackSpeed, attackRange, attackMultiplier, attackSpeedMultiplier, isSpecific);
+public class BrimStone extends AbstractNekoAttackItem {
+    public BrimStone(Settings settings, double health, double strength, double speed, double attackSpeed, double attackRange, double attackMultiplier, double attackSpeedMultiplier) {
+        super(settings, health, strength, speed, attackSpeed, attackRange, attackMultiplier, attackSpeedMultiplier);
     }
 
     @Override

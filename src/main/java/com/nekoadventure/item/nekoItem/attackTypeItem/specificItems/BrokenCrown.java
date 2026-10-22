@@ -1,7 +1,7 @@
 package com.nekoadventure.item.nekoItem.attackTypeItem.specificItems;
 
 import com.nekoadventure.client.ShiftKeyHelper;
-import com.nekoadventure.item.nekoItem.attackTypeItem.NekoAttackTypeItem;
+import com.nekoadventure.item.nekoItem.attackTypeItem.AbstractNekoSpecificItem;
 import com.nekoadventure.item.other.NekoPackageItem;
 import com.nekoadventure.other.itemApart.NekoPackageDataManager;
 import net.minecraft.client.item.TooltipContext;
@@ -14,12 +14,11 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class BrokenCrown extends NekoAttackTypeItem {
+public class BrokenCrown extends AbstractNekoSpecificItem {
 
 
     public BrokenCrown(Settings settings, double health, double strength, double speed, double attackSpeed, double attackRange, double attackMultiplier, double attackSpeedMultiplier, boolean isSpecific) {
         super(settings, health, strength, speed, attackSpeed, attackRange, attackMultiplier, attackSpeedMultiplier, isSpecific);
-
     }
 
     @Override

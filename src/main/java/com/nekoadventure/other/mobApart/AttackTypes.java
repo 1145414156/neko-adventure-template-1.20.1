@@ -1,4 +1,4 @@
-package com.nekoadventure.other.attackApart;
+package com.nekoadventure.other.mobApart;
 
 import com.nekoadventure.entity.missile.MissileEntity;
 import net.minecraft.entity.Entity;

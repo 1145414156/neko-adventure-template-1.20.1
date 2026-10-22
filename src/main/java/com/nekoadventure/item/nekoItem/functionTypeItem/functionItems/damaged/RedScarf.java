@@ -3,9 +3,9 @@ package com.nekoadventure.item.nekoItem.functionTypeItem.functionItems.damaged;
 import com.nekoadventure.entity.ModEntities;
 import com.nekoadventure.entity.missile.MissileEntity;
 import com.nekoadventure.entity.missile.MissileModelType;
-import com.nekoadventure.item.nekoItem.functionTypeItem.functionItems.NekoFunctionItem;
+import com.nekoadventure.item.nekoItem.functionTypeItem.functionItems.AbstractNekoFunctionItem;
 import com.nekoadventure.item.other.NekoPackageItem;
-import com.nekoadventure.other.attackApart.AttackTypes;
+import com.nekoadventure.other.mobApart.AttackTypes;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.decoration.ArmorStandEntity;
@@ -18,14 +18,14 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Comparator;
 import java.util.List;
 
-public class RedScarf extends NekoFunctionItem {
+public class RedScarf extends AbstractNekoFunctionItem {
     public RedScarf(Settings settings) {
         super(settings);
         text= Text.of("当附近有生物死亡时，在其位置召唤一个弹幕，锁定最近的生物;同时当玩家受到伤害时，对造成伤害者造成一次\"力量\"/2的伤害");
     }
 
     @Override
-    public boolean applyDamagedFunctionItem(PlayerEntity player) {
+    public boolean applyDamagedFunction(PlayerEntity player) {
         double damage = 2;
         if (player.getOffHandStack().getItem() instanceof NekoPackageItem nekoPackage){
             damage=nekoPackage.getStrength(player)/2;
@@ -38,7 +38,7 @@ public class RedScarf extends NekoFunctionItem {
     }
 
     @Override
-    public void applyTickFunctionItem(PlayerEntity player) {
+    public void applyTickFunction(PlayerEntity player) {
         World world=player.getWorld();
         double range = 2;
         double damage = 2;

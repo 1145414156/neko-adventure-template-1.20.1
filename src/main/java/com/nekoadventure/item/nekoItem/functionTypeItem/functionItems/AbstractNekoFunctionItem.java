@@ -10,13 +10,13 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class NekoFunctionItem extends AbstractNekoItem {
+public class AbstractNekoFunctionItem extends AbstractNekoItem {
 
-    public NekoFunctionItem(Settings settings) {
+    public AbstractNekoFunctionItem(Settings settings) {
         super(settings);
     }
-    public boolean applyDamagedFunctionItem(PlayerEntity player){return false;}
-    public void applyTickFunctionItem(PlayerEntity player){}
+    public boolean applyDamagedFunction(PlayerEntity player){return false;}
+    public void applyTickFunction(PlayerEntity player){}
 
     @Override
     public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {

@@ -4,9 +4,9 @@ import com.nekoadventure.client.ShiftKeyHelper;
 import com.nekoadventure.entity.ModEntities;
 import com.nekoadventure.entity.missile.MissileEntity;
 import com.nekoadventure.entity.missile.MissileModelType;
-import com.nekoadventure.item.nekoItem.attackTypeItem.NekoAttackTypeItem;
+import com.nekoadventure.item.nekoItem.attackTypeItem.AbstractNekoAttackItem;
 import com.nekoadventure.item.other.NekoPackageItem;
-import com.nekoadventure.other.attackApart.AttackTypes;
+import com.nekoadventure.other.mobApart.AttackTypes;
 import com.nekoadventure.other.itemApart.NekoPackageDataManager;
 import com.nekoadventure.sound.ModSoundEvents;
 import net.minecraft.client.item.TooltipContext;
@@ -31,10 +31,10 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class ExposedWire extends NekoAttackTypeItem {
+public class ExposedWire extends AbstractNekoAttackItem {
     final int MAX_CONNECT =8;
-    public ExposedWire(Settings settings, double health, double strength, double speed, double attackSpeed, double attackRange, double attackMultiplier, double attackSpeedMultiplier, boolean isSpecific) {
-        super(settings, health, strength, speed, attackSpeed, attackRange, attackMultiplier, attackSpeedMultiplier, isSpecific);
+    public ExposedWire(Settings settings, double health, double strength, double speed, double attackSpeed, double attackRange, double attackMultiplier, double attackSpeedMultiplier) {
+        super(settings, health, strength, speed, attackSpeed, attackRange, attackMultiplier, attackSpeedMultiplier);
     }
 
     @Override

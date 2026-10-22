@@ -5,9 +5,9 @@ import com.nekoadventure.entity.ModEntities;
 import com.nekoadventure.entity.missile.MissileEntity;
 import com.nekoadventure.entity.missile.MissileModelType;
 import com.nekoadventure.item.ModItems;
-import com.nekoadventure.item.nekoItem.attackTypeItem.NekoAttackTypeItem;
+import com.nekoadventure.item.nekoItem.attackTypeItem.AbstractNekoAttackItem;
 import com.nekoadventure.item.other.NekoPackageItem;
-import com.nekoadventure.other.attackApart.AttackTypes;
+import com.nekoadventure.other.mobApart.AttackTypes;
 import com.nekoadventure.other.itemApart.NekoPackageDataManager;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.Entity;
@@ -16,7 +16,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Box;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
@@ -25,9 +24,9 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class Zenith extends NekoAttackTypeItem {
-    public Zenith(Settings settings, double health, double strength, double speed, double attackSpeed, double attackRange, double attackMultiplier, double attackSpeedMultiplier, boolean isSpecific) {
-        super(settings, health, strength, speed, attackSpeed, attackRange, attackMultiplier, attackSpeedMultiplier, isSpecific);
+public class Zenith extends AbstractNekoAttackItem {
+    public Zenith(Settings settings, double health, double strength, double speed, double attackSpeed, double attackRange, double attackMultiplier, double attackSpeedMultiplier) {
+        super(settings, health, strength, speed, attackSpeed, attackRange, attackMultiplier, attackSpeedMultiplier);
     }
 
     @Override
@@ -172,15 +171,5 @@ public class Zenith extends NekoAttackTypeItem {
             Vec3d closestPoint = startXZ.add(dir.multiply(projection));
             return entityXZ.distanceTo(closestPoint) <= 1.2;
         }).collect(Collectors.toList());
-    }
-
-    protected final Vec3d getRotationVector(float pitch, float yaw) {
-        float f = pitch * (float) (Math.PI / 180.0);
-        float g = -yaw * (float) (Math.PI / 180.0);
-        float h = MathHelper.cos(g);
-        float i = MathHelper.sin(g);
-        float j = MathHelper.cos(f);
-        float k = MathHelper.sin(f);
-        return new Vec3d(i * j, -k, h * j);
     }
 }

@@ -8,7 +8,7 @@ import com.nekoadventure.entity.missile.MissileModelType;
 import com.nekoadventure.item.ModItems;
 import com.nekoadventure.network.mob.FloorShakeNetworking;
 import com.nekoadventure.network.mob.ScreenShakeNetworking;
-import com.nekoadventure.other.attackApart.AttackTypes;
+import com.nekoadventure.other.mobApart.AttackTypes;
 import com.nekoadventure.other.itemApart.SpawnRandomSoulItems;
 import com.nekoadventure.sound.ModSoundEvents;
 import net.fabricmc.api.EnvType;

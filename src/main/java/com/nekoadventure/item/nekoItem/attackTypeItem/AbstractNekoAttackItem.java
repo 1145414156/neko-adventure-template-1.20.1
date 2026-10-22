@@ -8,29 +8,24 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public abstract class NekoAttackTypeItem extends AbstractNekoItem {
-    boolean isSpecific;
+public abstract class AbstractNekoAttackItem extends AbstractNekoItem {
     private final Map<UUID, Long> lastOffAttackTimes = new HashMap<>();
-    public NekoAttackTypeItem(Settings settings, double health, double strength, double speed, double attackSpeed,
-                              double attackRange, double attackMultiplier, double attackSpeedMultiplier, boolean isSpecific) {
+    public AbstractNekoAttackItem(Settings settings, double health, double strength, double speed, double attackSpeed,
+                                  double attackRange, double attackMultiplier, double attackSpeedMultiplier) {
         super(settings);
         this.health=health;
         this.attackRange=attackRange;
         this.attackSpeed=attackSpeed;
         this.strength=strength;
         this.speed=speed;
-        this.isSpecific=isSpecific;
         this.attackSpeedMultiplier=attackSpeedMultiplier;
         this.attackMultiplier=attackMultiplier;
     }
 
-    public boolean getIsSpecific(){return isSpecific;}
 
     public void changeMainAttackType(PlayerEntity player){}
 
     public void changeOffAttackType(PlayerEntity player){}
-
-    public void applySpecificItem(PlayerEntity player, LivingEntity target){}
 
     public boolean canExecute(PlayerEntity player,int tick) {
         long now = player.getWorld().getTime();
@@ -41,6 +36,4 @@ public abstract class NekoAttackTypeItem extends AbstractNekoItem {
         }
         return false;
     }
-
-
 }

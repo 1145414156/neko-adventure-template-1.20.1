@@ -1,7 +1,7 @@
 package com.nekoadventure.item.nekoItem;
 
 import com.nekoadventure.client.ShiftKeyHelper;
-import com.nekoadventure.item.nekoItem.functionTypeItem.functionItems.NekoFunctionItem;
+import com.nekoadventure.item.nekoItem.functionTypeItem.functionItems.AbstractNekoFunctionItem;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -13,14 +13,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 public abstract class AbstractNekoItem extends Item {
-    //这里是总物品道具的起点，为防止之后代码结构混乱，请参考这个列表
-    /*AbstractNekoItem--->AttackTypeItem--->各种实际改变攻击方式的道具 / 特效类型道具
-        ||         \
-       \  /         \______\FunctionItem---->所有实际功能类道具入口
-        v
-    NumItem-->各种实际数值道具
-    就是这么多啦，创这么多的类如果第一次看还是有点复杂的（对不起啦本人代码技术力有限），有更好的方法欢迎指导，感激不尽感激不尽qwq
-     */
     public Text text;
     public double health;
     public double strength;
@@ -72,7 +64,7 @@ public abstract class AbstractNekoItem extends Item {
         String textAttackMultiplier = "";
         String textAttackSpeedMultiplier = "";
 
-        if (!(this instanceof NekoFunctionItem)) {
+        if (!(this instanceof AbstractNekoFunctionItem)) {
             if (health!=0){if (health>0){textHealth=" 生命"+"+"+health;} else {textHealth=" 生命"+health;}}
             if (strength!=0){if (strength>0){textStrength=" 力量"+"+"+strength;} else {textStrength=" 力量"+strength;}}
             if (speed!=0){if (speed>0){textSpeed=" 移速"+"+"+speed;} else {textSpeed=" 移速"+speed;}}

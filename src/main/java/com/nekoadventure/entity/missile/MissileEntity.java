@@ -1,9 +1,9 @@
 package com.nekoadventure.entity.missile;
 
 
-import com.nekoadventure.item.nekoItem.attackTypeItem.NekoAttackTypeItem;
+import com.nekoadventure.item.nekoItem.attackTypeItem.AbstractNekoSpecificItem;
 import com.nekoadventure.item.other.NekoPackageItem;
-import com.nekoadventure.other.attackApart.AttackTypes;
+import com.nekoadventure.other.mobApart.AttackTypes;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -147,7 +147,7 @@ public class MissileEntity extends Entity {
                                 && NekoPackageItem.getIsFinished(player.getOffHandStack())!=2) {
                             ArrayList specificItems=NekoPackageItem.getNekoItem(player.getOffHandStack(),true,1);
                             for (Object specificItem:specificItems){
-                                ((NekoAttackTypeItem) specificItem).applySpecificItem(player,livingTarget);
+                                ((AbstractNekoSpecificItem) specificItem).applySpecificItem(player,livingTarget);
                             }
                         }
                     }

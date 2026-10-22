@@ -1,7 +1,7 @@
 package com.nekoadventure.item.nekoItem.functionTypeItem.functionItems.tick;
 
 import com.nekoadventure.item.ModItems;
-import com.nekoadventure.item.nekoItem.functionTypeItem.functionItems.NekoFunctionItem;
+import com.nekoadventure.item.nekoItem.functionTypeItem.functionItems.AbstractNekoFunctionItem;
 import com.nekoadventure.other.itemApart.NekoPackageDataManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -11,14 +11,14 @@ import net.minecraft.particle.ParticleTypes;
 import net.minecraft.text.Text;
 import java.util.List;
 
-public class SoulJar extends NekoFunctionItem {
+public class SoulJar extends AbstractNekoFunctionItem {
     public SoulJar(Settings settings) {
         super(settings);
         text= Text.of("每击杀100只生物时，生成道具（纯净灵魂）");
     }
 
     @Override
-    public void applyTickFunctionItem(PlayerEntity player) {
+    public void applyTickFunction(PlayerEntity player) {
         if (player.getWorld().isClient()) return;
         int soul = NekoPackageDataManager.getItemIntState(player, "soulJar");
         List<LivingEntity> livingEntities=player.getWorld().getEntitiesByClass(

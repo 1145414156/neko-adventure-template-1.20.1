@@ -1,10 +1,10 @@
 package com.nekoadventure.item.nekoItem.functionTypeItem.functionItems.damaged;
 
-import com.nekoadventure.item.nekoItem.functionTypeItem.functionItems.NekoFunctionItem;
+import com.nekoadventure.item.nekoItem.functionTypeItem.functionItems.AbstractNekoFunctionItem;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.Text;
 
-public class SpiritingAway extends NekoFunctionItem {
+public class SpiritingAway extends AbstractNekoFunctionItem {
     int tick=0;
     public SpiritingAway(Settings settings) {
         super(settings);
@@ -12,7 +12,7 @@ public class SpiritingAway extends NekoFunctionItem {
     }
 
     @Override
-    public boolean applyDamagedFunctionItem(PlayerEntity player) {
+    public boolean applyDamagedFunction(PlayerEntity player) {
         if (tick<100){
             tick++;
         }

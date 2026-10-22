@@ -1,7 +1,7 @@
 package com.nekoadventure.item.nekoItem.attackTypeItem.specificItems;
 
 import com.nekoadventure.client.ShiftKeyHelper;
-import com.nekoadventure.item.nekoItem.attackTypeItem.NekoAttackTypeItem;
+import com.nekoadventure.item.nekoItem.attackTypeItem.AbstractNekoSpecificItem;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -13,14 +13,14 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class ABundleOfTNT extends NekoAttackTypeItem {
+public class ABundleOfTNT extends AbstractNekoSpecificItem {
+
     public ABundleOfTNT(Settings settings, double health, double strength, double speed, double attackSpeed, double attackRange, double attackMultiplier, double attackSpeedMultiplier, boolean isSpecific) {
         super(settings, health, strength, speed, attackSpeed, attackRange, attackMultiplier, attackSpeedMultiplier, isSpecific);
     }
 
     @Override
     public void applySpecificItem(PlayerEntity player, LivingEntity target) {
-        super.applySpecificItem(player, target);
         Explosion explosion = new Explosion(
                 target.getWorld(),
                 player,

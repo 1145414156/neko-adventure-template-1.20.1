@@ -6,7 +6,7 @@ import com.nekoadventure.entity.ModEntities;
 import com.nekoadventure.entity.missile.MissileEntity;
 import com.nekoadventure.entity.missile.MissileModelType;
 import com.nekoadventure.item.ModItems;
-import com.nekoadventure.other.attackApart.AttackTypes;
+import com.nekoadventure.other.mobApart.AttackTypes;
 import com.nekoadventure.other.itemApart.SpawnRandomSoulItems;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;

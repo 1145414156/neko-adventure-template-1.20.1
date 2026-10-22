@@ -1,6 +1,6 @@
 package com.nekoadventure.mixin.itemApart;
 
-import com.nekoadventure.item.nekoItem.attackTypeItem.NekoAttackTypeItem;
+import com.nekoadventure.item.nekoItem.attackTypeItem.AbstractNekoSpecificItem;
 import com.nekoadventure.item.other.NekoPackageItem;
 import com.nekoadventure.other.mazeApart.PlayerBlackScreenState;
 import net.minecraft.entity.Entity;
@@ -108,7 +108,7 @@ public abstract class PlayerEntityMixin extends LivingEntity {
                     ArrayList specificItems = NekoPackageItem.getNekoItem(player.getOffHandStack(),
                             false, 1);
                     for (int i = specificItems.size(); i >= 1; i--) {
-                        NekoAttackTypeItem nekoAttackTypeItem = (NekoAttackTypeItem) specificItems.get(i - 1);
+                        AbstractNekoSpecificItem nekoAttackTypeItem = (AbstractNekoSpecificItem) specificItems.get(i - 1);
                         nekoAttackTypeItem.applySpecificItem(player, (LivingEntity) target);
                     }
                 }
