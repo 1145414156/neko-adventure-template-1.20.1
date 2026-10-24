@@ -21,7 +21,6 @@ import net.minecraft.client.render.model.json.ModelTransformationMode;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.particle.DustParticleEffect;
 import net.minecraft.util.Identifier;
@@ -58,11 +57,8 @@ public class MissileEntityRenderer extends EntityRenderer<MissileEntity> {
     public void render(MissileEntity entity, float yaw, float tickDelta,
                        MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
         super.render(entity, yaw, tickDelta, matrices, vertexConsumers, light);
-        boolean renderRed;
-        if(entity.getOwner() != null && entity.getOwner() instanceof PlayerEntity){
-            renderRed=false;
-        } else renderRed= entity.getOwner() == null || !(entity.getOwner() instanceof MissileEntity) || !((((MissileEntity) entity.getOwner()).getOwner()) instanceof PlayerEntity);
 
+        boolean renderRed = !(entity.getRealOwner() instanceof PlayerEntity);
         float red =1.0f;
         float green = renderRed ? 0.0f : 1.0f;
         float blue = renderRed ? 0.0f : 1.0f;
@@ -90,40 +86,8 @@ public class MissileEntityRenderer extends EntityRenderer<MissileEntity> {
                 float progress = (float) duration / Math.max(1, time);
                 float eased = (float) Math.pow(progress,10);
                 Vec3d look = entity.getRotationVec(tickDelta);
-                float length = 1.5f;
-                matrices.push();
-                matrices.translate(-look.x, -look.y, -look.z);
-                float yawRad = (float) Math.atan2(look.z, look.x);
-                float pitchRad = (float) Math.acos(MathHelper.clamp(look.y, -1.0, 1.0));
-                matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees((1.5707964f - yawRad) * 57.295776f));
-                matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(pitchRad * 57.295776f));
-                float roll;
-                {
-                    Vec3d toCamera = this.dispatcher.camera.getPos().subtract(entity.getLerpedPos(tickDelta));
-                    Vec3d perpendicular = toCamera.subtract(look.multiply(toCamera.dotProduct(look)));
-                    if (perpendicular.lengthSquared() < 1.0E-4) {
-                        roll = 0.0f;
-                    } else {
-                        float ryAngle = 1.5707964f - yawRad;
-                        double u = Math.cos(ryAngle) * perpendicular.x - Math.sin(ryAngle) * perpendicular.z;
-                        double w = Math.cos(pitchRad) * (Math.sin(ryAngle) * perpendicular.x + Math.cos(ryAngle) * perpendicular.z)
-                                - Math.sin(pitchRad) * perpendicular.y;
-                        roll = (float) Math.atan2(-u, w);
-                    }
-                }
-
-                float vStart = 0.0f;
-                float vEnd = 1.0f;
                 float uMid = 0.999f;
                 float inner = 0.6f * (1.0f - eased);
-                float ix1 = MathHelper.cos(roll + 3.1415927f) * inner;
-                float iz1 = MathHelper.sin(roll + 3.1415927f) * inner;
-                float ix2 = MathHelper.cos(roll) * inner;
-                float iz2 = MathHelper.sin(roll) * inner;
-                float jx1 = MathHelper.cos(roll + 4.712389f) * inner;
-                float jz1 = MathHelper.sin(roll + 4.712389f) * inner;
-                float jx2 = MathHelper.cos(roll + 1.5707964f) * inner;
-                float jz2 = MathHelper.sin(roll + 1.5707964f) * inner;
                 int t= entity.getAliveDuration() %5/2;
                 Identifier texture=new Identifier(NekoAdventure.MOD_ID, "textures/entity/missile/brimstone"+t+".png");
                 if (entity.getFlag()==1){
@@ -134,23 +98,9 @@ public class MissileEntityRenderer extends EntityRenderer<MissileEntity> {
 
                 VertexConsumer consumer = vertexConsumers.getBuffer(
                         RenderLayer.getEntityTranslucentEmissive(texture));
-                MatrixStack.Entry entry = matrices.peek();
-                java.util.function.Consumer<float[]> beamVertex = v -> consumer.vertex(entry.getPositionMatrix(), v[0], v[1], v[2])
-                        .color(255, 255, 255, 255)
-                        .texture(v[3], v[4])
-                        .overlay(OverlayTexture.DEFAULT_UV)
-                        .light(LightmapTextureManager.MAX_LIGHT_COORDINATE)
-                        .normal(baseNormal, 0.0f, 1.0f, 0.0f)
-                        .next();
-                beamVertex.accept(new float[]{ix1, length, iz1, uMid, vEnd});
-                beamVertex.accept(new float[]{ix1, 0.0f,   iz1, uMid, vStart});
-                beamVertex.accept(new float[]{ix2, 0.0f,   iz2, 0.0f, vStart});
-                beamVertex.accept(new float[]{ix2, length, iz2, 0.0f, vEnd});
-                beamVertex.accept(new float[]{jx1, length, jz1, uMid, vEnd});
-                beamVertex.accept(new float[]{jx1, 0.0f,   jz1, uMid, vStart});
-                beamVertex.accept(new float[]{jx2, 0.0f,   jz2, 0.0f, vStart});
-                beamVertex.accept(new float[]{jx2, length, jz2, 0.0f, vEnd});
-                matrices.pop();
+                MissileEntity next = BrimstoneBeamRenderer.findNext(entity);
+                BrimstoneBeamRenderer.render(entity, next, look, tickDelta, inner, baseNormal, matrices,
+                        consumer, uMid, this.dispatcher.camera.getPos());
                if (entity.getWorld() instanceof ClientWorld clientWorld
                         && (entity.getFlag() > 2 || entity.getFlag() < 1)
                         ) {

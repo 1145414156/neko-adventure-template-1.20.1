@@ -15,6 +15,7 @@ public class NightVision extends AbstractNekoFunctionItem {
 
     @Override
     public void applyTickFunction(PlayerEntity player) {
+        if (player.getWorld().isClient()) return;
         player.addStatusEffect(new StatusEffectInstance(StatusEffects.NIGHT_VISION,301,1,true,false,false));
     }
 }

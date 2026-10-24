@@ -9,8 +9,8 @@ import com.nekoadventure.item.nekoItem.AbstractNekoItem;
 import com.nekoadventure.item.nekoItem.attackTypeItem.AbstractNekoAttackItem;
 import com.nekoadventure.item.other.NekoPackageItem;
 import com.nekoadventure.network.mob.ScreenShakeNetworking;
-import com.nekoadventure.other.mobApart.AttackTypes;
 import com.nekoadventure.other.itemApart.NekoPackageDataManager;
+import com.nekoadventure.other.mobApart.AttackTypes;
 import com.nekoadventure.sound.ModSoundEvents;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.Entity;
@@ -35,8 +35,8 @@ public class BrimStone extends AbstractNekoAttackItem {
     }
 
     @Override
-    public void changeMainAttackType(PlayerEntity player) {
-        super.changeMainAttackType(player);
+    public void changeMainAttackType(PlayerEntity player, float yaw) {
+        super.changeMainAttackType(player, yaw);
         World world=player.getWorld();
         int range=0;
         double damage=0;
@@ -49,27 +49,27 @@ public class BrimStone extends AbstractNekoAttackItem {
         List<MissileEntity> brimStones = world.getEntitiesByClass(
                 MissileEntity.class,
                 player.getBoundingBox().expand(attackRange*4),
-                entity -> Objects.equals(entity.getOwner(), player) &&entity.getAttackType().equals(AttackTypes.AttackType.BRIMSTONE));
+                entity -> Objects.equals(entity.getOwner(), player) && AttackTypes.AttackType.BRIMSTONE.equals(entity.getAttackType()));
         if (!world.isClient) {
             if (brimStones.isEmpty()) {
                 double spacing = 1.0;
                 double cubeSize = 0.5;
+                Vec3d spawnPos = player.getPos().add(0, 1.2, 0);
+                float initialYaw = yaw;
+                float pitch = player.getPitch();
+                float currentYaw = initialYaw;
                 for (int length = 1; length <= range; length++) {
-                    Vec3d playerPos = player.getPos().add(0,1.2,0);
-                    Vec3d lookDirection = player.getRotationVec(1.0F);
-                    MissileEntity missile = getMissileEntity(player, range, damage,length);
-                    Vec3d spawnPos = playerPos.add(lookDirection.multiply(length * spacing - cubeSize / 2));
+                    MissileEntity missile = getMissileEntity(player, range, damage, length);
+                    int t = (int) ((length - 1) / (double) range * missile.getTime());
+                    float calculateYaw = getCalculateYawFromNekoItems(player, t);
+                    yaw = calculateYaw != 114514 ? initialYaw + calculateYaw : initialYaw;
+                    Vec3d direction = getRotationVector(pitch, currentYaw);
+                    spawnPos = spawnPos.add(direction.multiply(length == 1 ? spacing - cubeSize / 2 : spacing));
                     missile.setPos(spawnPos.x, spawnPos.y, spawnPos.z);
-                    missile.setYaw(player.getYaw());
-                    missile.setPitch(player.getPitch());
-
+                    missile.setYaw(yaw);
+                    missile.setPitch(pitch);
                     world.spawnEntity(missile);
-                }
-
-                if (player.getOffHandStack().getItem() instanceof NekoPackageItem nekoPackage) {
-                    if(nekoPackage.isHaveNekoItem(player.getOffHandStack(), ModItems.EXPOSED_WIRE)){
-                        specialAttackWithExportWire(player, range, world, damage, spacing, cubeSize);
-                    }
+                    currentYaw = yaw;
                 }
                 player.getWorld().playSound(null, player.getBlockPos(), ModSoundEvents.BRIMSTONE_ATTACK,
                         SoundCategory.PLAYERS, 0.8F, 1.0F);
@@ -88,44 +88,23 @@ public class BrimStone extends AbstractNekoAttackItem {
         cooldown = Math.max(60, Math.min(200, cooldown));
         player.getItemCooldownManager().set(player.getOffHandStack().getItem(), cooldown);
     }
-
-    private void specialAttackWithExportWire(PlayerEntity player, int range, World world, double damage, double spacing, double cubeSize) {
-        for (int z = 0; z<= range /5; z++){
-            float yaw= world.random.nextInt(360);
-            for (int length = 1; length <= range; length++) {
-                Vec3d playerPos = player.getPos().add(0,1.2,0);
-                Vec3d lookDirection=getRotationVector(0,yaw);
-                MissileEntity missile = getMissileEntity(player, range, damage,length);
-                Vec3d spawnPos = playerPos.add(lookDirection.multiply(length * spacing - cubeSize / 2));
-                missile.setPos(spawnPos.x, spawnPos.y, spawnPos.z);
-
-                missile.setYaw(yaw);
-                missile.setPitch(0);
-
-                world.spawnEntity(missile);
-            }
-        }
-    }
-
-
-
     @Override
-    public void changeOffAttackType(PlayerEntity player) {
-        super.changeOffAttackType(player);
+    public void changeOffAttackType(PlayerEntity player, float yaw) {
+        super.changeOffAttackType(player, yaw);
         World world=player.getWorld();
         double damage=1;
         double attackRange = 3;
         if (player.getOffHandStack().getItem() instanceof NekoPackageItem nekoPackage){
             damage=nekoPackage.getStrength(player);
             attackRange = nekoPackage.getAttackRange(player);
-            ArrayList<AbstractNekoItem> attackItems=NekoPackageItem.getNekoItem(player.getOffHandStack(),true,3);
+            ArrayList<AbstractNekoItem> attackItems=NekoPackageItem.getNekoItems(player.getOffHandStack(),true,3);
             if (attackItems.get(attackItems.size()-1).equals(ModItems.BRIMSTONE)) return;
         }
         List<MissileEntity> missileEntities = world.getEntitiesByClass(
                 MissileEntity.class,
                 player.getBoundingBox().expand(attackRange*4),
-                entity -> Objects.equals(entity.getOwner(), player)
-        );
+                entity -> Objects.equals(entity.getOwner(), player)&&!Objects.equals(entity.getAttackType(), AttackTypes.AttackType.BRIMSTONE)
+        ).stream().limit(5).toList();
             int count = 16;
             double radius = 2.0;
             if (!missileEntities.isEmpty()){
@@ -133,7 +112,7 @@ public class BrimStone extends AbstractNekoAttackItem {
                     List<MissileEntity> brimStones = world.getEntitiesByClass(
                             MissileEntity.class,
                             missile.getBoundingBox().expand(attackRange*4),
-                            entity-> Objects.equals(entity.getOwner(), missile) &&entity.getAttackType().equals(AttackTypes.AttackType.BRIMSTONE)
+                            entity-> Objects.equals(entity.getOwner(), missile) && AttackTypes.AttackType.BRIMSTONE.equals(entity.getAttackType())
                     );
                     if (brimStones.isEmpty()) {
                         player.getWorld().playSound(null, player.getBlockPos(), ModSoundEvents.BRIMSTONE_ATTACK,
@@ -144,15 +123,35 @@ public class BrimStone extends AbstractNekoAttackItem {
                             double x = centerPos.x + radius * Math.cos(angle);
                             double z = centerPos.z + radius * Math.sin(angle);
                             double y = centerPos.y;
-                            MissileEntity brimStone = getMissileEntity(missile,attackRange,damage,-1);
+
+                            MissileEntity brimStone = getMissileEntity(missile, attackRange, damage, i + 1);
                             brimStone.setPosition(x, y, z);
-                            brimStone.setPitch(missile.getPitch());
-                            brimStone.setYaw(missile.getYaw());
+                            brimStone.setPitch(0);
+                            brimStone.setYaw((float) Math.toDegrees(angle));
                             world.spawnEntity(brimStone);
                         }
                     }
                 }
             }
+    }
+    private float getCalculateYawFromNekoItems(PlayerEntity player, int t) {
+        if (player.getOffHandStack().getItem() instanceof NekoPackageItem) {
+            List<AbstractNekoItem> attackItems = NekoPackageItem.getNekoItems(player.getOffHandStack(), true, 0);
+            int count=0;
+            float addYaw=0;
+            for(int l=attackItems.size()-1;l>=0;l--){
+                AbstractNekoItem attackItem=attackItems.get(l);
+                if (attackItem.getCalculateYaw(t)!=114514){
+                    addYaw+=(attackItem.getCalculateYaw(t));
+                    count++;
+                    if (count>=3){
+                        return addYaw;
+                    }
+                }
+            }
+            return addYaw;
+        }
+        return 114514;
     }
 
     private @NotNull MissileEntity getMissileEntity(Entity owner, double range, double damage,int flag) {

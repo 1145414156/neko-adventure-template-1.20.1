@@ -6,8 +6,8 @@ import com.nekoadventure.entity.missile.MissileEntity;
 import com.nekoadventure.entity.missile.MissileModelType;
 import com.nekoadventure.item.nekoItem.attackTypeItem.AbstractNekoAttackItem;
 import com.nekoadventure.item.other.NekoPackageItem;
-import com.nekoadventure.other.mobApart.AttackTypes;
 import com.nekoadventure.other.itemApart.NekoPackageDataManager;
+import com.nekoadventure.other.mobApart.AttackTypes;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -28,8 +28,8 @@ public class Joyeuse extends AbstractNekoAttackItem {
     }
 
     @Override
-    public void changeMainAttackType(PlayerEntity player) {
-        super.changeMainAttackType(player);
+    public void changeMainAttackType(PlayerEntity player, float yaw) {
+        super.changeMainAttackType(player, yaw);
         double range = 1;
         double damage = 1;
         if (player.getOffHandStack().getItem() instanceof NekoPackageItem nekoPackage){
@@ -63,7 +63,7 @@ public class Joyeuse extends AbstractNekoAttackItem {
         if (flag>-1) {
             MissileEntity missileEntity = getMissileEntity(player, range, damage,bulletType,flag);
             missileEntity.setPos(player.getX(), player.getEyeY(), player.getZ());
-            missileEntity.setYaw(player.getYaw());
+            missileEntity.setYaw(yaw);
             missileEntity.setPitch(player.getPitch());
             player.getWorld().spawnEntity(missileEntity);
             double[] finalData = NekoPackageDataManager.getFinalData(player);
@@ -76,8 +76,8 @@ public class Joyeuse extends AbstractNekoAttackItem {
     }
 
     @Override
-    public void changeOffAttackType(PlayerEntity player) {
-        super.changeOffAttackType(player);
+    public void changeOffAttackType(PlayerEntity player, float yaw) {
+        super.changeOffAttackType(player, yaw);
         if (canExecute(player,10)){
             double range = 1;
             double damage = 1;
@@ -94,7 +94,7 @@ public class Joyeuse extends AbstractNekoAttackItem {
                 AttackTypes bulletType = new AttackTypes(AttackTypes.AttackType.BULLET);
                     MissileEntity missileEntity = getMissileEntity(missile, range, damage,bulletType);
                     missileEntity.setPos(player.getX(), player.getEyeY(), player.getZ());
-                    missileEntity.setYaw(player.getYaw());
+                    missileEntity.setYaw(yaw);
                     missileEntity.setPitch(player.getPitch());
                     player.getWorld().spawnEntity(missileEntity);
             }

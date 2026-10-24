@@ -6,8 +6,8 @@ import com.nekoadventure.entity.missile.MissileEntity;
 import com.nekoadventure.entity.missile.MissileModelType;
 import com.nekoadventure.item.nekoItem.attackTypeItem.AbstractNekoAttackItem;
 import com.nekoadventure.item.other.NekoPackageItem;
-import com.nekoadventure.other.mobApart.AttackTypes;
 import com.nekoadventure.other.itemApart.NekoPackageDataManager;
+import com.nekoadventure.other.mobApart.AttackTypes;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -30,8 +30,7 @@ public class Boomerang extends AbstractNekoAttackItem {
     }
 
     @Override
-    public void changeMainAttackType(PlayerEntity player) {
-        super.changeMainAttackType(player);
+    public void changeMainAttackType(PlayerEntity player, float yaw) {
         double range = 2;
         double damage = 2;
         if (player.getOffHandStack().getItem() instanceof NekoPackageItem nekoPackage){
@@ -39,6 +38,7 @@ public class Boomerang extends AbstractNekoAttackItem {
             damage=nekoPackage.getStrength(player);
         }
         MissileEntity missileEntity = getMissileEntity(player, range, damage);
+        missileEntity.setYaw(yaw);
         player.getWorld().playSound(null, player.getBlockPos(), SoundEvents.BLOCK_DISPENSER_LAUNCH,
                 SoundCategory.PLAYERS, 1.0F, 1.0F);
         player.getWorld().spawnEntity(missileEntity);
@@ -50,8 +50,8 @@ public class Boomerang extends AbstractNekoAttackItem {
     }
 
     @Override
-    public void changeOffAttackType(PlayerEntity player) {
-        super.changeOffAttackType(player);
+    public void changeOffAttackType(PlayerEntity player, float yaw) {
+        super.changeOffAttackType(player, yaw);
         if (canExecute(player,10)){
             double range = 2;
             double damage = 2;
@@ -59,14 +59,17 @@ public class Boomerang extends AbstractNekoAttackItem {
                 range = nekoPackage.getAttackRange(player);
                 damage = nekoPackage.getStrength(player);
             }
-            List<MissileEntity> missileEntities = player.getWorld().getEntitiesByClass(
+            MissileEntity missileEntity = player.getWorld().getEntitiesByClass(
                     MissileEntity.class,
                     player.getBoundingBox().expand(range*4),
                     entity -> entity.getOwner()!=null&&entity.getOwner().equals(player)
-            );
-            if (!missileEntities.isEmpty()) {
-                for (MissileEntity missileEntity : missileEntities) {
-                    LivingEntity target = missileEntity.getWorld().getEntitiesByClass(
+            ).stream()
+                    .max(Comparator.comparingDouble(
+                            missile -> missile.squaredDistanceTo(player)
+                    ))
+                    .orElse(null);
+            if (missileEntity !=null) {
+                LivingEntity target = missileEntity.getWorld().getEntitiesByClass(
                             LivingEntity.class,
                             player.getBoundingBox().expand(range*4),
                             entity -> entity.isAlive() && entity != player
@@ -75,14 +78,14 @@ public class Boomerang extends AbstractNekoAttackItem {
                         Vec3d pos = missileEntity.getPos();
                         MissileEntity offMissile = getMissileEntity(missileEntity, range, damage);
                         Vec3d direction = target.getEyePos().subtract(pos).normalize();
-                        double yaw = Math.toDegrees(Math.atan2(-direction.x, direction.z));
+                        yaw = (float) Math.toDegrees(Math.atan2(-direction.x, direction.z));
                         double pitch = Math.toDegrees(Math.atan2(-direction.y, Math.sqrt(direction.x * direction.x + direction.z * direction.z)));
                         offMissile.setPosition(pos);
-                        offMissile.setYaw((float) yaw);
+                        offMissile.setYaw(yaw);
                         offMissile.setPitch((float) pitch);
                         missileEntity.getWorld().spawnEntity(offMissile);
                     }
-                }
+
             }
         }
     }
@@ -99,7 +102,6 @@ public class Boomerang extends AbstractNekoAttackItem {
                 damage);
         missileEntity.setMissileModelType(MissileModelType.BOOMERANG);
         missileEntity.setPos(owner.getX(), owner.getEyeY(), owner.getZ());
-        missileEntity.setYaw(owner.getYaw());
         missileEntity.setPitch(owner.getPitch());
         return missileEntity;
     }

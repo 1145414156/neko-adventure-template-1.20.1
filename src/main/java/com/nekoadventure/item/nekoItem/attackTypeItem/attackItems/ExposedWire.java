@@ -6,8 +6,8 @@ import com.nekoadventure.entity.missile.MissileEntity;
 import com.nekoadventure.entity.missile.MissileModelType;
 import com.nekoadventure.item.nekoItem.attackTypeItem.AbstractNekoAttackItem;
 import com.nekoadventure.item.other.NekoPackageItem;
-import com.nekoadventure.other.mobApart.AttackTypes;
 import com.nekoadventure.other.itemApart.NekoPackageDataManager;
+import com.nekoadventure.other.mobApart.AttackTypes;
 import com.nekoadventure.sound.ModSoundEvents;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.Entity;
@@ -38,8 +38,8 @@ public class ExposedWire extends AbstractNekoAttackItem {
     }
 
     @Override
-    public void changeMainAttackType(PlayerEntity player) {
-        super.changeMainAttackType(player);
+    public void changeMainAttackType(PlayerEntity player, float yaw) {
+        super.changeMainAttackType(player, yaw);
         //这里是选择实体部分
         World world = player.getWorld();
         double attackRange = 3;
@@ -55,9 +55,9 @@ public class ExposedWire extends AbstractNekoAttackItem {
         if (!entities.isEmpty()) {
             for (Entity entity : entities) {
                 Vec3d pos=new Vec3d(entity.getX(),entity.getEyeY(),entity.getZ());
-                AttackTypes lazyAttack=new AttackTypes(AttackTypes.AttackType.LAZY);
+                AttackTypes attack =new AttackTypes(AttackTypes.AttackType.HOMING);
                 MissileEntity missile=new MissileEntity(ModEntities.MISSILE,world,player,
-                        lazyAttack,false,attackRange,5, strength);
+                        attack,false,attackRange,5, strength);
                 missile.setMissileModelType(MissileModelType.NULL);
                 missile.setPosition(pos);
                 world.spawnEntity(missile);
@@ -74,8 +74,8 @@ public class ExposedWire extends AbstractNekoAttackItem {
     }
 
     @Override
-    public void changeOffAttackType(PlayerEntity player) {
-        super.changeOffAttackType(player);
+    public void changeOffAttackType(PlayerEntity player, float yaw) {
+        super.changeOffAttackType(player, yaw);
         if (canExecute(player,10)){
             World world = player.getWorld();
             double attackRange = 3;
@@ -98,7 +98,7 @@ public class ExposedWire extends AbstractNekoAttackItem {
                 List<Entity> entities = getEntitiesInRange(missileEntity, world, attackRange<=4? (int) attackRange :4);
 
                 List<LivingEntity> livingEntities = entities.stream()
-                        .filter(e -> e instanceof LivingEntity&&!Objects.equals(missileEntity.getOwner(), e))
+                        .filter(e -> e instanceof LivingEntity&&!Objects.equals(missileEntity.getRealOwner(), e)&&e.isAttackable())
                         .map(e -> (LivingEntity) e)
                         .collect(Collectors.toList());
                 entityChooseHandler(missileEntity, livingEntities, world, MAX_CONNECT);
@@ -122,7 +122,7 @@ public class ExposedWire extends AbstractNekoAttackItem {
         for (Entity entity : entities) {
             DamageSource damageSource=null;
             if (owner instanceof MissileEntity){
-                damageSource=owner.getDamageSources().mobAttack((LivingEntity) ((MissileEntity) owner).getOwner());
+                damageSource=owner.getDamageSources().mobAttack((LivingEntity)((MissileEntity) owner).getRealOwner());
             }
             if (owner instanceof PlayerEntity) {
                damageSource=owner.getDamageSources().mobAttack((PlayerEntity)owner);
@@ -137,7 +137,6 @@ public class ExposedWire extends AbstractNekoAttackItem {
         }
     }
 
-    //从弹幕/玩家所有者身上获取 NekoPackageItem 的力量值
     private double getPlayerStrength(Entity owner) {
         Entity playerEntity = owner;
         if (owner instanceof MissileEntity missile) {

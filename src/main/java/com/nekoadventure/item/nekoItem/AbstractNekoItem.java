@@ -47,6 +47,12 @@ public abstract class AbstractNekoItem extends Item {
         return attackSpeedMultiplier;
     }
 
+
+//瞎输的值，特殊意义
+    public float getCalculateYaw(int t){
+        return 114514;
+    }
+
     @Override
     public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
         super.appendTooltip(stack, world, tooltip, context);

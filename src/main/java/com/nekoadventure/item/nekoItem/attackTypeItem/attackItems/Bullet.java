@@ -6,8 +6,8 @@ import com.nekoadventure.entity.missile.MissileEntity;
 import com.nekoadventure.entity.missile.MissileModelType;
 import com.nekoadventure.item.nekoItem.attackTypeItem.AbstractNekoAttackItem;
 import com.nekoadventure.item.other.NekoPackageItem;
-import com.nekoadventure.other.mobApart.AttackTypes;
 import com.nekoadventure.other.itemApart.NekoPackageDataManager;
+import com.nekoadventure.other.mobApart.AttackTypes;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -27,8 +27,8 @@ public class Bullet extends AbstractNekoAttackItem {
     }
 
     @Override
-    public void changeMainAttackType(PlayerEntity player) {
-        super.changeMainAttackType(player);
+    public void changeMainAttackType(PlayerEntity player, float yaw) {
+        super.changeMainAttackType(player, yaw);
         double range = 2;
         double damage = 2;
         if (player.getOffHandStack().getItem() instanceof NekoPackageItem nekoPackage){
@@ -36,6 +36,7 @@ public class Bullet extends AbstractNekoAttackItem {
             damage=nekoPackage.getStrength(player);
         }
         MissileEntity missileEntity = getMissileEntity(player, range, damage);
+        missileEntity.setYaw(yaw);
         player.getWorld().playSound(null, player.getBlockPos(), SoundEvents.BLOCK_DISPENSER_LAUNCH,
                 SoundCategory.PLAYERS, 1.0F, 1.0F);
         player.getWorld().spawnEntity(missileEntity);
@@ -62,7 +63,6 @@ public class Bullet extends AbstractNekoAttackItem {
                 damage);
         missileEntity.setMissileModelType(MissileModelType.BULLET);
         missileEntity.setPos(player.getX(), player.getEyeY(), player.getZ());
-        missileEntity.setYaw(player.getYaw());
         missileEntity.setPitch(player.getPitch());
         return missileEntity;
     }

@@ -1,10 +1,13 @@
 package com.nekoadventure.other.mobApart;
 
 import com.nekoadventure.entity.missile.MissileEntity;
+import com.nekoadventure.item.nekoItem.AbstractNekoItem;
+import com.nekoadventure.item.other.NekoPackageItem;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.TargetPredicate;
 import net.minecraft.entity.mob.HostileEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 
@@ -68,17 +71,17 @@ public class AttackTypes {
     }
 
     private void homingMovement(MissileEntity entity,double range,double speed) {
-        this.delayMovement(entity,range,speed);
         LivingEntity nearest = entity.getWorld().getClosestEntity(
                 LivingEntity.class,
                 TargetPredicate.DEFAULT,
                 entity.getControllingPassenger(),
-                entity.getX(), entity.getY(), entity.getZ(),
+                entity.getX(), entity.getEyeY(), entity.getZ(),
                 entity.getBoundingBox().expand(8)
         );
         if (nearest != null) {
             entity.teleport(nearest.getX(), nearest.getY(), nearest.getZ());
         }
+        delayMovement(entity,range,speed);
     }
 
     // ==============================================================
@@ -87,11 +90,32 @@ public class AttackTypes {
     private void bulletMovement(MissileEntity entity, double speed) {
         Vec3d direction = Vec3d.fromPolar(entity.getPitch(), entity.getYaw()).normalize();
         Vec3d desiredVelocity = direction.multiply(speed);
+        if (entity.getRealOwner() instanceof PlayerEntity player){
+            float initialYaw= entity.getInitialYaw();
+            if (player.getOffHandStack().getItem() instanceof NekoPackageItem){
+                List<AbstractNekoItem> attackItems = NekoPackageItem.getNekoItems(player.getOffHandStack(), true, 0);
+                int count=0;
+                float addYaw=initialYaw;
+                for(int l=attackItems.size()-1;l>=0;l--){
+                    AbstractNekoItem attackItem=attackItems.get(l);
+                    if (attackItem.getCalculateYaw(entity.getAliveDuration())!=114514){
+                        addYaw+=(attackItem.getCalculateYaw(entity.getAliveDuration()));
+                        count++;
+                        if (count>=3){
+                            entity.setYaw(addYaw);
+                            break;
+                        }
+                    }
+                }
+
+            }
+        }
         entity.addVelocity(
                 (desiredVelocity.x - entity.getVelocity().x) * 0.5,
                 (desiredVelocity.y - entity.getVelocity().y) * 0.5,
                 (desiredVelocity.z - entity.getVelocity().z) * 0.5
         );
+
     }
 
     private void delayMovement(MissileEntity entity,double range,double speed) {
@@ -101,8 +125,10 @@ public class AttackTypes {
                 List<LivingEntity> targets = entity.getWorld().getEntitiesByClass(
                         LivingEntity.class,
                         entity.getOwner().getBoundingBox().expand(range),
-                        z -> z instanceof LivingEntity &&
-                                z != entity.getOwner()
+                        z ->
+                                z instanceof LivingEntity &&
+                                z != entity.getOwner()&&
+                                z.isAttackable()
                 );
                 Entity nearest = targets.stream()
                         .min(Comparator.comparingDouble(entity::distanceTo))
@@ -145,9 +171,7 @@ public class AttackTypes {
         delayMovement(entity,range,speed);
         if (entity.getAliveDuration() < entity.getTime() / 2) {
             Entity owner = entity.getOwner();
-            if (owner == null) {
-                return;
-            }
+            if (owner == null) return;
             double yawRad = Math.toRadians(owner.getYaw());
             Vec3d forwardH = new Vec3d(-Math.sin(yawRad), 0, Math.cos(yawRad));
             Vec3d rightH = new Vec3d(-forwardH.z, 0, forwardH.x);
@@ -183,14 +207,7 @@ public class AttackTypes {
         double omega = 2 * Math.PI / time;
         boolean isLeft = entity.getFlag() < 11;
         double sign = isLeft ? 1.0 : -1.0;
-        double offsetPrev = 0.0;
-        if (t > 0) {
-            double thetaPrev = omega * (t - 1);
-            offsetPrev = Math.atan2(b * Math.cos(thetaPrev), -a * Math.sin(thetaPrev) * sign);
-        }
-        float baseYaw = (t == 0)
-                ? (float) (entity.getYaw() + (isLeft ? 180.0 : 0.0))
-                : (float) (entity.getYaw() - Math.toDegrees(offsetPrev));
+        float baseYaw = entity.getInitialYaw() + (isLeft ? 180.0f : 0.0f);
         double bYRad = Math.toRadians(baseYaw);
         Vec3d forward = new Vec3d(-Math.sin(bYRad), 0, Math.cos(bYRad));
         Vec3d right = new Vec3d(-forward.z, 0, forward.x);

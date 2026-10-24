@@ -6,8 +6,8 @@ import com.nekoadventure.entity.missile.MissileEntity;
 import com.nekoadventure.entity.missile.MissileModelType;
 import com.nekoadventure.item.nekoItem.attackTypeItem.AbstractNekoAttackItem;
 import com.nekoadventure.item.other.NekoPackageItem;
-import com.nekoadventure.other.mobApart.AttackTypes;
 import com.nekoadventure.other.itemApart.NekoPackageDataManager;
+import com.nekoadventure.other.mobApart.AttackTypes;
 import com.nekoadventure.sound.ModSoundEvents;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.Entity;
@@ -33,8 +33,8 @@ public class ShortHook extends AbstractNekoAttackItem {
     }
 
     @Override
-    public void changeMainAttackType(PlayerEntity player) {
-        super.changeMainAttackType(player);
+    public void changeMainAttackType(PlayerEntity player, float yaw) {
+        super.changeMainAttackType(player, yaw);
         if (player.getWorld().isClient) return;
         double range = 4;
         double damage=1;
@@ -98,8 +98,8 @@ public class ShortHook extends AbstractNekoAttackItem {
     }
 
     @Override
-    public void changeOffAttackType(PlayerEntity player) {
-        super.changeOffAttackType(player);
+    public void changeOffAttackType(PlayerEntity player, float yaw) {
+        super.changeOffAttackType(player, yaw);
         if (canExecute(player,5)) {
             World world = player.getWorld();
             double damage;
@@ -121,8 +121,8 @@ public class ShortHook extends AbstractNekoAttackItem {
                     .orElse(null);
             Optional<LivingEntity> farthestTarget = world.getEntitiesByClass(
                     LivingEntity.class,
-                    farthestMissile.getBoundingBox().expand(5),
-                    entity -> farthestMissile.getOwner() != entity && entity.isAlive()
+                    farthestMissile.getBoundingBox().expand(4),
+                    entity -> farthestMissile.getOwner() != entity && entity.isAlive()&&entity.isAttackable()
             ).stream().max(Comparator.comparingDouble(entity -> entity.squaredDistanceTo(farthestMissile)));
 
             farthestTarget.ifPresent(target -> {
@@ -159,7 +159,7 @@ public class ShortHook extends AbstractNekoAttackItem {
     public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
         super.appendTooltip(stack, world, tooltip, context);
         Text moreText=Text.of("主攻击：对面前\"射程\"/2(最多8格)的生物造成一次\"力量\"的伤害并且拉向身前");
-        Text moreText1=Text.of("次攻击：弹幕会持续对\"射程\"/2(最多5格)范围中最远的生物造成一次\"力量\"/2的伤害并将该生物拉向身前");
+        Text moreText1=Text.of("次攻击：弹幕会持续对\"射程\"/2(最多4格)范围中最远的生物造成一次\"力量\"/2的伤害并将该生物拉向身前");
 
         if (ShiftKeyHelper.isShiftDown()) {
             tooltip.add(moreText);

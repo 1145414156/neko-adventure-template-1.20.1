@@ -1,6 +1,5 @@
 package com.nekoadventure.item.soulItem;
 
-import com.nekoadventure.item.ModItems;
 import com.nekoadventure.item.other.NekoPackageItem;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;

@@ -14,6 +14,7 @@ public class LavaWalker extends AbstractNekoFunctionItem {
 
     @Override
     public void applyTickFunction(PlayerEntity player) {
+        if (player.getWorld().isClient()) return;
         player.addStatusEffect(new StatusEffectInstance(
                 StatusEffects.FIRE_RESISTANCE,
                 20,

@@ -14,6 +14,7 @@ public class TacticalVest extends AbstractNekoFunctionItem {
 
     @Override
     public void applyTickFunction(PlayerEntity player) {
+        if (player.getWorld().isClient()) return;
         player.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE,20,0,true,false,false));
     }
 }

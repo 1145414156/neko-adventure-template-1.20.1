@@ -45,7 +45,7 @@ public class ModItems {
     public static final NumItem ONION=register("onion",
             new NumItem(new Item.Settings().rarity(Rarity.RARE).food(FoodComponents.APPLE),0,0.5,2,0.5,0,0,0.2));
     public static final NumItem CHOCOLATE_BISCUIT=register("chocolate_biscuit",
-            new NumItem(new Item.Settings().rarity(Rarity.UNCOMMON),3,0,1.5,0.5,0,0,0));
+            new NumItem(new Item.Settings().rarity(Rarity.UNCOMMON).food(FoodComponents.COOKIE),3,0,1.5,0.5,0,0,0));
     public static final NumItem COMPRESSED_IRON=register("compress_iron",
             new NumItem(new Item.Settings().rarity(Rarity.RARE),0,3,-0.3,0,0,0.4,-0.3));
     public static final NumItem THE_FOURTH_EYE=register("the_fourth_eye",
@@ -79,7 +79,7 @@ public class ModItems {
     public static final NumItem QUENCHING_CHAIN=register("quenching_chain",
             new NumItem(new Item.Settings().rarity(Rarity.COMMON),0,2.0,0,-0.4,3,0,0));
     public static final NumItem MILK=register("milk",
-            new NumItem(new Item.Settings().food(FoodComponents.GLOW_BERRIES),0,-10.0,0,1.5,0,0,0.3));
+            new NumItem(new Item.Settings(),0,-10.0,0,1.5,0,0,0.3));
     public static final NumItem HUGE_SNOWBALL=register("huge_snowball",
             new NumItem(new Item.Settings().rarity(Rarity.COMMON),0,1.5,-0.5,-0.3,0,0,0));
     public static final NumItem BROKEN_SOUL=register("broken_soul",
@@ -144,7 +144,7 @@ public class ModItems {
     public static final CactusBall CACTUS_BALL=register("cactus_ball",
             new CactusBall(new Item.Settings().rarity(Rarity.COMMON)));
     public static final EnchantedGoldenAppleSlice ENCHANTED_GOLDEN_APPLE_SLICE=register("enchanted_golden_apple_slice",
-            new EnchantedGoldenAppleSlice(new Item.Settings().rarity(Rarity.RARE)));
+            new EnchantedGoldenAppleSlice(new Item.Settings().rarity(Rarity.RARE).food(FoodComponents.GOLDEN_APPLE)));
     public static final StrangePotion STRANGE_POTION=register("strange_potion",
             new StrangePotion(new Item.Settings().rarity(Rarity.COMMON)));
     public static final Iodophor IODOPHOR=register("iodophor",
@@ -169,6 +169,14 @@ public class ModItems {
             new Adrenaline(new Item.Settings().rarity(Rarity.RARE)));
     public static final Battery BATTERY=register("battery",
             new Battery(new Item.Settings().rarity(Rarity.UNCOMMON)));
+    public static final Acceleration ACCELERATION=register("acceleration",
+            new Acceleration(new Item.Settings().rarity(Rarity.COMMON)));
+    public static final Deceleration DECELERATION=register("deceleration",
+            new Deceleration(new Item.Settings().rarity(Rarity.COMMON)));
+    public static final Swirl SWIRL=register("swirl",
+            new Swirl(new Item.Settings().rarity(Rarity.COMMON)));
+    public static final Twist TWIST=register("twist",
+            new Twist(new Item.Settings().rarity(Rarity.COMMON)));
 
     //攻击方式类道具
     public static final ExposedWire EXPOSED_WIRE=register("exposed_wire",
@@ -183,20 +191,14 @@ public class ModItems {
             new Lance(new Item.Settings().rarity(Rarity.RARE),0,1.5,0,-0.3,4,0,-0.2));
     public static final Parry PARRY=register("parry",
             new Parry(new Item.Settings().rarity(Rarity.UNCOMMON),0,0.4,1.3,0.1,0,0,0));
-    public static final Swirl SWIRL=register("swirl",
-            new Swirl(new Item.Settings().rarity(Rarity.COMMON),0,0,0,0,0,0,0));
-    public static final Twist TWIST=register("twist",
-            new Twist(new Item.Settings().rarity(Rarity.COMMON),0,0,0,0,0,0,0));
     public static final Boomerang BOOMERANG=register("boomerang",
             new Boomerang(new Item.Settings().rarity(Rarity.RARE),0,0,0.5,0.5,5,0,0));
-    public static final Acceleration ACCELERATION=register("acceleration",
-            new Acceleration(new Item.Settings().rarity(Rarity.COMMON),0,0,0,0,0,0,0));
-    public static final Deceleration DECELERATION=register("deceleration",
-            new Deceleration(new Item.Settings().rarity(Rarity.COMMON),0,0,0,0,0,0,0));
     public static final Zenith ZENITH=register("zenith",
             new Zenith(new Item.Settings().rarity(Rarity.EPIC),0,1.5,0.5,0,0,0.3,0));
     public static final ShortHook SHORT_HOOK=register("short_hook",
             new ShortHook(new Item.Settings().rarity(Rarity.UNCOMMON),0,0.2,0.5,-0.3,-1,0,0));
+    public static final Text TEXT=register("text",
+            new Text(new Item.Settings().rarity(Rarity.EPIC),0,0,0,0,0,0,0));
 
     //特效类道具
     public static final Fever FEVER=register("fever",
@@ -228,11 +230,11 @@ public class ModItems {
     public static final WitheredRosePetals WITHERED_ROSE_PETALS=register("withered_rose_petals",
             new WitheredRosePetals(new Item.Settings().rarity(Rarity.COMMON),-5,1.5,0,0.4,2,0,0,true));
     public static final Beer BEER=register("beer",
-            new Beer(new Item.Settings().rarity(Rarity.UNCOMMON).food(FoodComponents.SPIDER_EYE),1.0,-0.5,0,0.4,2,0,0,true));
+            new Beer(new Item.Settings().rarity(Rarity.UNCOMMON),1.0,-0.5,0,0.4,2,0,0,true));
     public static final StrangeBeer STRANGE_BEER=register("strange_beer",
-            new StrangeBeer(new Item.Settings().rarity(Rarity.UNCOMMON).food(FoodComponents.POISONOUS_POTATO),3,-2,0,0,0,0,0,true));
+            new StrangeBeer(new Item.Settings().rarity(Rarity.UNCOMMON),3,-2,0,0,0,0,0,true));
     public static final PurpleJuice PURPLE_JUICE=register("purple_juice",
-            new PurpleJuice(new Item.Settings().rarity(Rarity.UNCOMMON).food(FoodComponents.COOKED_CHICKEN),1.5,-0.5,0,0,0,0,0,true));
+            new PurpleJuice(new Item.Settings().rarity(Rarity.UNCOMMON),1.5,-0.5,0,0,0,0,0,true));
     public static final FloatingAhoge FLOATING_AHOGE=register("floating_ahoge",
             new FloatingAhoge(new Item.Settings().rarity(Rarity.COMMON),0,0,1.0,0,0,0,0,true));
     public static final SkeletonPriestJewel SKELETON_PRIEST_JEWEL=register("skeleton_priest_jewel",

@@ -109,11 +109,11 @@ public class NekoPackageItem extends Item {
                             addNekoItemData(player);
                             applyData(player, damageAttr, speedAttr, healthAttr, attackSpeedAttr);
                         }
+                        NekoPackageItem.applyFunction(NekoPackageItem.getNekoItems(player.getOffHandStack(), false, 4), player, 1);
+                        NekoPackageDataManager.decayTickData(player);
+                        List<AbstractNekoItem> nekoSpecificItems=NekoPackageItem.getNekoItems(player.getOffHandStack(),false,1);
+                        nekoSpecificItems.forEach(item->{if (item instanceof AbstractNekoSpecificItem abstractNekoSpecificItem){abstractNekoSpecificItem.calculateOnTick(player);}});
                     }
-                    NekoPackageItem.applyFunction(NekoPackageItem.getNekoItem(player.getOffHandStack(), false, 4), player, 1);
-                    NekoPackageDataManager.decayTickData(player);
-                    List<AbstractNekoItem> nekoSpecificItems=NekoPackageItem.getNekoItem(player.getOffHandStack(),false,1);
-                    nekoSpecificItems.forEach(item->{if (item instanceof AbstractNekoSpecificItem abstractNekoSpecificItem){abstractNekoSpecificItem.calculateOnTick(player);}});
                 }
                 else {
                     if (!world.isClient) {
@@ -132,7 +132,7 @@ public class NekoPackageItem extends Item {
         //遍历来读取物品数值
         {
             NekoPackageDataManager.PlayerNekoData data = NekoPackageDataManager.getOrCreate(player);
-            ArrayList items=getNekoItem(player.getOffHandStack(),true,0);
+            ArrayList items= getNekoItems(player.getOffHandStack(),true,0);
             for (Object item : items) {
                 AbstractNekoItem nekoItem = (AbstractNekoItem) item;
                 data.nekoData[0] += nekoItem.getHealth();
@@ -250,6 +250,9 @@ public class NekoPackageItem extends Item {
 
         //attackRange
         data[4] = Math.max(Math.min(data[4], NekoPackageDataManager.MAX_ATTACK_RANGE), 4);
+
+        //speed
+        data[1]= Math.max(Math.min(data[1], NekoPackageDataManager.MAX_SPEED), 0);
     }
 
     private void clearPlayerAttributeInstance(EntityAttributeInstance damageAttr, EntityAttributeInstance speedAttr, EntityAttributeInstance healthAttr, EntityAttributeInstance attackSpeedAttr) {
@@ -306,7 +309,7 @@ public class NekoPackageItem extends Item {
                 }
             }
             if (finalAttackMainItem != null) {
-                finalAttackMainItem.changeMainAttackType(player);
+                finalAttackMainItem.changeMainAttackType(player,player.getYaw());
             }
         }
     }
@@ -315,14 +318,14 @@ public class NekoPackageItem extends Item {
         ItemStack stack = player.getStackInHand(Hand.OFF_HAND);
         if (getIsFinished(stack)==2) {return;}
         if (player.getItemCooldownManager().isCoolingDown(ModItems.NEKO_PACKAGE)) {return;}
-        if (!getNekoItem(stack, false, 3).isEmpty()) {
+        if (!getNekoItems(stack, false, 3).isEmpty()) {
             if (player.getAttackCooldownProgress(0.0f) == 1) {
                 applyMainAttackTypeItem(player);
             }
         }
     }
 
-    public static void applyOffAttackTypeItem(PlayerEntity player) {
+    public static void applyOffAttackTypeItem(PlayerEntity player,float yaw) {
         AbstractNekoAttackItem finalAttackOffItem=null;
         AbstractNekoAttackItem finalAttackMainItem = null;
         ItemStack stack = player.getStackInHand(Hand.OFF_HAND);
@@ -342,7 +345,7 @@ public class NekoPackageItem extends Item {
                 }
             }
             if (finalAttackOffItem != null) {
-                finalAttackOffItem.changeOffAttackType(player);
+                finalAttackOffItem.changeOffAttackType(player, yaw);
             }
 
         }
@@ -378,7 +381,7 @@ public class NekoPackageItem extends Item {
     //这个方法是用来提取物品的
     //这里的boolean是判断道具是否可重复
     //getType=0:拿全部道具,=1:拿特效类道具,=3:拿改变攻击类道具，=4:拿功能类道具
-    public static ArrayList<AbstractNekoItem> getNekoItem(ItemStack stack, boolean isRepeatable,int getType) {
+    public static ArrayList<AbstractNekoItem> getNekoItems(ItemStack stack, boolean isRepeatable, int getType) {
         if (stack.getItem()!=ModItems.NEKO_PACKAGE){return new ArrayList<>();}
         ArrayList<AbstractNekoItem> nekoItems = new ArrayList<>();
         NbtCompound nbt = stack.getOrCreateNbt();
@@ -419,7 +422,7 @@ public class NekoPackageItem extends Item {
     /**@return true=拥有，false=未拥有
      **/
     public boolean isHaveNekoItem(ItemStack stack, AbstractNekoItem scanNekoItem) {
-        ArrayList<AbstractNekoItem> abstractNekoItems=getNekoItem(stack,false,0);
+        ArrayList<AbstractNekoItem> abstractNekoItems= getNekoItems(stack,false,0);
         return abstractNekoItems.contains(scanNekoItem);
     }
 

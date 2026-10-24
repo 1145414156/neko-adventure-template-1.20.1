@@ -1,7 +1,6 @@
 package com.nekoadventure.item.nekoItem.attackTypeItem;
 
 import com.nekoadventure.item.nekoItem.AbstractNekoItem;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 
 import java.util.HashMap;
@@ -23,10 +22,9 @@ public abstract class AbstractNekoAttackItem extends AbstractNekoItem {
     }
 
 
-    public void changeMainAttackType(PlayerEntity player){}
+    public void changeMainAttackType(PlayerEntity player,float yaw){}
 
-    public void changeOffAttackType(PlayerEntity player){}
-
+    public void changeOffAttackType(PlayerEntity player,float yaw){}
     public boolean canExecute(PlayerEntity player,int tick) {
         long now = player.getWorld().getTime();
         Long last = lastOffAttackTimes.get(player.getUuid());

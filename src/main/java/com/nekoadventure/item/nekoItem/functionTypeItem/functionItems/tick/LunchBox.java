@@ -17,7 +17,7 @@ public class LunchBox extends AbstractNekoFunctionItem {
     public void applyTickFunction(PlayerEntity player) {
         if (player.getWorld().isClient()) return;
         if (!(player.getOffHandStack().getItem() instanceof NekoPackageItem nekoPackage)) return;
-        int haveFoodItem = NekoPackageItem.getNekoItem(player.getOffHandStack(), true, 0).stream()
+        int haveFoodItem = NekoPackageItem.getNekoItems(player.getOffHandStack(), true, 0).stream()
                 .filter(Item::isFood)
                 .toList()
                 .size();

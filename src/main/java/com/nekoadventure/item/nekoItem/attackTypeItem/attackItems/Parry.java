@@ -26,8 +26,8 @@ public class Parry extends AbstractNekoAttackItem {
     }
 
     @Override
-    public void changeMainAttackType(PlayerEntity player) {
-        super.changeMainAttackType(player);
+    public void changeMainAttackType(PlayerEntity player, float yaw) {
+        super.changeMainAttackType(player, yaw);
         if (player.getWorld().isClient) return;
         double damage = 1;
         double range = 1;
@@ -40,7 +40,7 @@ public class Parry extends AbstractNekoAttackItem {
         List<MissileEntity> contactedMissiles = player.getWorld().getEntitiesByClass(
                 MissileEntity.class,
                 playerBox.expand(0.3 + range * 0.1),
-                missile -> missile.getOwner() != player
+                missile -> !(missile.getRealOwner() instanceof PlayerEntity)
         );
         if (!contactedMissiles.isEmpty()) {
             for (MissileEntity missile : contactedMissiles) {
@@ -63,8 +63,8 @@ public class Parry extends AbstractNekoAttackItem {
     }
 
     @Override
-    public void changeOffAttackType(PlayerEntity player) {
-        super.changeOffAttackType(player);
+    public void changeOffAttackType(PlayerEntity player, float yaw) {
+        super.changeOffAttackType(player, yaw);
         if (player.getWorld().isClient) return;
         if (!canExecute(player, 5)) {
         double damage = 1;
@@ -83,7 +83,7 @@ public class Parry extends AbstractNekoAttackItem {
             List<MissileEntity> contactedMissiles = player.getWorld().getEntitiesByClass(
                     MissileEntity.class,
                     ownMissile.getBoundingBox().expand(0.2),
-                    missile -> missile.getOwner() != player
+                    missile -> !(missile.getOwner() instanceof PlayerEntity)
             );
             for (MissileEntity missile : contactedMissiles) {
                 missile.setOwner(player);

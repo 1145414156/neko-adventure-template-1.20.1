@@ -7,8 +7,8 @@ import com.nekoadventure.entity.missile.MissileModelType;
 import com.nekoadventure.item.ModItems;
 import com.nekoadventure.item.nekoItem.attackTypeItem.AbstractNekoAttackItem;
 import com.nekoadventure.item.other.NekoPackageItem;
-import com.nekoadventure.other.mobApart.AttackTypes;
 import com.nekoadventure.other.itemApart.NekoPackageDataManager;
+import com.nekoadventure.other.mobApart.AttackTypes;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -16,6 +16,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
@@ -30,15 +31,15 @@ public class Zenith extends AbstractNekoAttackItem {
     }
 
     @Override
-    public void changeMainAttackType(PlayerEntity player) {
-        super.changeMainAttackType(player);
+    public void changeMainAttackType(PlayerEntity player, float yaw) {
+        super.changeMainAttackType(player, yaw);
         double range = 2;
         double damage = 2;
         if (player.getOffHandStack().getItem() instanceof NekoPackageItem nekoPackage){
             range=nekoPackage.getAttackRange(player);
             damage=nekoPackage.getStrength(player);
         }
-        Vec3d look = player.getRotationVec(1.0F);
+        Vec3d look = getRotationVector(player.getPitch(),yaw);
         Vec3d horizontalLook = new Vec3d(look.x, 0, look.z).normalize();
         List<LivingEntity> entities=getEntitiesOnLine(player,player.getEyePos(),horizontalLook,range);
         if (!entities.isEmpty()){
@@ -48,13 +49,13 @@ public class Zenith extends AbstractNekoAttackItem {
         }
         range=Math.min(15,range)+(!entities.isEmpty()?0.0F:player.getWorld().getRandom().nextInt(10)-4);
         MissileEntity missileEntity = getMissileEntity(player, range, damage);
-        missileEntity.setYaw(player.getYaw()+(!entities.isEmpty()?0.0F:player.getWorld().random.nextInt(40)-19));
+        missileEntity.setYaw(yaw+(!entities.isEmpty()?0.0F:player.getWorld().random.nextInt(40)-19));
         missileEntity.setPitch(0);
         player.getWorld().spawnEntity(missileEntity);
 
         if (player.getOffHandStack().getItem() instanceof NekoPackageItem nekoPackage) {
             if(nekoPackage.isHaveNekoItem(player.getOffHandStack(), ModItems.EXPOSED_WIRE)){
-                specialAttackWithExportWire(player, range, damage);
+                specialAttackWithExportWire(player, range, damage,yaw);
             }
         }
 
@@ -65,7 +66,7 @@ public class Zenith extends AbstractNekoAttackItem {
         player.getItemCooldownManager().set(player.getOffHandStack().getItem(), cooldown);
     }
 
-    private void specialAttackWithExportWire(PlayerEntity player, double range, double damage) {
+    private void specialAttackWithExportWire(PlayerEntity player, double range, double damage,float yaw) {
         for (int i=-1; i<=1; i+=2) {
             Vec3d look = player.getRotationVec(1.0F);
             Vec3d horizontalLook = new Vec3d(look.x, 0, look.z).normalize();
@@ -77,15 +78,15 @@ public class Zenith extends AbstractNekoAttackItem {
             }
             range=Math.min(15,range)+(!entities.isEmpty()?0.0F:player.getWorld().getRandom().nextInt(10)-4);
             MissileEntity missileEntity = getMissileEntity(player, range, damage);
-            missileEntity.setYaw(player.getYaw()+(!entities.isEmpty()?0.0F:player.getWorld().random.nextInt(40)-19+20*i));
+            missileEntity.setYaw(yaw+(!entities.isEmpty()?0.0F:player.getWorld().random.nextInt(40)-19+20*i));
             missileEntity.setPitch(0);
             player.getWorld().spawnEntity(missileEntity);
         }
     }
 
     @Override
-    public void changeOffAttackType(PlayerEntity player) {
-        super.changeOffAttackType(player);
+    public void changeOffAttackType(PlayerEntity player, float yaw) {
+        super.changeOffAttackType(player, yaw);
         if (canExecute(player, 10)) {
             double range = 2;
             double damage = 2;
@@ -125,7 +126,7 @@ public class Zenith extends AbstractNekoAttackItem {
                 bulletType,
                 true,
                 range,
-                10+owner.getWorld().getRandom().nextInt(10),
+                15+owner.getWorld().getRandom().nextInt(10),
                 damage,
                 owner.getWorld().random.nextInt(21)
         );
@@ -171,5 +172,15 @@ public class Zenith extends AbstractNekoAttackItem {
             Vec3d closestPoint = startXZ.add(dir.multiply(projection));
             return entityXZ.distanceTo(closestPoint) <= 1.2;
         }).collect(Collectors.toList());
+    }
+
+    protected final Vec3d getRotationVector(float pitch, float yaw) {
+        float f = pitch * (float) (Math.PI / 180.0);
+        float g = -yaw * (float) (Math.PI / 180.0);
+        float h = MathHelper.cos(g);
+        float i = MathHelper.sin(g);
+        float j = MathHelper.cos(f);
+        float k = MathHelper.sin(f);
+        return new Vec3d(i * j, -k, h * j);
     }
 }

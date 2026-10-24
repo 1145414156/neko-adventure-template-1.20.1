@@ -2,12 +2,10 @@ package com.nekoadventure.item.itemGroup;
 
 import com.nekoadventure.NekoAdventure;
 import com.nekoadventure.block.ModBlocks;
-import com.nekoadventure.datagen.tags.ModItemTagsProvider;
 import com.nekoadventure.item.ModItems;
 import com.nekoadventure.item.nekoItem.AbstractNekoItem;
 import com.nekoadventure.item.other.NekoPackageItem;
 import com.nekoadventure.item.soulItem.AbstractSoulItem;
-import com.nekoadventure.other.itemApart.SpawnRandomNekoItems;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;

@@ -6,8 +6,8 @@ import com.nekoadventure.entity.missile.MissileEntity;
 import com.nekoadventure.entity.missile.MissileModelType;
 import com.nekoadventure.item.nekoItem.attackTypeItem.AbstractNekoAttackItem;
 import com.nekoadventure.item.other.NekoPackageItem;
-import com.nekoadventure.other.mobApart.AttackTypes;
 import com.nekoadventure.other.itemApart.NekoPackageDataManager;
+import com.nekoadventure.other.mobApart.AttackTypes;
 import com.nekoadventure.particle.ModParticleTypes;
 import com.nekoadventure.sound.ModSoundEvents;
 import net.minecraft.client.item.TooltipContext;
@@ -35,8 +35,8 @@ public class Lance extends AbstractNekoAttackItem {
     }
 
     @Override
-    public void changeMainAttackType(PlayerEntity player) {
-        super.changeMainAttackType(player);
+    public void changeMainAttackType(PlayerEntity player, float yaw) {
+        super.changeMainAttackType(player, yaw);
         if (player.getWorld().isClient) return;
         double range = 4;
         double damage=1;
@@ -71,7 +71,7 @@ public class Lance extends AbstractNekoAttackItem {
             return;
         }
         Vec3d dir = horizontalDir.normalize();
-        Vec3d origin = new Vec3d(start.x, start.y+1.0, start.z);
+        Vec3d origin = new Vec3d(start.x, start.y, start.z);
         double step = 0.5;
         int count = (int) (maxDistance / step);
 
@@ -118,8 +118,8 @@ public class Lance extends AbstractNekoAttackItem {
     }
 
     @Override
-    public void changeOffAttackType(PlayerEntity player) {
-        super.changeOffAttackType(player);
+    public void changeOffAttackType(PlayerEntity player, float yaw) {
+        super.changeOffAttackType(player, yaw);
         if (canExecute(player,10)) {
             World world = player.getWorld();
             double damage;
@@ -145,7 +145,7 @@ public class Lance extends AbstractNekoAttackItem {
             Optional<LivingEntity> nearestTarget = world.getEntitiesByClass(
                     LivingEntity.class,
                     nearestMissile.getBoundingBox().expand(5),
-                    entity -> nearestMissile.getOwner() != entity && entity.isAlive()
+                    entity -> nearestMissile.getOwner() != entity && entity.isAlive()&&entity.isAttackable()
             ).stream().min(Comparator.comparingDouble(entity -> entity.squaredDistanceTo(nearestMissile)));
 
             nearestTarget.ifPresent(target -> {

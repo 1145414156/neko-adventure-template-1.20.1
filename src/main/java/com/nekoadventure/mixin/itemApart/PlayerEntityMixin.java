@@ -103,9 +103,9 @@ public abstract class PlayerEntityMixin extends LivingEntity {
         if (target instanceof LivingEntity&&target.isAttackable()) {
             PlayerEntity player = (PlayerEntity) (Object) this;
             if (NekoPackageItem.getIsFinished(player.getOffHandStack())!=2 &&
-                    !NekoPackageItem.getNekoItem(player.getOffHandStack(), false, 1).isEmpty()) {
+                    !NekoPackageItem.getNekoItems(player.getOffHandStack(), false, 1).isEmpty()) {
                 if (player.getAttackCooldownProgress(0.0f) == 1) {
-                    ArrayList specificItems = NekoPackageItem.getNekoItem(player.getOffHandStack(),
+                    ArrayList specificItems = NekoPackageItem.getNekoItems(player.getOffHandStack(),
                             false, 1);
                     for (int i = specificItems.size(); i >= 1; i--) {
                         AbstractNekoSpecificItem nekoAttackTypeItem = (AbstractNekoSpecificItem) specificItems.get(i - 1);
@@ -122,7 +122,7 @@ public abstract class PlayerEntityMixin extends LivingEntity {
 		PlayerEntity player = (PlayerEntity) (Object) this;
         if (player.getOffHandStack().getItem() instanceof NekoPackageItem
                 && NekoPackageItem.getIsFinished(player.getOffHandStack())!=2) {
-                if (NekoPackageItem.applyFunction(NekoPackageItem.getNekoItem
+                if (NekoPackageItem.applyFunction(NekoPackageItem.getNekoItems
                         (player.getOffHandStack(), false, 4), player, 2)) {
                     cir.cancel();
             }
