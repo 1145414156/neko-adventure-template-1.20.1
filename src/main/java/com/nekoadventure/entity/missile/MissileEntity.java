@@ -4,6 +4,7 @@ package com.nekoadventure.entity.missile;
 import com.nekoadventure.item.nekoItem.attackTypeItem.AbstractNekoSpecificItem;
 import com.nekoadventure.item.other.NekoPackageItem;
 import com.nekoadventure.other.mobApart.AttackTypes;
+import com.nekoadventure.other.mobApart.MissileModelType;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -126,8 +127,8 @@ public class MissileEntity extends Entity {
     private boolean entityCheckCollision() {
         Vec3d velocity = this.getVelocity();
         boolean stationary = velocity.lengthSquared() < 1.0E-6;
-        // 静止弹幕不做接触检测；但 HOMING 弹幕靠吸附到目标身上命中，零速度时必须仍能判定
-        if (stationary && this.getAttackType() != AttackTypes.AttackType.HOMING) {
+        if (stationary && this.getAttackType() != AttackTypes.AttackType.HOMING&&
+                this.getAttackType() != AttackTypes.AttackType.LAZY) {
             return false;
         }
         Vec3d direction = stationary ? Vec3d.ZERO : velocity.normalize();

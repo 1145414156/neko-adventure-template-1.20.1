@@ -2,7 +2,7 @@ package com.nekoadventure.item.nekoItem.functionTypeItem.functionItems.damaged;
 
 import com.nekoadventure.entity.ModEntities;
 import com.nekoadventure.entity.missile.MissileEntity;
-import com.nekoadventure.entity.missile.MissileModelType;
+import com.nekoadventure.other.mobApart.MissileModelType;
 import com.nekoadventure.item.nekoItem.functionTypeItem.functionItems.AbstractNekoFunctionItem;
 import com.nekoadventure.item.other.NekoPackageItem;
 import com.nekoadventure.other.mobApart.AttackTypes;

@@ -1,4 +1,4 @@
-package com.nekoadventure.entity.missile;
+package com.nekoadventure.other.mobApart;
 
 public enum MissileModelType {
     BULLET,

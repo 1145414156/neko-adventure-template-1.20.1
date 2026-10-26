@@ -3,7 +3,7 @@ package com.nekoadventure.item.nekoItem.attackTypeItem.specificItems;
 import com.nekoadventure.client.ShiftKeyHelper;
 import com.nekoadventure.entity.ModEntities;
 import com.nekoadventure.entity.missile.MissileEntity;
-import com.nekoadventure.entity.missile.MissileModelType;
+import com.nekoadventure.other.mobApart.MissileModelType;
 import com.nekoadventure.item.nekoItem.attackTypeItem.AbstractNekoSpecificItem;
 import com.nekoadventure.item.other.NekoPackageItem;
 import com.nekoadventure.other.mobApart.AttackTypes;

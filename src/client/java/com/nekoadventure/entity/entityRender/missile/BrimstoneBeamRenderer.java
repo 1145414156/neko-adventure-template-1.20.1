@@ -1,7 +1,7 @@
 package com.nekoadventure.entity.entityRender.missile;
 
 import com.nekoadventure.entity.missile.MissileEntity;
-import com.nekoadventure.entity.missile.MissileModelType;
+import com.nekoadventure.other.mobApart.MissileModelType;
 import net.minecraft.client.render.LightmapTextureManager;
 import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.VertexConsumer;

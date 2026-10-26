@@ -4,7 +4,7 @@ import com.nekoadventure.block.ModBlocks;
 import com.nekoadventure.effect.ModStatusEffects;
 import com.nekoadventure.entity.ModEntities;
 import com.nekoadventure.entity.missile.MissileEntity;
-import com.nekoadventure.entity.missile.MissileModelType;
+import com.nekoadventure.other.mobApart.MissileModelType;
 import com.nekoadventure.item.ModItems;
 import com.nekoadventure.network.mob.FloorShakeNetworking;
 import com.nekoadventure.network.mob.ScreenShakeNetworking;

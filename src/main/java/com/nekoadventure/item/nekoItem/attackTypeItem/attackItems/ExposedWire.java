@@ -3,7 +3,7 @@ package com.nekoadventure.item.nekoItem.attackTypeItem.attackItems;
 import com.nekoadventure.client.ShiftKeyHelper;
 import com.nekoadventure.entity.ModEntities;
 import com.nekoadventure.entity.missile.MissileEntity;
-import com.nekoadventure.entity.missile.MissileModelType;
+import com.nekoadventure.other.mobApart.MissileModelType;
 import com.nekoadventure.item.nekoItem.attackTypeItem.AbstractNekoAttackItem;
 import com.nekoadventure.item.other.NekoPackageItem;
 import com.nekoadventure.other.itemApart.NekoPackageDataManager;
@@ -99,6 +99,7 @@ public class ExposedWire extends AbstractNekoAttackItem {
 
                 List<LivingEntity> livingEntities = entities.stream()
                         .filter(e -> e instanceof LivingEntity&&!Objects.equals(missileEntity.getRealOwner(), e)&&e.isAttackable())
+                        .limit(8)
                         .map(e -> (LivingEntity) e)
                         .collect(Collectors.toList());
                 entityChooseHandler(missileEntity, livingEntities, world, MAX_CONNECT);

@@ -3,7 +3,7 @@ package com.nekoadventure.entity.entityRender.missile;
 
 import com.nekoadventure.NekoAdventure;
 import com.nekoadventure.entity.missile.MissileEntity;
-import com.nekoadventure.entity.missile.MissileModelType;
+import com.nekoadventure.other.mobApart.MissileModelType;
 import com.nekoadventure.entity.ModEntityModelLayers;
 import com.nekoadventure.entity.model.missile.BoomerangEntityModel;
 import com.nekoadventure.item.ModItems;

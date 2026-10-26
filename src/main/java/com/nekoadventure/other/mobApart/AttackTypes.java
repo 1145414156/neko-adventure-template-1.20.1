@@ -14,7 +14,6 @@ import net.minecraft.util.math.Vec3d;
 import java.util.Comparator;
 import java.util.List;
 
-//全部攻击方法的移动方法
 public class AttackTypes {
     public enum AttackType {
         BULLET,
@@ -93,7 +92,8 @@ public class AttackTypes {
         if (entity.getRealOwner() instanceof PlayerEntity player){
             float initialYaw= entity.getInitialYaw();
             if (player.getOffHandStack().getItem() instanceof NekoPackageItem){
-                List<AbstractNekoItem> attackItems = NekoPackageItem.getNekoItems(player.getOffHandStack(), true, 0);
+                List<AbstractNekoItem> attackItems = NekoPackageItem.getNekoItems(player.getOffHandStack(),
+                        true, 0);
                 int count=0;
                 float addYaw=initialYaw;
                 for(int l=attackItems.size()-1;l>=0;l--){

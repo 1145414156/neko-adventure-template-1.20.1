@@ -4,7 +4,7 @@ package com.nekoadventure.entity.boss;
 import com.nekoadventure.effect.ModStatusEffects;
 import com.nekoadventure.entity.ModEntities;
 import com.nekoadventure.entity.missile.MissileEntity;
-import com.nekoadventure.entity.missile.MissileModelType;
+import com.nekoadventure.other.mobApart.MissileModelType;
 import com.nekoadventure.item.ModItems;
 import com.nekoadventure.other.itemApart.SpawnRandomSoulItems;
 import com.nekoadventure.other.mobApart.AttackTypes;
