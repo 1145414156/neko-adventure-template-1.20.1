@@ -152,7 +152,7 @@ public class MuddySpiderEntityModel extends SinglePartEntityModel<MuddySpiderEnt
 	public void setAngles(MuddySpiderEntity entity, float limbAngle, float limbDistance, float animationProgress, float headYaw, float headPitch) {
 		this.getPart().traverse().forEach(ModelPart::resetTransform);
 		this.animateMovement(MuddySpiderModelAnimation.WALK,limbAngle,limbDistance,2f,2.5f);
-		this.updateAnimation(MuddySpiderEntity.attackAnimation, MuddySpiderModelAnimation.JUMP_ATTACK,animationProgress,1.0f);
+		this.updateAnimation(entity.attackAnimation, MuddySpiderModelAnimation.JUMP_ATTACK,animationProgress,1.0f);
 
 		this.head.yaw = headYaw * (float) (Math.PI / 180.0);
 		this.head.pitch = headPitch * (float) (Math.PI / 180.0);

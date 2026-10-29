@@ -182,9 +182,11 @@ public class ModCNLanguageProvider extends FabricLanguageProvider {
         //音效
         translationBuilder.add("sounds.neko_adventure.electricity_run_through","电流:贯穿声");
         translationBuilder.add("sounds.neko_adventure.brimstone_attack","硫磺火:喷射");
+        translationBuilder.add("sounds.neko_adventure.short_hook_attack","短勾:命中");
         translationBuilder.add("sounds.neko_adventure.brimstone_fierce_attack","硫磺火:强力溅射");
         translationBuilder.add("sounds.neko_adventure.lance_attack","长枪:刺中");
         translationBuilder.add("sounds.neko_adventure.parry_attack","格挡:成功");
+        translationBuilder.add("neko-adventure:attack/poker_extract","扑克牌:抽取");
         translationBuilder.add("sounds.neko_adventure.grand_knight_walk","大骑士:行走");
         translationBuilder.add("sounds.neko_adventure.grand_knight_ambient","大骑士:摩擦声");
         translationBuilder.add("sounds.neko_adventure.grand_knight_sword_attack","大骑士:剑击");
@@ -193,6 +195,8 @@ public class ModCNLanguageProvider extends FabricLanguageProvider {
         translationBuilder.add("sounds.neko_adventure.grand_knight_earth_quaker","大骑士:践踏");
         translationBuilder.add("sounds.neko_adventure.grand_knight_hurt","大骑士:受伤");
         translationBuilder.add("sounds.neko_adventure.grand_knight_death","大骑士:死亡");
+        translationBuilder.add("sounds.neko_adventure.blade_attack","刀片:触发");
+        translationBuilder.add("sounds.neko_adventure.skeleton_priest_jewel","祭司宝石:触发");
 
         //生物
         translationBuilder.add(ModEntities.HUGE_SLIME,"史莱姆(巨无霸款)");

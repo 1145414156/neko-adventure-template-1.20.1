@@ -2,10 +2,15 @@ package com.nekoadventure.item.nekoItem.functionTypeItem.functionItems.tick;
 
 import com.nekoadventure.item.nekoItem.functionTypeItem.functionItems.AbstractNekoFunctionItem;
 import com.nekoadventure.other.itemApart.NekoPackageDataManager;
+import com.nekoadventure.sound.ModSoundEvents;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.particle.DefaultParticleType;
+import net.minecraft.particle.ParticleTypes;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundCategory;
 import net.minecraft.text.Text;
 
 import java.util.Random;
@@ -37,31 +42,34 @@ public class Poker extends AbstractNekoFunctionItem {
     }
 
     private void applyRandomEffect(PlayerEntity player, int i) {
-        StatusEffectInstance effect = null;
-        String message = "";
-
+        StatusEffectInstance effect;
+        DefaultParticleType particleType=null;
         effect = switch (i) {
             case 0 -> {
-                message = "抽到的是红桃";
+                particleType=ParticleTypes.HEART;
                 yield effectInstance(StatusEffects.REGENERATION);
             }
             case 1 -> {
-                message = "抽到的是方块";
+                particleType=ParticleTypes.FIREWORK;
                 yield effectInstance(StatusEffects.RESISTANCE);
             }
             case 2 -> {
-                message = "抽到的是黑桃";
+                particleType=ParticleTypes.CLOUD;
                 yield effectInstance(StatusEffects.SPEED);
             }
             case 3 -> {
-                message = "抽到的是梅花";
+                particleType=ParticleTypes.FLAME;
                 yield effectInstance(StatusEffects.STRENGTH);
             }
-            default -> effect;
+            default -> null;
         };
-
+        if (player.getWorld() instanceof ServerWorld serverWorld){
+            serverWorld.spawnParticles(particleType,
+                    player.getX(), player.getY()+1, player.getZ(), 10, 0.5, 0.5, 0.5, 0.01);
+        }
+        player.getWorld().playSound(null, player.getBlockPos(), ModSoundEvents.POKER_EXTRACT,
+                SoundCategory.PLAYERS, 1.0F, 1.0F);
         if (effect != null) {
-            player.sendMessage(Text.of(message), true);
             player.addStatusEffect(effect);
         }
     }

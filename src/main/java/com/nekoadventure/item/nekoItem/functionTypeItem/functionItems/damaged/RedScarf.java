@@ -5,11 +5,13 @@ import com.nekoadventure.entity.missile.MissileEntity;
 import com.nekoadventure.other.mobApart.MissileModelType;
 import com.nekoadventure.item.nekoItem.functionTypeItem.functionItems.AbstractNekoFunctionItem;
 import com.nekoadventure.item.other.NekoPackageItem;
+import com.nekoadventure.other.itemApart.NekoPackageDataManager;
 import com.nekoadventure.other.mobApart.AttackTypes;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -19,6 +21,8 @@ import java.util.Comparator;
 import java.util.List;
 
 public class RedScarf extends AbstractNekoFunctionItem {
+    private static final int DEATH_RECORD_TICKS = 100;
+
     public RedScarf(Settings settings) {
         super(settings);
         text= Text.of("当附近有生物死亡时，在其位置召唤一个弹幕，锁定最近的生物;同时当玩家受到伤害时，对造成伤害者造成一次\"力量\"/2的伤害");
@@ -32,7 +36,8 @@ public class RedScarf extends AbstractNekoFunctionItem {
         }
         LivingEntity attacker=player.getAttacker();
         if (attacker != null) {
-                attacker.damage(player.getDamageSources().magic(), (float) damage);
+            player.getWorld().playSound(null, player.getBlockPos(), SoundEvents.ENCHANT_THORNS_HIT, SoundCategory.PLAYERS, 1.0F, 1.0F);
+            attacker.damage(player.getDamageSources().magic(), (float) damage);
         }
         return false;
     }
@@ -54,6 +59,9 @@ public class RedScarf extends AbstractNekoFunctionItem {
         );
         if (!entities.isEmpty()) {
             for (LivingEntity entity : entities) {
+                if (NekoPackageDataManager.markEntityProcessed(player, entity.getUuid(), DEATH_RECORD_TICKS)) {
+                    continue;
+                }
                 MissileEntity missile=getMissileEntity(player,range,damage);
                 LivingEntity target=getNearestEntity(entity,range);
                 if (target!=null) {
@@ -64,7 +72,6 @@ public class RedScarf extends AbstractNekoFunctionItem {
                     missile.setPitch((float) pitch);
                     missile.setPos(entity.getX(), entity.getEyeY(), entity.getZ());
                     world.spawnEntity(missile);
-                    entity.remove(Entity.RemovalReason.KILLED);
                 }
             }
         }

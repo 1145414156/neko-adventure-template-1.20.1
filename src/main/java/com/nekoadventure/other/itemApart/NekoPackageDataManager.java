@@ -12,6 +12,8 @@ public class NekoPackageDataManager {
     private static final ConcurrentHashMap<UUID, PlayerNekoData> SERVER_DATA = new ConcurrentHashMap<>();
     private static final ConcurrentHashMap<UUID, Set<String>> ITEM_STATE = new ConcurrentHashMap<>();
     private static final ConcurrentHashMap<UUID, ConcurrentHashMap<String, Integer>> ITEM_INT_STATE = new ConcurrentHashMap<>();
+  //给那些需要记录实体死亡用的
+    private static final ConcurrentHashMap<UUID, ConcurrentHashMap<UUID, Long>> ENTITY_RECORD = new ConcurrentHashMap<>();
     private static volatile double[] clientFinalData;
     private static volatile int clientLevel = 1;
 
@@ -40,6 +42,7 @@ public class NekoPackageDataManager {
         SERVER_DATA.remove(playerUuid);
         ITEM_STATE.remove(playerUuid);
         ITEM_INT_STATE.remove(playerUuid);
+        ENTITY_RECORD.remove(playerUuid);
     }
 
     public static boolean getItemState(PlayerEntity player, String key) {
@@ -66,6 +69,18 @@ public class NekoPackageDataManager {
         states.put(key, value);
     }
 
+    // 记录一次实体处理，有效期内重复调用返回false；过期记录在写入时顺带清理
+    public static boolean markEntityProcessed(PlayerEntity player, UUID entityUuid, int expireTicks) {
+        ConcurrentHashMap<UUID, Long> records = ENTITY_RECORD.computeIfAbsent(player.getUuid(), uuid -> new ConcurrentHashMap<>());
+        long now = player.getWorld().getTime();
+        records.entrySet().removeIf(entry -> entry.getValue() <= now);
+        if (records.containsKey(entityUuid)) {
+            return true;
+        }
+        records.put(entityUuid, now + expireTicks);
+        return false;
+    }
+
     public static double[] getFinalData(PlayerEntity player) {
         if (player.getWorld().isClient) {
             return clientFinalData;
@@ -87,11 +102,7 @@ public class NekoPackageDataManager {
         }
         data.recycle = true;
     }
-//    public static double[] getTickData(PlayerEntity player) {
-//        PlayerNekoData data = SERVER_DATA.get(player.getUuid());
-//        return data == null ? null : data.tickData;
-//    }
-    public static void addTickData(PlayerEntity player, double[] tickData1) {
+public static void addTickData(PlayerEntity player, double[] tickData1) {
         if (player.getWorld().isClient) {
             return;
         }

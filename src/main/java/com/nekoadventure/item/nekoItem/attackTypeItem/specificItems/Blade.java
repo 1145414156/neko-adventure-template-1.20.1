@@ -3,10 +3,14 @@ package com.nekoadventure.item.nekoItem.attackTypeItem.specificItems;
 import com.nekoadventure.client.ShiftKeyHelper;
 import com.nekoadventure.item.nekoItem.attackTypeItem.AbstractNekoSpecificItem;
 import com.nekoadventure.item.other.NekoPackageItem;
+import com.nekoadventure.sound.ModSoundEvents;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.particle.ParticleTypes;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundCategory;
 import net.minecraft.text.Text;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
@@ -28,6 +32,17 @@ public class Blade extends AbstractNekoSpecificItem {
             }
             target.damage(player.getDamageSources().mobAttack(player),
                     (float) strength);
+            player.getWorld().playSound(null, player.getBlockPos(), ModSoundEvents.BLADE_ATTACK,
+                    SoundCategory.PLAYERS, 1.0F, 1.0F);
+            if (player.getWorld() instanceof ServerWorld serverWorld) {
+                serverWorld.spawnParticles(
+                        ParticleTypes.CRIT,
+                        target.getX(), target.getEyeY(), target.getZ(),
+                        30,
+                        0.4, 0.4, 0.4,
+                        0.5
+                );
+            }
         }
     }
 

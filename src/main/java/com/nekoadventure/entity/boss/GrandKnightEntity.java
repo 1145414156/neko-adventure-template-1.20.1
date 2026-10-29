@@ -32,6 +32,7 @@ import net.minecraft.entity.mob.Monster;
 import net.minecraft.entity.passive.IronGolemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.particle.BlockStateParticleEffect;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -247,6 +248,16 @@ public class GrandKnightEntity extends HostileEntity implements Monster {
                 this.setStage(2);
                 this.stage=2;
                 replaceDeepSlateWithLava(this.getBlockPos());
+                List<PlayerEntity> playerEntities=this.getWorld().getEntitiesByClass(
+                        PlayerEntity.class,
+                        this.getBoundingBox().expand(32),
+                        e-> true
+                );
+                for (PlayerEntity playerEntity : playerEntities) {
+                    if (playerEntity instanceof ServerPlayerEntity){
+                        ScreenShakeNetworking.sendToPlayer((ServerPlayerEntity) playerEntity, 5, 0.5F);
+                    }
+                }
                 this.dataTracker.set(STAGE_CHANGE, 2);
             }
         }
@@ -259,17 +270,24 @@ public class GrandKnightEntity extends HostileEntity implements Monster {
 
     private void replaceDeepSlateWithLava(BlockPos center) {
         World world = this.getWorld();
-        int halfX = 24;
-        int halfZ = 24;
+        int halfX = 32;
+        int halfZ = 32;
         int height = 10;
         for (int dx = -halfX; dx <= halfX; dx++) {
             for (int dy = -2; dy <= height; dy++) {
                 for (int dz = -halfZ; dz <= halfZ; dz++) {
                     BlockPos pos = center.add(dx, dy, dz);
                     BlockState state = world.getBlockState(pos);
-
                     if (state.isOf(Blocks.DEEPSLATE)) {
                         world.setBlockState(pos, Blocks.LAVA.getDefaultState(), 3);
+                    }
+                    else if (state.isOf(Blocks.COBBLESTONE)||state.isOf(Blocks.NETHERRACK)) {
+                        if (this.getWorld().random.nextInt(100)+1<10) {
+                            world.breakBlock(pos, false);
+                        }
+                        else {
+                            world.setBlockState(pos, Blocks.AIR.getDefaultState(), 3);
+                        }
                     }
                 }
             }
@@ -309,16 +327,16 @@ public class GrandKnightEntity extends HostileEntity implements Monster {
         this.setVelocity(Vec3d.ZERO);
         this.setYaw(0);
         this.setPitch(0);
-        List<PlayerEntity> playerEntities=this.getWorld().getEntitiesByClass(
-                PlayerEntity.class,
-                this.getBoundingBox().expand(32),
-                e-> true
-        );
         Direction skillDirection = Direction.SOUTH;
         BlockPos skillCenter = findBossRoomBlock(this.getBlockPos());
         if (skillCenter == null) {
             return;
         }
+        List<PlayerEntity> playerEntities=this.getWorld().getEntitiesByClass(
+                PlayerEntity.class,
+                this.getBoundingBox().expand(32),
+                e-> true
+        );
         if (time == 36) {
             Direction leftDir = skillDirection.rotateYCounterclockwise();
             breakObsidianArea(skillCenter, leftDir);
@@ -355,6 +373,7 @@ public class GrandKnightEntity extends HostileEntity implements Monster {
                 for (int dz = -2; dz <= 2; dz++) {
                     BlockPos pos = origin.add(dx, dy, dz);
                     if (world.getBlockState(pos).isOf(ModBlocks.BOSS_ROOM_BLOCK)) {
+                        System.out.println("Found boss room block"+pos);
                         return pos;
                     }
                 }
@@ -380,9 +399,9 @@ public class GrandKnightEntity extends HostileEntity implements Monster {
     }
     private void transformRoom(BlockPos center) {
         World world = this.getWorld();
-        int length =32;
+        int length =24;
         for (int dx = -length; dx <= length; dx++) {
-            for (int dy = 1; dy <= 12; dy++) {
+            for (int dy = 0; dy <= 12; dy++) {
                 for (int dz = -length; dz <= length; dz++) {
                     BlockPos pos = center.add(dx, dy, dz);
                     BlockState state = world.getBlockState(pos);
@@ -555,6 +574,7 @@ public class GrandKnightEntity extends HostileEntity implements Monster {
     private void shieldSmashSkill() {
         if (this.getTarget() == null) {return;}
         int time=-(skillTick-SHIELD_SMASH_DURATION);
+        List<? extends PlayerEntity> playerEntities=this.getWorld().getPlayers();
         if(time==15){
             for (int i=0;i<3;i++){
                 this.playSound(SoundEvents.BLOCK_DISPENSER_LAUNCH,1.0f,0.5f);
@@ -564,6 +584,13 @@ public class GrandKnightEntity extends HostileEntity implements Monster {
                 bullet.setPosition(this.getEyePos().add(0,-2,0));
                 this.getWorld().spawnEntity(bullet);
                 this.damageEntitiesInFront(4,2,2,this.getDamageAmount());
+            }
+            if (!playerEntities.isEmpty()){
+                for (PlayerEntity playerEntity : playerEntities) {
+                    if (playerEntity instanceof ServerPlayerEntity){
+                        ScreenShakeNetworking.sendToPlayer((ServerPlayerEntity) playerEntity, 10, 0.2F);
+                    }
+                }
             }
         }
         else if (time==35){
@@ -576,10 +603,17 @@ public class GrandKnightEntity extends HostileEntity implements Monster {
                 this.getWorld().spawnEntity(bullet);
                 this.damageEntitiesInFront(4,2,2,this.getDamageAmount());
             }
+            if (!playerEntities.isEmpty()){
+                for (PlayerEntity playerEntity : playerEntities) {
+                    if (playerEntity instanceof ServerPlayerEntity){
+                        ScreenShakeNetworking.sendToPlayer((ServerPlayerEntity) playerEntity, 10, 0.2F);
+                    }
+                }
+            }
         }
         else if (time==70){
             for (int i=0;i<7;i++){
-                this.playSound(SoundEvents.BLOCK_DISPENSER_LAUNCH,1.0f,0.5f);
+                this.playSound(SoundEvents.BLOCK_DISPENSER_LAUNCH,1.0f,0.3f);
                 MissileEntity bullet=getMissileEntity(this,24,100,0);
                 bullet.setYaw(this.getYaw()-60+20*i);
                 bullet.setPitch(0);
@@ -587,12 +621,20 @@ public class GrandKnightEntity extends HostileEntity implements Monster {
                 this.getWorld().spawnEntity(bullet);
                 this.damageEntitiesInFront(6,5,2,this.getDamageAmount());
             }
+            if (!playerEntities.isEmpty()){
+                for (PlayerEntity playerEntity : playerEntities) {
+                    if (playerEntity instanceof ServerPlayerEntity){
+                        ScreenShakeNetworking.sendToPlayer((ServerPlayerEntity) playerEntity, 10, 0.4F);
+                    }
+                }
+            }
         }
 
     }
     private void shieldSlapSkill() {
         if (this.getTarget() == null) {return;}
         int time=-(skillTick-SHIELD_SLAP_DURATION);
+        List<? extends PlayerEntity> playerEntities=this.getWorld().getPlayers();
         if (time==30){
             for (int i=0;i<=9;i++){
                 this.playSound(SoundEvents.BLOCK_DISPENSER_LAUNCH,1.0f,0.5f);
@@ -608,6 +650,37 @@ public class GrandKnightEntity extends HostileEntity implements Monster {
                 this.getWorld().spawnEntity(bullet);
 
                 this.damageEntitiesInFront(6,4,4,this.getDamageAmount());
+            }
+            if (!playerEntities.isEmpty()){
+                for (PlayerEntity playerEntity : playerEntities) {
+                    if (playerEntity instanceof ServerPlayerEntity){
+                        ScreenShakeNetworking.sendToPlayer((ServerPlayerEntity) playerEntity, 10, 0.2F);
+                    }
+                }
+            }
+            if (this.getWorld() instanceof ServerWorld serverWorld) {
+                double radius = 3.0;
+                int steps = 16;
+                double yawRad = Math.toRadians(this.getYaw());
+                double fwdX = -Math.sin(yawRad);
+                double fwdZ = Math.cos(yawRad);
+                double rightX = -Math.cos(yawRad);
+                double rightZ = -Math.sin(yawRad);
+                double baseY = this.getEyeY()-1.0;
+                for (int s = 0; s <= steps; s++) {
+                    double angle = -Math.PI / 2 + (Math.PI / steps) * s;
+                    double cos = Math.cos(angle);
+                    double sin = Math.sin(angle);
+                    double px = this.getX() + (fwdX * cos + rightX * sin) * radius;
+                    double pz = this.getZ() + (fwdZ * cos + rightZ * sin) * radius;
+                    serverWorld.spawnParticles(
+                            ParticleTypes.SWEEP_ATTACK,
+                            px, baseY, pz,
+                            1,
+                            0.0, 0.0, 0.0,
+                            0.0
+                    );
+                }
             }
             this.playSound(SoundEvents.ENTITY_PLAYER_ATTACK_SWEEP, 2.0F, 0.2F);
         }
@@ -649,6 +722,27 @@ public class GrandKnightEntity extends HostileEntity implements Monster {
             }
             if (this.getWorld() instanceof ServerWorld serverWorld){
                 FloorShakeNetworking.sendToAll(serverWorld,this.getBlockPos().down(1),12+getStage()*4,1.0f,4.0f);
+                BlockPos center = this.getBlockPos();
+                int r = 5;
+                for (int dx = -r; dx <= r; dx++) {
+                    for (int dz = -r; dz <= r; dz++) {
+                        if (dx * dx + dz * dz > r * r) continue;
+                        BlockPos ground = center.add(dx, 0, dz);
+                        while (ground.getY() > serverWorld.getBottomY()
+                                && serverWorld.getBlockState(ground).isAir()) {
+                            ground = ground.down();
+                        }
+                        BlockState state = serverWorld.getBlockState(ground);
+                        if (state.isAir()) continue;
+                        serverWorld.spawnParticles(
+                                new BlockStateParticleEffect(ParticleTypes.BLOCK, state),
+                                ground.getX() + 0.5, ground.getY() + 1.0, ground.getZ() + 0.5,
+                                10,
+                                0.5, 0.1, 0.5,
+                                0.1
+                        );
+                    }
+                }
             }
         }
     }
@@ -656,25 +750,36 @@ public class GrandKnightEntity extends HostileEntity implements Monster {
     private void brimstoneSkill() {
         if (this.getTarget() == null) {return;}
         int time=-(skillTick-BRIMSTONE_DURATION);
+        List<PlayerEntity> playerEntities=this.getWorld().getEntitiesByClass(
+                PlayerEntity.class,
+                this.getBoundingBox().expand(12+getStage()*4),
+                e-> true
+        );
         if (time==30){
             int range=12;
             double spacing = 1.0;
             double cubeSize = 0.5;
             for (int length = 1; length <= range; length++) {
-                Vec3d mobPos = this.getEyePos().add(0,-0.9,0);
+                Vec3d mobPos = this.getEyePos().add(0,-1.2,0);
                 Vec3d lookDirection = this.getRotation(this.getYaw());
-                MissileEntity missile=getMissileEntity(this,10,40);
+                MissileEntity missile=getMissileEntity(this,range,40);
+                missile.setFlag(length);
                 AttackTypes brimstoneType = new AttackTypes(AttackTypes.AttackType.BRIMSTONE);
                 missile.setAttackType(brimstoneType);
                 missile.setTreadable(true);
                 missile.setMissileModelType(MissileModelType.BRIMSTONE);
                 Vec3d spawnPos = mobPos.add(lookDirection.multiply(length * spacing - cubeSize / 2));
-                missile.setPos(spawnPos.x, this.getEyeY()-0.7, spawnPos.z);
+                missile.setPos(spawnPos.x, this.getEyeY()-1.2, spawnPos.z);
                 missile.setYaw(this.getYaw());
                 missile.setPitch(0);
                 this.getWorld().spawnEntity(missile);
                 this.getWorld().playSound(null, this.getBlockPos(), ModSoundEvents.BRIMSTONE_ATTACK,
                         SoundCategory.HOSTILE, 0.1F, 1.3F);
+                for (PlayerEntity playerEntity : playerEntities) {
+                    if (playerEntity instanceof ServerPlayerEntity){
+                        ScreenShakeNetworking.sendToPlayer((ServerPlayerEntity) playerEntity, 30, 0.2F);
+                    }
+                }
             }
         }
     }
@@ -683,7 +788,7 @@ public class GrandKnightEntity extends HostileEntity implements Monster {
         int time = -(skillTick - RAPID_SLASHES_DURATION);
         Vec3d targetPos;
         if (time==1){
-            this.playSound(ModSoundEvents.ENTITY_GRAND_KNIGHT_RAPID_ATTACK,10.0f,1.0f);
+            this.playSound(ModSoundEvents.ENTITY_GRAND_KNIGHT_RAPID_ATTACK,5.0f,1.0f);
         }
         if (time== 32){
             if (isTargetInRange(12)){
@@ -701,6 +806,9 @@ public class GrandKnightEntity extends HostileEntity implements Monster {
             missile.setPitch(0);
             missile.setPosition(this.getEyePos().add(0,-1.5,0));
             this.getWorld().spawnEntity(missile);
+            if (this.getWorld() instanceof ServerWorld serverWorld){
+                spawnSlashArc(serverWorld,90,3.0,180);
+            }
         }
         if (time== 42){
             if (isTargetInRange(12)){
@@ -718,6 +826,9 @@ public class GrandKnightEntity extends HostileEntity implements Monster {
             missile.setPitch(0);
             missile.setPosition(this.getEyePos().add(0,-1.5,0));
             this.getWorld().spawnEntity(missile);
+            if (this.getWorld() instanceof ServerWorld serverWorld) {
+                spawnSlashArc(serverWorld,60,3.0,180);
+            }
         }
     }
 
@@ -747,6 +858,43 @@ public class GrandKnightEntity extends HostileEntity implements Monster {
             }
         }
     }
+    private void spawnSlashArc(ServerWorld serverWorld, float rotDeg, double radius, float arcDeg) {
+        if (arcDeg <= 0) return;
+        int steps = Math.max(8, (int) (arcDeg / 5));
+        double yawRad = Math.toRadians(this.getYaw());
+        double rightZ = -Math.sin(yawRad);
+        double fwdZ = Math.cos(yawRad);
+        double rightX = -fwdZ;
+        double rotRad = Math.toRadians(rotDeg);
+        double diagY = Math.cos(rotRad);
+        double sinR = Math.sin(rotRad);
+        double diagX = sinR * rightX;
+        double diagZ = sinR * rightZ;
+        double baseY = this.getY() + this.getHeight() * 0.5;
+        double halfArc = Math.toRadians(arcDeg) / 2;
+        for (int s = 0; s <= steps; s++) {
+            double theta = -halfArc + (2 * halfArc) * s / steps;
+            double cosT = Math.cos(theta);
+            double sinT = Math.sin(theta);
+            double dx = sinT * diagX + cosT * rightZ;
+            double dy = sinT * diagY;
+            double dz = sinT * diagZ + cosT * fwdZ;
+            double len = Math.sqrt(dx * dx + dy * dy + dz * dz);
+            dx /= len;
+            dy /= len;
+            dz /= len;
+            double px = this.getX() + dx * radius;
+            double py = baseY + dy * radius;
+            double pz = this.getZ() + dz * radius;
+            serverWorld.spawnParticles(
+                    ParticleTypes.FLAME,
+                    px, py, pz,
+                    2,
+                    0.05, 0.05, 0.05,
+                    0.01
+            );
+        }
+    }
     private void grabSkill(){
         if (this.getTarget() == null) {return;}
         int time=-(skillTick-GRAB_DURATION);
@@ -767,6 +915,15 @@ public class GrandKnightEntity extends HostileEntity implements Monster {
                     target = entity;
                     break;
                 }
+            }
+            if (this.getWorld() instanceof ServerWorld serverWorld) {
+                serverWorld.spawnParticles(
+                        ParticleTypes.CLOUD,
+                        this.getX(), this.getY()+0.5, this.getZ(),
+                        3,
+                        0.5, 0.5, 0.5,
+                        0
+                );
             }
         }
         if (time > 50 && time < 115) {
@@ -802,11 +959,17 @@ public class GrandKnightEntity extends HostileEntity implements Monster {
             float lostHealth=this.getMaxHealth()-this.getTarget().getHealth();
             this.damageEntitiesInFront(3.5, 3.0, 3.0, (float) (this.getDamageAmount()+lostHealth*0.008));
             this.playSound(ModSoundEvents.ENTITY_GRAND_KNIGHT_SWORD_ATTACK,10.0f,1.0f);
+            if (this.getWorld() instanceof ServerWorld serverWorld) {
+                spawnSlashArc(serverWorld,120,3.0,180);
+            }
         }
         if (time==36){
             float lostHealth=this.getMaxHealth()-this.getTarget().getHealth();
             this.damageEntitiesInFront(3.5, 3.0, 3.0, (float) (this.getDamageAmount()+lostHealth*0.008));
             this.playSound(ModSoundEvents.ENTITY_GRAND_KNIGHT_SWORD_ATTACK,10.0f,1.0f);
+            if (this.getWorld() instanceof ServerWorld serverWorld) {
+                spawnSlashArc(serverWorld,310,3.0,180);
+            }
         }
     }
 

@@ -11,6 +11,7 @@ import com.nekoadventure.other.itemApart.SpawnRandomSoulItems;
 import com.nekoadventure.other.mobApart.AttackTypes;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.*;
 import net.minecraft.entity.ai.control.MoveControl;
 import net.minecraft.entity.ai.goal.ActiveTargetGoal;
@@ -32,6 +33,7 @@ import net.minecraft.entity.mob.SlimeEntity;
 import net.minecraft.entity.passive.IronGolemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.particle.BlockStateParticleEffect;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -39,6 +41,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -63,6 +66,17 @@ public class HugeSlimeEntity extends HostileEntity implements Monster {
     @Environment(EnvType.CLIENT)
     public final AnimationState DASH_SKILL_ANI=new AnimationState();
     private static final int DASH_SKILL_DURATION=60;
+
+    @Environment(EnvType.CLIENT)
+    public final AnimationState SUMMONING_ANI=new AnimationState();
+    private static final int SUMMONING_DURATION = 40;
+    private static final int SUMMONING_REVEAL_TICK = 30;
+    private static final TrackedData<Integer> SUMMONING_STATE =
+            DataTracker.registerData(HugeSlimeEntity.class, TrackedDataHandlerRegistry.INTEGER);
+    private int playedSummoningState = 0;
+    private boolean isSummoning = false;
+    private int summoningTick = 0;
+    private boolean summoningChecked = false;
 
     private static final TrackedData<Integer> ACTIVE_SKILL =
             DataTracker.registerData(HugeSlimeEntity.class, TrackedDataHandlerRegistry.INTEGER);
@@ -118,6 +132,7 @@ public class HugeSlimeEntity extends HostileEntity implements Monster {
         super.tick();
         if (this.getWorld().isClient) {
             this.syncClientAnimations();
+            return;
         }
         this.bossBar.setPercent(this.getHealth() / this.getMaxHealth());
         this.stretch = this.stretch + (this.targetStretch - this.stretch) * 0.5F;
@@ -127,6 +142,19 @@ public class HugeSlimeEntity extends HostileEntity implements Monster {
         if (!players.isEmpty()){
             players.forEach(p-> p.addStatusEffect(new StatusEffectInstance(ModStatusEffects.BOSS_FIGHT,40,0,false,false,true)));
         }
+
+        if (!this.getWorld().isClient) {
+            this.applySummoning();
+            this.checkSummonOnSpawn();
+        }
+
+        if (this.isSummoning) {
+            this.setVelocity(0, 0, 0);
+            this.onGroundLastTick = this.isOnGround();
+            this.updateStretch();
+            return;
+        }
+
         if (this.isOnGround() && !this.onGroundLastTick&&canJump) {
             int particleCount = 12;
             for (int j = 0; j < particleCount; j++) {
@@ -154,6 +182,16 @@ public class HugeSlimeEntity extends HostileEntity implements Monster {
     }
 
     private void syncClientAnimations() {
+        int summoningState = this.dataTracker.get(SUMMONING_STATE);
+        if (summoningState != this.playedSummoningState) {
+            if (summoningState == 1) {
+                SUMMONING_ANI.start(this.age);
+            } else {
+                SUMMONING_ANI.stop();
+            }
+            this.playedSummoningState = summoningState;
+        }
+
         int activeSkill = this.dataTracker.get(ACTIVE_SKILL);
         if (activeSkill != this.playedSkill) {
             TRAMPLE_SKILL_ANI.stop();
@@ -182,6 +220,58 @@ public class HugeSlimeEntity extends HostileEntity implements Monster {
     public void onStoppedTrackingBy(ServerPlayerEntity player) {
         super.onStoppedTrackingBy(player);
         this.bossBar.removePlayer(player);
+    }
+
+    private void checkSummonOnSpawn() {
+        if (this.summoningChecked) {
+            return;
+        }
+        this.summoningChecked = true;
+        this.startSummoning();
+    }
+
+    private void startSummoning() {
+        this.isSummoning = true;
+        this.summoningTick = SUMMONING_DURATION;
+        this.setAiDisabled(true);
+        this.dataTracker.set(SUMMONING_STATE, 1);
+    }
+
+    private void applySummoning() {
+        if (!this.isSummoning) {
+            return;
+        }
+        if (this.summoningTick > 0) {
+            this.summoningTick--;
+            this.summoningAnimationTick();
+        } else {
+            this.isSummoning = false;
+            this.setAiDisabled(false);
+            this.dataTracker.set(SUMMONING_STATE, 0);
+        }
+    }
+
+    private void summoningAnimationTick() {
+        int time = SUMMONING_DURATION - this.summoningTick;
+        this.setVelocity(0, 0, 0);
+        this.targetStretch = 0.0F;
+        if (time == 1) {
+            this.playSound(this.getSquishSound(), 1.5F, 0.5F);
+        }
+        if (time == SUMMONING_REVEAL_TICK) {
+            this.playSound(this.getJumpSound(), 1.5F, 0.8F);
+            this.spawnSummoningParticles();
+        }
+    }
+
+    private void spawnSummoningParticles() {
+        if (!(this.getWorld() instanceof ServerWorld serverWorld)) {
+            return;
+        }
+        double width = this.getWidth();
+        serverWorld.spawnParticles(ParticleTypes.ITEM_SLIME,
+                this.getX(), this.getY() + this.getHeight() * 0.5, this.getZ(),
+                100, width * 0.8, this.getHeight() * 0.4, width * 0.8, 0.05);
     }
 
     private void applySkill() {
@@ -253,6 +343,15 @@ public class HugeSlimeEntity extends HostileEntity implements Monster {
                         slimes.get(0).remove(RemovalReason.KILLED);
                     }
             }
+            if (this.getWorld() instanceof ServerWorld serverWorld) {
+                serverWorld.spawnParticles(
+                        ParticleTypes.CLOUD,
+                        this.getX(), this.getY() + 0.5, this.getZ(),
+                        8,
+                        0.3, 0.2, 0.3,
+                        0.1
+                );
+            }
         }
     }
 
@@ -270,6 +369,15 @@ public class HugeSlimeEntity extends HostileEntity implements Monster {
                 slime.setPos(this.getX(), this.getY() + 0.5, this.getZ());
                 this.getWorld().spawnEntity(slime);
                 this.summonCount++;
+                if (this.getWorld() instanceof ServerWorld serverWorld) {
+                    serverWorld.spawnParticles(
+                            ParticleTypes.ITEM_SLIME,
+                            this.getX(), this.getEyeY(), this.getZ(),
+                            70,
+                            1.5, 1.5, 1.5,
+                            0
+                    );
+                }
             } else {
                 LivingEntity target = this.getTarget();
                 Vec3d pos = this.getPos().add(0, 1.0, 0);
@@ -281,6 +389,15 @@ public class HugeSlimeEntity extends HostileEntity implements Monster {
                     missile.setYaw((float) yaw + this.random.nextInt(30) - 15);
                     missile.setPitch((float) pitch + this.random.nextInt(2) - 1);
                     this.getWorld().spawnEntity(missile);
+                if (this.getWorld() instanceof ServerWorld serverWorld) {
+                    serverWorld.spawnParticles(
+                            ParticleTypes.ANGRY_VILLAGER,
+                            this.getX(), this.getEyeY(), this.getZ(),
+                            50,
+                            1.5, 1.5, 1.5,
+                            0
+                    );
+                }
             }
         }
     }
@@ -293,6 +410,7 @@ public class HugeSlimeEntity extends HostileEntity implements Monster {
         int times=-(skillTick-TRAMPLE_SKILL_DURATION);
         int cycle=60;
         int time=times;
+        List<? extends PlayerEntity> playerEntities=this.getWorld().getPlayers();
         while (time>=cycle){
             time=time%cycle;
         }
@@ -309,25 +427,46 @@ public class HugeSlimeEntity extends HostileEntity implements Monster {
             this.setVelocity(this.getVelocity().add(this.getVelocity().x,-10,this.getVelocity().z));
         }
         else if (time==50){
-            double range = 16;
-            for (int i = 0; i < 16; i++) {
-                float yaw = i * 22.5f;
+            double range = 20;
+            int count=20;
+            for (int i = 0; i < count; i++) {
+                float yaw = (float) (i * 360) /count;
                 MissileEntity missile = getMissileEntity(this, range,40);
                 missile.setPos(this.getX(), this.getY() + 1.0, this.getZ());
                 missile.setYaw(yaw);
                 missile.setPitch(0.0F);
                 this.getWorld().spawnEntity(missile);
             }
-            List<? extends PlayerEntity> playerEntities=this.getWorld().getPlayers();
             if (!playerEntities.isEmpty()){
                 for (PlayerEntity playerEntity : playerEntities) {
                     if (playerEntity instanceof ServerPlayerEntity){
-                        ScreenShakeNetworking.sendToPlayer((ServerPlayerEntity) playerEntity, 5, 0.2F);
+                        ScreenShakeNetworking.sendToPlayer((ServerPlayerEntity) playerEntity, 10, 0.3F);
                     }
                 }
             }
             if (this.getWorld() instanceof ServerWorld serverWorld){
                 FloorShakeNetworking.sendToAll(serverWorld,this.getBlockPos().down(1),5,1.0f,3.0f);
+                BlockPos center = this.getBlockPos();
+                int r = 5;
+                for (int dx = -r; dx <= r; dx++) {
+                    for (int dz = -r; dz <= r; dz++) {
+                        if (dx * dx + dz * dz > r * r) continue;
+                        BlockPos ground = center.add(dx, 0, dz);
+                        while (ground.getY() > serverWorld.getBottomY()
+                                && serverWorld.getBlockState(ground).isAir()) {
+                            ground = ground.down();
+                        }
+                        BlockState state = serverWorld.getBlockState(ground);
+                        if (state.isAir()) continue;
+                        serverWorld.spawnParticles(
+                                new BlockStateParticleEffect(ParticleTypes.BLOCK, state),
+                                ground.getX() + 0.5, ground.getY() + 1.0, ground.getZ() + 0.5,
+                                10,
+                                0.5, 0.1, 0.5,
+                                0.1
+                        );
+                    }
+                }
             }
             this.playSound(SoundEvents.ENTITY_PLAYER_BIG_FALL, 1.0F, 1.0F);
             this.playSound(SoundEvents.ENTITY_SLIME_SQUISH,2.0f,0.5f);
@@ -353,6 +492,15 @@ public class HugeSlimeEntity extends HostileEntity implements Monster {
                 missile.setYaw((float) yaw+this.random.nextInt(30)-15);
                 missile.setPitch((float) pitch+this.random.nextInt(2)-1);
                 this.getWorld().spawnEntity(missile);
+            if (this.getWorld() instanceof ServerWorld serverWorld) {
+                serverWorld.spawnParticles(
+                        ParticleTypes.ANGRY_VILLAGER,
+                        this.getX(), this.getEyeY(), this.getZ(),
+                        1,
+                        1.5, 1.5, 1.5,
+                        0
+                );
+            }
         }
     }
 
@@ -413,6 +561,14 @@ public class HugeSlimeEntity extends HostileEntity implements Monster {
         if (this.canAttack()) {
             this.damage(player);
         }
+    }
+
+    @Override
+    public boolean damage(DamageSource source, float amount) {
+        if (this.isSummoning) {
+            return false;
+        }
+        return super.damage(source, amount);
     }
 
     protected void damage(LivingEntity target) {
@@ -742,18 +898,28 @@ public class HugeSlimeEntity extends HostileEntity implements Monster {
     protected void initDataTracker() {
         super.initDataTracker();
         this.dataTracker.startTracking(ACTIVE_SKILL, -1);
+        this.dataTracker.startTracking(SUMMONING_STATE, 0);
     }
 
     @Override
     public void writeCustomDataToNbt(NbtCompound nbt) {
         super.writeCustomDataToNbt(nbt);
         nbt.putInt("SummonCount", this.summonCount);
+        nbt.putBoolean("SummoningChecked", this.summoningChecked);
+        nbt.putBoolean("IsSummoning", this.isSummoning);
+        nbt.putInt("SummoningTick", this.summoningTick);
     }
 
     @Override
     public void readCustomDataFromNbt(NbtCompound nbt) {
         super.readCustomDataFromNbt(nbt);
         this.summonCount = nbt.getInt("SummonCount");
+        this.summoningChecked = nbt.getBoolean("SummoningChecked");
+        this.isSummoning = nbt.getBoolean("IsSummoning");
+        this.summoningTick = nbt.getInt("SummoningTick");
+        if (this.isSummoning) {
+            this.dataTracker.set(SUMMONING_STATE, 1);
+        }
 
         if (this.hasCustomName()) {
             this.bossBar.setName(this.getDisplayName());

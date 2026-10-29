@@ -33,9 +33,7 @@ public class CactusBall extends AbstractNekoFunctionItem {
 
             if (nearest instanceof LivingEntity target) {
                 target.damage(player.getDamageSources().playerAttack(player), 3.0f);
-                world.playSound(null, target.getBlockPos(),
-                        SoundEvents.ENTITY_PLAYER_ATTACK_STRONG,
-                        SoundCategory.PLAYERS, 1.0F, 1.0F);
+                world.playSound(null, target.getBlockPos(), SoundEvents.ENCHANT_THORNS_HIT, SoundCategory.PLAYERS, 1.0F, 1.0F);
             }
         }
         return false;

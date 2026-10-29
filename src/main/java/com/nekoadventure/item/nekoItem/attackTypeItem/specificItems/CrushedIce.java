@@ -7,11 +7,18 @@ import com.nekoadventure.other.mobApart.MissileModelType;
 import com.nekoadventure.item.nekoItem.attackTypeItem.AbstractNekoSpecificItem;
 import com.nekoadventure.item.other.NekoPackageItem;
 import com.nekoadventure.other.mobApart.AttackTypes;
+import com.nekoadventure.sound.ModSoundEvents;
+import net.minecraft.block.Blocks;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.particle.ParticleTypes;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -41,6 +48,8 @@ public class CrushedIce extends AbstractNekoSpecificItem {
                 missile.setPosition(player.getEyePos());
                 player.getWorld().spawnEntity(missile);
             }
+            player.getWorld().playSound(null, player.getBlockPos(), SoundEvents.BLOCK_GLASS_BREAK,
+                    SoundCategory.PLAYERS, 1.0F, 1.0F);
         }
     }
 

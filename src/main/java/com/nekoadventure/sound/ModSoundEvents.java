@@ -3,6 +3,7 @@ package com.nekoadventure.sound;
 import com.nekoadventure.NekoAdventure;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.Identifier;
 
@@ -12,6 +13,10 @@ public class ModSoundEvents {
     public static final SoundEvent BRIMSTONE_FIERCE_ATTACK =register("brimstone_fierce_attack");
     public static final SoundEvent LANCE_ATTACK=register("lance_attack");
     public static final SoundEvent PARRY_ATTACK=register("parry_attack");
+    public static final SoundEvent BLADE_ATTACK=register("blade_attack");
+    public static final SoundEvent SHORT_HOOK_ATTACK=register("short_hook_attack");
+    public static final SoundEvent SKELETON_PRIEST_JEWEL=register("skeleton_priest_jewel");
+    public static final SoundEvent POKER_EXTRACT=register("poker_extract");
 
     public static final SoundEvent ENTITY_GRAND_KNIGHT_AMBIENT =register("grand_knight_ambient");
     public static final SoundEvent ENTITY_GRAND_KNIGHT_WALK =register("grand_knight_walk");
@@ -22,9 +27,12 @@ public class ModSoundEvents {
     public static final SoundEvent ENTITY_GRAND_KNIGHT_HURT=register("grand_knight_hurt");
     public static final SoundEvent ENTITY_GRAND_KNIGHT_DEATH=register("grand_knight_death");
 
+    public static final SoundEvent BOSS_FIGHT=register("boss_fight");
+
     private static SoundEvent register(String name) {
         Identifier id=new Identifier(NekoAdventure.MOD_ID, name);
         return Registry.register(Registries.SOUND_EVENT,id,SoundEvent.of(id));
     }
+
     public static void initialize(){};
 }

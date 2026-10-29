@@ -3,6 +3,7 @@ package com.nekoadventure.mixin.itemApart;
 import com.nekoadventure.item.nekoItem.attackTypeItem.AbstractNekoSpecificItem;
 import com.nekoadventure.item.other.NekoPackageItem;
 import com.nekoadventure.other.mazeApart.PlayerBlackScreenState;
+import com.nekoadventure.sound.ModSoundEvents;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -12,6 +13,9 @@ import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvent;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -124,6 +128,8 @@ public abstract class PlayerEntityMixin extends LivingEntity {
                 && NekoPackageItem.getIsFinished(player.getOffHandStack())!=2) {
                 if (NekoPackageItem.applyFunction(NekoPackageItem.getNekoItems
                         (player.getOffHandStack(), false, 4), player, 2)) {
+                    player.getWorld().playSound(null, player.getBlockPos(), SoundEvents.ENTITY_PLAYER_BIG_FALL,
+                            SoundCategory.PLAYERS, 1.0F, 0.9F);
                     cir.cancel();
             }
         }

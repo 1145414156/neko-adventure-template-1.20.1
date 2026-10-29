@@ -146,6 +146,9 @@ public class ModENLanguageProvider extends FabricLanguageProvider {
         translationBuilder.add(ModItems.GET_LAST_POOL_SOUL,"get_last_pool_soul");
 
         translationBuilder.add("sounds.neko_adventure.electricity_run_through","electricity_run_through");
+        translationBuilder.add("sounds.neko_adventure.blade_attack","blade_attack");
+        translationBuilder.add("sounds.neko_adventure.short_hook_attack","short_hook_attack");
+
 
         translationBuilder.add(ModStatusEffects.MAZE_CURSE,"maze_curse");
         translationBuilder.add(ModStatusEffects.BOSS_FIGHT,"boss_fight");
@@ -180,7 +183,6 @@ public class ModENLanguageProvider extends FabricLanguageProvider {
         translationBuilder.add(ModEntities.HUGE_SLIME,"huge_slime");
         translationBuilder.add(ModEntities.PRIEST_SKELETON,"priest_skeleton");
 
-        //按键绑定
         translationBuilder.add("key.neko-adventure.main_attack_type","Apply Main Attack");
     }
 }

@@ -169,6 +169,8 @@
   "itemgroup.soul_item_group": "猫的旅途：全部魂石",
   "key.neko-adventure.main_attack_type": "应用主攻击方式",
   "key.neko-adventure.reset_items": "立即刷新属性",
+  "neko-adventure:attack/poker_extract": "扑克牌:抽取",
+  "sounds.neko_adventure.blade_attack": "刀片:触发",
   "sounds.neko_adventure.brimstone_attack": "硫磺火:喷射",
   "sounds.neko_adventure.brimstone_fierce_attack": "硫磺火:强力溅射",
   "sounds.neko_adventure.electricity_run_through": "电流:贯穿声",
@@ -181,5 +183,7 @@
   "sounds.neko_adventure.grand_knight_sword_attack": "大骑士:剑击",
   "sounds.neko_adventure.grand_knight_walk": "大骑士:行走",
   "sounds.neko_adventure.lance_attack": "长枪:刺中",
-  "sounds.neko_adventure.parry_attack": "格挡:成功"
+  "sounds.neko_adventure.parry_attack": "格挡:成功",
+  "sounds.neko_adventure.short_hook_attack": "短勾:命中",
+  "sounds.neko_adventure.skeleton_priest_jewel": "祭司宝石:触发"
 }

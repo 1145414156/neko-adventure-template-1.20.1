@@ -7,6 +7,7 @@ import com.nekoadventure.block.maze.MazeRoomStageBlock;
 import com.nekoadventure.effect.ModStatusEffects;
 import com.nekoadventure.other.mazeApart.ClearRoomIssueRewardManager;
 import com.nekoadventure.other.mazeApart.MazeDataManager;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
@@ -14,9 +15,13 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
@@ -33,6 +38,10 @@ import java.util.List;
 //2.将初等合法的房间上方方块转换成MazeStructure方块
 //3.在清理房间后的奖励发放与清除外壳基岩
 public class MazeBlockEntity extends AbstractMazeBlockEntity{
+
+    //通过NBT设置的替换方块ID（命名空间:方块ID），设置后清理房间时门洞与墙壁优先替换为该方块
+    private String customBlockId = null;
+
     public MazeBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntityTypes.MAZE_BLOCK, pos, state);
     }
@@ -188,6 +197,7 @@ public class MazeBlockEntity extends AbstractMazeBlockEntity{
             for (PlayerEntity player:players) {
                 player.removeStatusEffect(ModStatusEffects.MAZE_CURSE);
                 player.sendMessage(Text.of("房间清理完成！"),true);
+                player.getWorld().playSound(null, player.getBlockPos(), SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.PLAYERS, 1.0F, 1.0F);
                 ClearRoomIssueRewardManager clearRoomIssueRewardManager=new ClearRoomIssueRewardManager();
                 clearRoomIssueRewardManager.apply(player, world);
             }
@@ -235,15 +245,20 @@ public class MazeBlockEntity extends AbstractMazeBlockEntity{
         int dx = direction.getOffsetX();
         int dz = direction.getOffsetZ();
         BlockPos gatePos = center.add(dx * range, 0, dz * range);
-        // 获取替换源方块位置：大门方块往中心方向移动1格，再向上5格
-        BlockPos sourcePos = gatePos.add(-dx, 5, -dz);
-        BlockState sourceState = world.getBlockState(sourcePos);
-        if (sourceState.isAir()) {
-            sourcePos = gatePos.add(-dx * 2, 5, -dz * 2);
+        // 优先使用自身NBT中保存的方块ID作为替换源方块，未设置时才走原有的查找逻辑
+        BlockState sourceState = getCustomSourceState();
+        if (sourceState == null) {
+            System.out.println("read NBT fail");
+            // 获取替换源方块位置：大门方块往中心方向移动1格，再向上5格
+            BlockPos sourcePos = gatePos.add(-dx, 5, -dz);
             sourceState = world.getBlockState(sourcePos);
-            // 如果仍是空气则直接返回(房间错误)
             if (sourceState.isAir()) {
-                return;
+                sourcePos = gatePos.add(-dx * 2, 5, -dz * 2);
+                sourceState = world.getBlockState(sourcePos);
+                // 如果仍是空气则直接返回(房间错误)
+                if (sourceState.isAir()) {
+                    return;
+                }
             }
         }
         BlockPos innerPos = gatePos.add(-dx, 0, -dz);
@@ -292,6 +307,32 @@ public class MazeBlockEntity extends AbstractMazeBlockEntity{
 
     }
 
+
+    //优先使用自身NBT中保存的方块ID作为替换源方块，未设置或无法解析时返回null交给原有逻辑
+    private BlockState getCustomSourceState() {
+        if (customBlockId == null || customBlockId.isBlank()) {
+            return null;
+        }
+        Identifier blockId = Identifier.tryParse(customBlockId);
+        if (blockId == null) {
+            return null;
+        }
+        return Registries.BLOCK.getOrEmpty(blockId).map(Block::getDefaultState).orElse(null);
+    }
+
+    @Override
+    protected void writeNbt(NbtCompound nbt) {
+        super.writeNbt(nbt);
+        if (customBlockId != null) {
+            nbt.putString("CustomBlockId", customBlockId);
+        }
+    }
+
+    @Override
+    public void readNbt(NbtCompound nbt) {
+        super.readNbt(nbt);
+        customBlockId = nbt.contains("CustomBlockId", NbtCompound.STRING_TYPE) ? nbt.getString("CustomBlockId") : null;
+    }
 
     private boolean isMazeDimension(ServerWorld world) {
         TagKey<DimensionType> isMazeTag = TagKey.of(

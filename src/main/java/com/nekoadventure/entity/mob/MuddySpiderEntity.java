@@ -28,7 +28,7 @@ import java.util.EnumSet;
 public class MuddySpiderEntity extends HostileEntity implements Monster {
 
     @Environment(EnvType.CLIENT)
-    public static final AnimationState attackAnimation=new AnimationState();
+    public final AnimationState attackAnimation=new AnimationState();
 
     private int skillCooldown = 0;
 
@@ -77,7 +77,7 @@ public class MuddySpiderEntity extends HostileEntity implements Monster {
         if (isJumpCharging && jumpTarget != null) {
             if (!attackAnimation.isRunning()) {
                 this.playSound(SoundEvents.ENTITY_SPIDER_AMBIENT,1.5f,0.5f);
-                attackAnimation.start(40);
+                attackAnimation.start(this.age);
             }
             jumpChargeTimer--;
             this.getLookControl().lookAt(jumpTarget, 30.0F, 30.0F);

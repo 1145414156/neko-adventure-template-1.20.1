@@ -25,7 +25,7 @@ import java.util.List;
 public final class BrimstoneBeamRenderer {
 
     /** 弧线细分数，越大越平滑 */
-    private static final int SEGMENTS = 6;
+    private static final int SEGMENTS = 8;
     /** 查找下一节光柱的搜索半径 */
     private static final double SEARCH_RADIUS = 6.0;
     /** 尾段沿自身视野向前收尾的长度（格） */
@@ -33,10 +33,6 @@ public final class BrimstoneBeamRenderer {
 
     private BrimstoneBeamRenderer() {
     }
-
-    /**
-     * 查找链式光柱的下一节：同主人、flag 大 1 的硫磺火弹幕，搜索半径 SEARCH_RADIUS 格，多个候选取最近。
-     */
     @Nullable
     public static MissileEntity findNext(MissileEntity entity) {
         if (entity.getFlag() >= (int) entity.getRange()) {
@@ -56,13 +52,6 @@ public final class BrimstoneBeamRenderer {
                 .min(Comparator.comparingDouble(e -> e.squaredDistanceTo(entity)))
                 .orElse(null);
     }
-
-    /**
-     * 渲染一节弧形光柱。
-     *
-     * @param next      下一节，null 表示当前是尾巴（或链断开），沿自身视野收尾
-     * @param cameraPos 相机世界坐标，用于让条带尽量正对镜头
-     */
     public static void render(MissileEntity entity, @Nullable MissileEntity next, Vec3d look, float tickDelta,
                               float inner, Matrix3f baseNormal, MatrixStack matrices,
                               VertexConsumer consumer, float uMid, Vec3d cameraPos) {
@@ -73,19 +62,14 @@ public final class BrimstoneBeamRenderer {
             endLook = next.getRotationVec(tickDelta);
             Vec3d nextPos = next.getLerpedPos(tickDelta).subtract(origin);
             if (entity.getFlag() == 1 || next.getFlag() >= (int) next.getRange()) {
-                //起点段只连到下一节位置：起点贴图的发射图案在贴图末端（v=1），
-                //若延伸到下一节前方会被下一节的中间段贴图盖住；下一节是尾巴时同理，
-                //只连到尾巴位置，由尾巴自己向前收尾，避免同一段重复渲染
                 end = nextPos;
             } else {
                 end = nextPos.add(endLook.multiply(TAIL_LENGTH));
             }
         } else {
-            //尾巴或链条断开：沿自身视野向前收尾一格
             endLook = look;
             end = look.multiply(TAIL_LENGTH);
         }
-        //切线长度取弦长，两端切线分别对齐各自视野，保证衔接处切线连续
         double handle = Math.max(end.length(), 0.5);
         Vec3d startHandle = look.multiply(handle);
         Vec3d endHandle = endLook.multiply(handle);
@@ -102,8 +86,6 @@ public final class BrimstoneBeamRenderer {
             }
         }
         double arcLength = Math.max(arc[SEGMENTS], 1.0E-4);
-
-        //每个采样点取面向镜头的宽度轴，与原来roll的逻辑等价
         Vec3d[] sides = new Vec3d[SEGMENTS + 1];
         Vec3d[] binormals = new Vec3d[SEGMENTS + 1];
         Vec3d prevSide = null;
@@ -112,7 +94,6 @@ public final class BrimstoneBeamRenderer {
             Vec3d toCamera = cameraPos.subtract(origin.add(points[i]));
             Vec3d side = toCamera.subtract(tangent.multiply(toCamera.dotProduct(tangent)));
             if (side.lengthSquared() < 1.0E-4 && prevSide != null) {
-                //视线与切线共线时沿用上一个采样点的宽度轴（投影到当前法平面）
                 side = prevSide.subtract(tangent.multiply(prevSide.dotProduct(tangent)));
             }
             if (side.lengthSquared() < 1.0E-4) {
@@ -134,7 +115,6 @@ public final class BrimstoneBeamRenderer {
         for (int i = 0; i < SEGMENTS; i++) {
             float v0 = (float) (arc[i] / arcLength);
             float v1 = (float) (arc[i + 1] / arcLength);
-            //两片互相垂直的条带，任意角度都能看到光柱
             emitBeamQuad(consumer, entry, baseNormal, points[i], sides[i], points[i + 1], sides[i + 1], inner, uMid, v0, v1);
             emitBeamQuad(consumer, entry, baseNormal, points[i], binormals[i], points[i + 1], binormals[i + 1], inner, uMid, v0, v1);
         }

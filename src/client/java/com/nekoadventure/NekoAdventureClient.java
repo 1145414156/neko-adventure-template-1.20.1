@@ -16,6 +16,7 @@ import com.nekoadventure.network.item.ClientNekoPackageDataHandler;
 import com.nekoadventure.network.maze.ClientScreenEffectHandler;
 import com.nekoadventure.network.mob.ClientScreenShakeHandler;
 import com.nekoadventure.particle.ModClientParticle;
+import com.nekoadventure.sound.BossMusicHandler;
 import com.nekoadventure.ui.NekoPackageScreen;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
@@ -46,13 +47,10 @@ public class NekoAdventureClient implements ClientModInitializer {
 		ClientFloorShakeHandler.init();
 		ClientNekoPackageDataHandler.init();
 		ModClientParticle.init();
+		BossMusicHandler.init();
 
 		ModEntityRenderer.register();
-		ModelLoadingPlugin.register(context -> {
-			for (int i = 0; i <= 20; i++) {
-				context.addModels(new Identifier(NekoAdventure.MOD_ID, "item/zenith_sword_" + i));
-			}
-		});
+		ModelLoadingPlugin.register(context -> {for (int i = 0; i <= 20; i++) {context.addModels(new Identifier(NekoAdventure.MOD_ID, "item/zenith_sword_" + i));}});
 
 		BlockRenderLayerMap.INSTANCE.putBlocks(RenderLayer.getTranslucent(),
 				ModBlocks.ROLL_ITEM_BLOCK, ModBlocks.SLOT_MACHINE_BLOCK,

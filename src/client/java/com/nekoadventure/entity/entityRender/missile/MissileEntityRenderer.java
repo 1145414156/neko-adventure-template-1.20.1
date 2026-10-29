@@ -58,13 +58,11 @@ public class MissileEntityRenderer extends EntityRenderer<MissileEntity> {
                        MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
         super.render(entity, yaw, tickDelta, matrices, vertexConsumers, light);
 
-        boolean renderRed = !(entity.getRealOwner() instanceof PlayerEntity);
+        boolean isPlayer = !(entity.getRealOwner() instanceof PlayerEntity);
         float red =1.0f;
-        float green = renderRed ? 0.0f : 1.0f;
-        float blue = renderRed ? 0.0f : 1.0f;
+        float green = isPlayer ? 0.0f : 1.0f;
+        float blue = isPlayer ? 0.0f : 1.0f;
 
-        //brimstone分支是用AI做的
-        //为了格式统一，所以说一股脑塞进一个分支里面了，观感可能有点差...
         if (entity.getMissileType() == MissileModelType.BRIMSTONE) {
             if (entity.getFlag()<=0){
                 if (entity.getWorld() instanceof ClientWorld clientWorld) {
@@ -130,13 +128,10 @@ public class MissileEntityRenderer extends EntityRenderer<MissileEntity> {
             BakedModel model = MinecraftClient.getInstance().getItemRenderer()
                     .getModel(JOYEUSE_STACK, entity.getWorld(), null, entity.getId());
             if (model != null) {
-                //物品贴图是单层平面，必须让贴图里 45° 的剑身轴线对准弹幕朝向，
-                //再绕剑轴 roll 到尽量正对镜头，否则平面与视线共面会被压成一条线（表现为不渲染）
                 Vec3d look = entity.getRotationVec(tickDelta);
                 Vec3d toCamera = this.dispatcher.camera.getPos().subtract(entity.getLerpedPos(tickDelta));
                 Vec3d faceDir = toCamera.subtract(look.multiply(toCamera.dotProduct(look)));
                 if (faceDir.lengthSquared() < 1.0E-4) {
-                    //视线几乎与剑轴共线时退化，用竖直平面兜底
                     faceDir = new Vec3d(0.0, 1.0, 0.0).crossProduct(look);
                 }
                 faceDir = faceDir.normalize();
@@ -183,7 +178,7 @@ public class MissileEntityRenderer extends EntityRenderer<MissileEntity> {
             matrices.push();
             matrices.multiply(this.dispatcher.getRotation());
             matrices.translate(0, 0.1, 0);
-            float size = 0.2f;
+            float size = 0.4f;
             float half = size / 2.0f;
             VertexConsumer vertexConsumer = vertexConsumers.getBuffer(
                     RenderLayer.getEntityCutoutNoCull(TEXTURE_BULLET));

@@ -157,5 +157,7 @@
   "itemgroup.num_item_group": "num_item_group",
   "itemgroup.soul_item_group": "soul_item_group",
   "key.neko-adventure.main_attack_type": "Apply Main Attack",
-  "sounds.neko_adventure.electricity_run_through": "electricity_run_through"
+  "sounds.neko_adventure.blade_attack": "blade_attack",
+  "sounds.neko_adventure.electricity_run_through": "electricity_run_through",
+  "sounds.neko_adventure.short_hook_attack": "short_hook_attack"
 }

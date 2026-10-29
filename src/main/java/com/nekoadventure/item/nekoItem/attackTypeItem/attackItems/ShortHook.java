@@ -59,14 +59,14 @@ public class ShortHook extends AbstractNekoAttackItem {
                 attack.setPosition(target.getEyePos().getX(), target.getEyePos().getY(), target.getEyePos().getZ());
                 player.getWorld().spawnEntity(attack);
             }
-            player.getWorld().playSound(null, player.getBlockPos(), ModSoundEvents.LANCE_ATTACK,
+            player.getWorld().playSound(null, player.getBlockPos(), ModSoundEvents.SHORT_HOOK_ATTACK,
                     SoundCategory.PLAYERS, 1.0F, 1.0F);
+            double[] finalData = NekoPackageDataManager.getFinalData(player);
+            double attackSpeed = finalData != null ? finalData[3] : 0;
+            int cooldown = (int) (100 - (attackSpeed / NekoPackageDataManager.MAX_ATTACK_SPEED) * 100);
+            cooldown = Math.max(10, Math.min(60, cooldown));
+            player.getItemCooldownManager().set(player.getOffHandStack().getItem(), cooldown);
         }
-        double[] finalData = NekoPackageDataManager.getFinalData(player);
-        double attackSpeed = finalData != null ? finalData[3] : 0;
-        int cooldown = (int) (100 - (attackSpeed / NekoPackageDataManager.MAX_ATTACK_SPEED) * 100);
-        cooldown = Math.max(10, Math.min(60, cooldown));
-        player.getItemCooldownManager().set(player.getOffHandStack().getItem(), cooldown);
     }
 
     private List<LivingEntity> getEntitiesOnLine(PlayerEntity player,

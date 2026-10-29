@@ -30,7 +30,9 @@ import net.minecraft.entity.passive.IronGolemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.FireballEntity;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
@@ -57,6 +59,16 @@ public class PriestSkeletonEntity extends HostileEntity implements Monster {
     @Environment(EnvType.CLIENT)
     public final AnimationState BULLET_SKILL =new AnimationState();
     private static final int BULLET_SKILL_DURATION =70;
+    @Environment(EnvType.CLIENT)
+    public final AnimationState SUMMON_ANI =new AnimationState();
+    private static final int SUMMON_DURATION =80;
+    private static final int SUMMON_REVEAL_TICK =55;
+    private static final TrackedData<Integer> SUMMON_STATE =
+            DataTracker.registerData(PriestSkeletonEntity.class, TrackedDataHandlerRegistry.INTEGER);
+    private int playedSummonState = 0;
+    private boolean isSummoning = false;
+    private int summonTick = 0;
+    private boolean summonChecked = false;
     private static final TrackedData<Integer> ACTIVE_SKILL =
             DataTracker.registerData(PriestSkeletonEntity.class, TrackedDataHandlerRegistry.INTEGER);
     private int playedSkill = -1;
@@ -119,6 +131,14 @@ public class PriestSkeletonEntity extends HostileEntity implements Monster {
             players.forEach(p-> p.addStatusEffect(new StatusEffectInstance(ModStatusEffects.BOSS_FIGHT,40,0,false,false,true)));
         }
 
+        this.applySummon();
+        this.checkSummonOnSpawn();
+
+        if (this.isSummoning){
+            this.setVelocity(0,0,0);
+            return;
+        }
+
         if (skillStage != 0&&skill!=0&&skill!=1){
             this.setVelocity(0,0,0);
         }
@@ -126,6 +146,16 @@ public class PriestSkeletonEntity extends HostileEntity implements Monster {
         this.applySkill();
     }
     private void syncClientAnimations() {
+        int summonState = this.dataTracker.get(SUMMON_STATE);
+        if (summonState != this.playedSummonState) {
+            if (summonState == 1) {
+                SUMMON_ANI.start(this.age);
+            } else {
+                SUMMON_ANI.stop();
+            }
+            this.playedSummonState = summonState;
+        }
+
         int activeSkill = this.dataTracker.get(ACTIVE_SKILL);
         if (activeSkill != this.playedSkill) {
             FIRE_SKILL.stop();
@@ -142,6 +172,57 @@ public class PriestSkeletonEntity extends HostileEntity implements Monster {
             }
             this.playedSkill = activeSkill;
         }
+    }
+
+    private void checkSummonOnSpawn() {
+        if (this.summonChecked) {
+            return;
+        }
+        this.summonChecked = true;
+        this.startSummon();
+    }
+
+    private void startSummon() {
+        this.isSummoning = true;
+        this.summonTick = SUMMON_DURATION;
+        this.setAiDisabled(true);
+        this.dataTracker.set(SUMMON_STATE, 1);
+    }
+
+    private void applySummon() {
+        if (!this.isSummoning) {
+            return;
+        }
+        if (this.summonTick > 0) {
+            this.summonTick--;
+            this.summonAnimationTick();
+        } else {
+            this.isSummoning = false;
+            this.setAiDisabled(false);
+            this.dataTracker.set(SUMMON_STATE, 0);
+        }
+    }
+
+    private void summonAnimationTick() {
+        int time = SUMMON_DURATION - this.summonTick;
+        this.setVelocity(0,0,0);
+        if (time == 1) {
+            this.playSound(SoundEvents.ENTITY_EVOKER_CAST_SPELL, 1.0F, 0.7F);
+        }
+        if (time == SUMMON_REVEAL_TICK) {
+            this.playSound(SoundEvents.ENTITY_EVOKER_PREPARE_SUMMON, 1.5F, 1.0F);
+            this.spawnSummonParticles();
+        }
+    }
+
+    private void spawnSummonParticles() {
+        if (!(this.getWorld() instanceof ServerWorld serverWorld)) {
+            return;
+        }
+        Vec3d center = this.getPos().add(0, this.getHeight() * 0.5, 0);
+        serverWorld.spawnParticles(ParticleTypes.SOUL,
+                center.x, center.y, center.z,
+                40, 1.0, this.getHeight() * 0.5, 1.0, 0.02);
     }
 
     private void applySkill() {
@@ -166,9 +247,6 @@ public class PriestSkeletonEntity extends HostileEntity implements Monster {
                 return;
             }
             skill=this.random.nextInt(4);
-            if (skill==3){
-                skill=random.nextBoolean()? 4:random.nextInt(3);
-            }
             //0.火球术，1.横扫，2.尖刺，3.弹幕
             switch (skill) {
                 case 0 -> skillTick = FIRE_SKILL_DURATION;
@@ -192,7 +270,33 @@ public class PriestSkeletonEntity extends HostileEntity implements Monster {
     private void fireballSkill(){
         if (this.getTarget()==null&&targetPos==null){return;}
         int times=-(skillTick-FIRE_SKILL_DURATION);
-        if (times==1){this.playSound(SoundEvents.ENTITY_EVOKER_CAST_SPELL, 0.7F, 1.0F);}
+        if (times==1){this.playSound(SoundEvents.ENTITY_EVOKER_CAST_SPELL, 1.0F, 1.0F);}
+        if (times == 10) {
+            if (getWorld() instanceof ServerWorld serverWorld) {
+                float yaw = this.getBodyYaw();
+                double yawRad = Math.toRadians(yaw);
+                double rightX = -Math.cos(yawRad);
+                double rightZ = -Math.sin(yawRad);
+                double px = this.getX() + rightX;
+                double py = this.getEyeY();
+                double pz = this.getZ() + rightZ;
+                serverWorld.spawnParticles(
+                        ParticleTypes.FLAME,
+                        px, py, pz,
+                        20,
+                        0.3, 0.3, 0.3,
+                        0.1
+                );
+                serverWorld.spawnParticles(
+                        ParticleTypes.LAVA,
+                        px, py, pz,
+                        5,
+                        0.2, 0.2, 0.2,
+                        0.1
+                );
+            }
+        }
+
       if (times==34||times==44||times==54){
           LivingEntity target = this.getTarget();
           if (target != null) {targetPos = target.getPos().add(0,1.5,0);}
@@ -202,6 +306,14 @@ public class PriestSkeletonEntity extends HostileEntity implements Monster {
                   this.getWorld(), this, direction.x, direction.y, direction.z, 0);
           fireball.setPosition(pos.x, pos.y-0.5, pos.z);
           this.getWorld().spawnEntity(fireball);
+          if (this.getWorld() instanceof ServerWorld serverWorld) {
+              Vec3d look = this.getRotationVec(1.0F);
+              double px = this.getX() + look.x;
+              double py = this.getY() + 1.0 + look.y;
+              double pz = this.getZ() + look.z;
+              serverWorld.spawnParticles(ParticleTypes.FLAME,
+                      px, py, pz, 10, 0.3, 0.3, 0.3, 0.1);
+          }
           this.playSound(SoundEvents.ENTITY_BLAZE_SHOOT, 1.0F, 1.0F);
       }
     }
@@ -210,18 +322,60 @@ public class PriestSkeletonEntity extends HostileEntity implements Monster {
         if (this.getTarget()==null&&targetPos==null){return;}
         int times = -(skillTick - SWEEP_SKILL_DURATION);
         if (times==1){this.playSound(SoundEvents.ENTITY_EVOKER_CAST_SPELL, 0.7F, 1.0F);}
+        if (times == 10) {
+            if (getWorld() instanceof ServerWorld serverWorld) {
+                float yaw = this.getBodyYaw();
+                double yawRad = Math.toRadians(yaw);
+                double rightX = -Math.cos(yawRad);
+                double rightZ = -Math.sin(yawRad);
+                double px = this.getX() + rightX;
+                double py = this.getEyeY();
+                double pz = this.getZ() + rightZ;
+                serverWorld.spawnParticles(
+                        ParticleTypes.CLOUD,
+                        px, py, pz,
+                        20,
+                        0.3, 0.3, 0.3,
+                        0.1
+                );
+            }
+        }
         if (times == 27) {
             int count = 8;
             float halfAngle = 60.0F;
             Vec3d pos=this.getEyePos();
-            damageEntitiesInFront(5,3,3,this.getDamageAmount());
+            damageEntitiesInFront(4,2,2,this.getDamageAmount());
             for (int i = 0; i < count; i++) {
                 float offset = -halfAngle + (halfAngle*2/count)*i;
-                MissileEntity missile = getMissileEntity(this,20,40);
-                missile.setPos(pos.x, pos.y-0.5, pos.z);
+                MissileEntity missile = getMissileEntity(this,32,80);
+                missile.setPos(pos.x, pos.y-1.5, pos.z);
                 missile.setYaw(getYaw()+offset);
-                missile.setPitch(this.getPitch());
+                missile.setPitch(0);
                 this.getWorld().spawnEntity(missile);
+            }
+            if (this.getWorld() instanceof ServerWorld serverWorld) {
+                double radius = 2.5;
+                int steps = 16;
+                double yawRad = Math.toRadians(this.getYaw());
+                double fwdX = -Math.sin(yawRad);
+                double fwdZ = Math.cos(yawRad);
+                double rightX = -Math.cos(yawRad);
+                double rightZ = -Math.sin(yawRad);
+                double baseY = this.getEyeY();
+                for (int s = 0; s <= steps; s++) {
+                    double angle = -Math.PI / 2 + (Math.PI / steps) * s;
+                    double cos = Math.cos(angle);
+                    double sin = Math.sin(angle);
+                    double px = this.getX() + (fwdX * cos + rightX * sin) * radius;
+                    double pz = this.getZ() + (fwdZ * cos + rightZ * sin) * radius;
+                    serverWorld.spawnParticles(
+                            ParticleTypes.SWEEP_ATTACK,
+                            px, baseY, pz,
+                            1,
+                            0.0, 0.0, 0.0,
+                            0.0
+                    );
+                }
             }
             this.playSound(SoundEvents.ENTITY_PLAYER_ATTACK_SWEEP, 1.0F, 1.0F);
         }
@@ -260,14 +414,34 @@ public class PriestSkeletonEntity extends HostileEntity implements Monster {
                     this.getWorld().spawnEntity(fangs);
                     this.playSound(SoundEvents.ENTITY_EVOKER_CAST_SPELL, 1.0F, 1.0F);
             }
+            if (this.getWorld() instanceof ServerWorld serverWorld) {
+                double yawRad = Math.toRadians(this.getYaw());
+                double fwdX = -Math.sin(yawRad);
+                double fwdZ = Math.cos(yawRad);
+                double leftX = Math.cos(yawRad);
+                double leftZ = Math.sin(yawRad);
+                double px = this.getX() + leftX + fwdX;
+                double py = this.getY() + this.getHeight() + 1.0;
+                double pz = this.getZ() + leftZ + fwdZ;
+
+                serverWorld.spawnParticles(
+                        ParticleTypes.SOUL,
+                        px, py, pz,
+                        3,
+                        0.3, 0.3, 0.3,
+                        0.02
+                );
+            }
         }
     }
     private void bulletSkill(){
         if (this.getTarget()==null&&targetPos==null){return;}
         int times = -(skillTick - BULLET_SKILL_DURATION);
-        if (times==1){this.playSound(SoundEvents.ENTITY_EVOKER_CAST_SPELL, 0.7F, 1.0F);}
+        if (times==1){
+            this.playSound(SoundEvents.ENTITY_EVOKER_CAST_SPELL, 0.7F, 1.0F);
+        }
         if (times<=10){
-            this.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 50, 2));
+            this.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 60, 2));
             this.setVelocity(this.getVelocity().add(0,0.2,0));
         }
         else if (times>20&&times<60){
@@ -278,12 +452,26 @@ public class PriestSkeletonEntity extends HostileEntity implements Monster {
             missile1.setYaw(this.getYaw()+bulletSkillAngle*10);
             missile1.setPos(this.getX(), this.getY()-0.5, this.getZ());
             this.getWorld().spawnEntity(missile1);
-
             MissileEntity missile2 =getMissileEntity(this,32,160);
             missile2.setPitch(0);
             missile2.setYaw(this.getYaw()+bulletSkillAngle*10+180);
             missile2.setPos(this.getX(), this.getY()-0.5, this.getZ());
             this.getWorld().spawnEntity(missile2);
+            if (getWorld() instanceof ServerWorld serverWorld) {
+                double yawRad = Math.toRadians(this.getYaw());
+                double rightX = -Math.cos(yawRad);
+                double rightZ = -Math.sin(yawRad);
+                double px = this.getX() + rightX;
+                double py = this.getY() + 2.75;
+                double pz = this.getZ() + rightZ;
+                serverWorld.spawnParticles(
+                        ParticleTypes.WITCH,
+                        px, py, pz,
+                        3,
+                        0.3, 0.3, 0.3,
+                        0.02
+                );
+            }
         }
 
     }
@@ -341,6 +529,14 @@ public class PriestSkeletonEntity extends HostileEntity implements Monster {
     }
 
     @Override
+    public boolean damage(DamageSource source, float amount) {
+        if (this.isSummoning) {
+            return false;
+        }
+        return super.damage(source, amount);
+    }
+
+    @Override
     public boolean isFireImmune() {
         return true;
     }
@@ -381,6 +577,7 @@ public class PriestSkeletonEntity extends HostileEntity implements Monster {
     protected void initDataTracker() {
         super.initDataTracker();
         this.dataTracker.startTracking(ACTIVE_SKILL, -1);
+        this.dataTracker.startTracking(SUMMON_STATE, 0);
     }
 
     @Override
@@ -389,6 +586,9 @@ public class PriestSkeletonEntity extends HostileEntity implements Monster {
         nbt.putInt("SkillTick", this.skillTick);
         nbt.putInt("SkillStage", this.skillStage);
         nbt.putInt("Skill", this.skill);
+        nbt.putBoolean("SummonChecked", this.summonChecked);
+        nbt.putBoolean("IsSummoning", this.isSummoning);
+        nbt.putInt("SummonTick", this.summonTick);
     }
 
     @Override
@@ -397,6 +597,12 @@ public class PriestSkeletonEntity extends HostileEntity implements Monster {
         this.skillTick = nbt.getInt("SkillTick");
         this.skillStage = nbt.getInt("SkillStage");
         this.skill = nbt.getInt("Skill");
+        this.summonChecked = nbt.getBoolean("SummonChecked");
+        this.isSummoning = nbt.getBoolean("IsSummoning");
+        this.summonTick = nbt.getInt("SummonTick");
+        if (this.isSummoning) {
+            this.dataTracker.set(SUMMON_STATE, 1);
+        }
 
         if (this.hasCustomName()) {
             this.bossBar.setName(this.getDisplayName());

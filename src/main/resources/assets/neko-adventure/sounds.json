@@ -26,10 +26,39 @@
   "parry_attack": {
     "subtitle": "sounds.neko_adventure.parry_attack",
     "sounds": [
-      "neko-adventure:attack/parry_attack"
+      "neko-adventure:attack/parry_attack1",
+      "neko-adventure:attack/parry_attack2"
+
+    ]
+  },
+  "blade_attack": {
+    "subtitle": "sounds.neko_adventure.blade_attack",
+    "sounds": [
+      "neko-adventure:attack/blade_attack1",
+      "neko-adventure:attack/blade_attack2"
+    ]
+  },
+  "short_hook_attack": {
+    "subtitle": "sounds.neko_adventure.short_hook_attack",
+    "sounds": [
+      "neko-adventure:attack/short_hook_attack1",
+      "neko-adventure:attack/short_hook_attack2",
+      "neko-adventure:attack/short_hook_attack3"
     ]
   },
 
+  "skeleton_priest_jewel": {
+    "subtitle": "sounds.neko_adventure.skeleton_priest_jewel",
+    "sounds": [
+      "neko-adventure:attack/skeleton_priest_jewel"
+    ]
+  },
+  "poker_extract": {
+    "subtitle": "sounds.neko_adventure.poker_extract",
+    "sounds": [
+      "neko-adventure:attack/poker_extract"
+    ]
+  },
 
   "grand_knight_ambient":{
     "subtitle": "sounds.neko_adventure.grand_knight_ambient",
@@ -83,6 +112,12 @@
     "subtitle": "sounds.neko_adventure.grand_knight_death",
     "sounds": [
       "neko-adventure:mob/grand_knight_death"
+    ]
+  },
+
+  "boss_fight":{
+    "sounds": [
+      "neko-adventure:music/boss_fight"
     ]
   }
 

@@ -94,12 +94,10 @@ public class GateBlockEntity extends BlockEntity implements BlockEntityTicker<Ga
         }
     }
     //这个方法是用来把那些无用的大门给变成墙壁
-    //提取为public static供感染统计门数时同步调用，避免统计时机早于方块实体tick时把无用大门也计入
     public static void resolveUselessGate(World world, BlockPos pos){
         if (world == null || pos == null) {
             return;
         }
-        //已经不是大门方块时直接跳过，保证重复调用安全
         if (!(world.getBlockState(pos).getBlock() instanceof GateBlock)) {
             return;
         }

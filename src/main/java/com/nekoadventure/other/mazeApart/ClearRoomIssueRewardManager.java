@@ -9,6 +9,7 @@ import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.world.World;
 
@@ -37,6 +38,10 @@ public class ClearRoomIssueRewardManager {
                     if (stack.getItem() instanceof AbstractSoulItem soulItem&&random.nextBoolean()) {
                         soulItem.addCharged(stack, 1);
                     }
+                }
+                if (world instanceof ServerWorld serverWorld) {
+                    serverWorld.spawnParticles(ParticleTypes.ELECTRIC_SPARK,
+                            player.getX(), player.getY()+1, player.getZ(), 10, 0.5, 0.5, 0.5, 0.1);
                 }
             }
         }

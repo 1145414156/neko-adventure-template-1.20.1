@@ -8,6 +8,7 @@
     "itemApart.NekoPackageSlotMixin",
     "itemApart.PlayerEntityMixin",
     "itemApart.ServerPlayerInteractionManagerMixin",
+    "mazeApart.JigsawReplacementStructureProcessorMixin",
     "mazeApart.ZombieEntityMixin"
   ],
   "injectors": {
