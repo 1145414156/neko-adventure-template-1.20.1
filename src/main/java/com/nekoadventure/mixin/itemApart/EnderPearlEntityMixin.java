@@ -1,7 +1,6 @@
 package com.nekoadventure.mixin.itemApart;
 
 import com.nekoadventure.NekoAdventure;
-import com.nekoadventure.effect.ModStatusEffects;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.thrown.EnderPearlEntity;

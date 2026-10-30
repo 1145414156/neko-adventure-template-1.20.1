@@ -2,8 +2,8 @@ package com.nekoadventure.entity.mob;
 
 import com.nekoadventure.entity.ModEntities;
 import com.nekoadventure.entity.missile.MissileEntity;
-import com.nekoadventure.other.mobApart.MissileModelType;
 import com.nekoadventure.other.mobApart.AttackTypes;
+import com.nekoadventure.other.mobApart.MissileModelType;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.EntityGroup;
 import net.minecraft.entity.EntityType;

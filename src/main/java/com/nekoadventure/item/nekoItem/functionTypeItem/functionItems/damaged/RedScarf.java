@@ -2,11 +2,11 @@ package com.nekoadventure.item.nekoItem.functionTypeItem.functionItems.damaged;
 
 import com.nekoadventure.entity.ModEntities;
 import com.nekoadventure.entity.missile.MissileEntity;
-import com.nekoadventure.other.mobApart.MissileModelType;
 import com.nekoadventure.item.nekoItem.functionTypeItem.functionItems.AbstractNekoFunctionItem;
 import com.nekoadventure.item.other.NekoPackageItem;
 import com.nekoadventure.other.itemApart.NekoPackageDataManager;
 import com.nekoadventure.other.mobApart.AttackTypes;
+import com.nekoadventure.other.mobApart.MissileModelType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.player.PlayerEntity;

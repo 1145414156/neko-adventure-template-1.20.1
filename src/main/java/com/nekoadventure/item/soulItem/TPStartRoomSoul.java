@@ -1,7 +1,6 @@
 package com.nekoadventure.item.soulItem;
 
 import com.nekoadventure.effect.ModStatusEffects;
-import com.nekoadventure.item.ModItems;
 import com.nekoadventure.other.mazeApart.MazeDataManager;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
