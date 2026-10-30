@@ -101,7 +101,6 @@ public class MissileEntity extends Entity {
         super.tick();
         this.noClip=true;
 
-        //mark
         if (this.getWorld().isClient) {return;}
 
         if(getAliveDuration()==0) {
@@ -192,9 +191,6 @@ public class MissileEntity extends Entity {
             }
         }
     }
-
-    //=================================================================================================
-
     @Override
     protected void initDataTracker() {
         this.dataTracker.startTracking(MISSILE_MODEL_TYPE, MissileModelType.BULLET.ordinal());

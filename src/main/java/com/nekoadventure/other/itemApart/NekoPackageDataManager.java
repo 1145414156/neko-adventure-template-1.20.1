@@ -12,7 +12,6 @@ public class NekoPackageDataManager {
     private static final ConcurrentHashMap<UUID, PlayerNekoData> SERVER_DATA = new ConcurrentHashMap<>();
     private static final ConcurrentHashMap<UUID, Set<String>> ITEM_STATE = new ConcurrentHashMap<>();
     private static final ConcurrentHashMap<UUID, ConcurrentHashMap<String, Integer>> ITEM_INT_STATE = new ConcurrentHashMap<>();
-  //给那些需要记录实体死亡用的
     private static final ConcurrentHashMap<UUID, ConcurrentHashMap<UUID, Long>> ENTITY_RECORD = new ConcurrentHashMap<>();
     private static volatile double[] clientFinalData;
     private static volatile int clientLevel = 1;

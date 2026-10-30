@@ -52,8 +52,6 @@ public class ModKeyBoard {
             }
         }
     }
-
-    //主攻击方式由按键触发(按住可持续触发，实际频率由服务端冷却校验控制)
     private static void applyMainAttackType(MinecraftClient client) {
         if (client.player != null) {
             ItemStack offHand = client.player.getOffHandStack();

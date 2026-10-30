@@ -76,7 +76,7 @@ public class NekoPackageItem extends Item {
             stack.decrement(1);
             return;
         }
-        //通过的纸盒进入维度，且玩家为创造模式会被自动清除
+        //通关的纸盒进入维度，且玩家为生存模式会被自动清除
         if (world instanceof ServerWorld serverWorld&& getIsFinished(stack)==2&&
                 entity instanceof PlayerEntity player && !player.isCreative()&& isMazeDimension(serverWorld)){
             stack.decrement(1);

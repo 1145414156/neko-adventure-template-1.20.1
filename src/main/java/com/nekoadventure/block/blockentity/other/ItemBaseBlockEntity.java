@@ -20,18 +20,13 @@ public class ItemBaseBlockEntity extends BlockEntity {
 
     private ItemStack item =ItemStack.EMPTY;
     private int requiredCoins = 0;
-    //上一次交互的游戏刻,只为冷却服务,不需要存档
     private long lastUseTime = -100L;
     public ItemBaseBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntityTypes.ITEM_BASE_BLOCK_ENTITY, pos, state);
     }
-
-    //是否还在右键冷却中
     public boolean isInUseCooldown() {
         return world != null && world.getTime() - lastUseTime < USE_COOLDOWN_TICKS;
     }
-
-    //记录一次右键交互,进入冷却
     public void markUsed() {
         if (world != null) {
             lastUseTime = world.getTime();
@@ -85,16 +80,12 @@ public class ItemBaseBlockEntity extends BlockEntity {
             item = ItemStack.EMPTY;
         }
     }
-
-    //以下是给网络同步用的
-
     @Override
     public NbtCompound toInitialChunkDataNbt() {
         NbtCompound nbt = new NbtCompound();
         writeNbt(nbt);
         return nbt;
     }
-
     @Override
     public Packet<ClientPlayPacketListener> toUpdatePacket() {
         return BlockEntityUpdateS2CPacket.create(this);

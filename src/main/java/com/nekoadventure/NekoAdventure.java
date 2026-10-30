@@ -8,7 +8,7 @@ import com.nekoadventure.event.ModEvents;
 import com.nekoadventure.item.ModItems;
 import com.nekoadventure.item.itemGroup.ModItemGroups;
 import com.nekoadventure.network.item.NekoPackageDataNetworking;
-import com.nekoadventure.network.maze.MobIdInputNetworking;
+import com.nekoadventure.network.maze.SpawnMobBlockIdInputNetworking;
 import com.nekoadventure.particle.ModParticleTypes;
 import com.nekoadventure.sound.ModSoundEvents;
 import com.nekoadventure.villager.ModTrades;
@@ -37,7 +37,7 @@ public class NekoAdventure implements ModInitializer {
 		ModItemGroups.registerGroups();
 		ModEvents.initialize();
 		NekoPackageDataNetworking.registerServerReceivers();
-		MobIdInputNetworking.registerServerReceivers();
+		SpawnMobBlockIdInputNetworking.registerServerReceivers();
 		ModParticleTypes.initialize();
 
 		ModEntities.initialize();

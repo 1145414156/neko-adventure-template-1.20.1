@@ -21,7 +21,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-//这个类是专门用来做在获得战斗效果时，关门（生成对应的方块）
+//这个方块是专门用来做在获得战斗效果时，关门（生成基岩）
 public class GateBlockEntity extends BlockEntity implements BlockEntityTicker<GateBlockEntity> {
 
 

@@ -9,18 +9,15 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
+/**这个类由AI辅助完成**/
 
 public class FloorShakeNetworking {
 
     public static final Identifier CHANNEL = new Identifier(NekoAdventure.MOD_ID, "floor_rotate");
 
-    /** 默认的最小/最大弹跳高度 */
+    // 默认的最小/最大弹跳高度
     public static final float DEFAULT_MIN_HEIGHT = 0.8F;
     public static final float DEFAULT_MAX_HEIGHT = 2.0F;
-
-    /**
-     * 给单个玩家发送地板旋转效果
-     */
     public static void sendToPlayer(ServerPlayerEntity player, BlockPos center, double radius,
                                     float minHeight, float maxHeight) {
         PacketByteBuf buf = PacketByteBufs.create();
@@ -30,11 +27,6 @@ public class FloorShakeNetworking {
         buf.writeFloat(maxHeight);
         ServerPlayNetworking.send(player, CHANNEL, buf);
     }
-
-    /**
-     * 给一个世界里的所有在线玩家发送地板效果
-     * 使用默认高度范围
-     */
     public static void sendToAll(ServerWorld world, BlockPos center, double radius) {
         sendToAll(world, center, radius, false, DEFAULT_MIN_HEIGHT, DEFAULT_MAX_HEIGHT);
     }
@@ -48,7 +40,7 @@ public class FloorShakeNetworking {
     }
 
     /**
-     * 给一个世界里的所有在线玩家发送地板旋转效果
+     * 给一个世界里的所有在线玩家发送地板效果
      *
      * @param destroyBlocks 是否真实践踏：true 时受影响方块被破坏（不掉落物，基岩等不可破坏方块除外）
      */

@@ -14,19 +14,13 @@ import net.minecraft.util.math.Vec3d;
 import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 
-/**
- * 天顶剑刀光拖尾渲染。
- * 与 AttackTypes.zenithMovement 使用同一套椭圆轨迹参数（半轴 a、b、角速度 omega、
- * 左右方向 sign），把剑已经扫过的椭圆弧解析重建为一条带状光刃：
- * 内弧与外弧由椭圆单位法线向两侧偏移得到，两条边线始终与轨迹等距、连续平滑。
- * 贴图整图沿弧长只拉伸一次（u: 尾端0 -> 剑身1，v: 内弧0 -> 外弧1）。
- * 拖尾跨度在起手与收尾阶段平滑收敛：起手渐长刻意放缓，刀光由短到长逐步展开。
- */
+//天顶剑刀光拖尾渲染
+//该类由AI辅助完成
 public final class ZenithSlashRenderer {
 
     private static final Identifier SLASH_TEXTURE =
             new Identifier(NekoAdventure.MOD_ID, "textures/particle/zenith_particle.png");
-    /** 各变色剑的刀光颜色 */
+    // 各变色剑的刀光颜色
     private static final int[] WEAPON_COLORS = {
             0xEBA687, 0x7A42BF, 0x384ED2, 0xB2FFB4, 0xED1C24,
             0xEC3EC0, 0x5B9EE8, 0xFFE745, 0x6BCB00, 0xFE9E23,
@@ -34,27 +28,25 @@ public final class ZenithSlashRenderer {
             0x8FD71D, 0x50DE7A, 0x54EAF5, 0xED3F85, 0xFEC2FA,
             0xB2FFB4
     };
-    /** 弧带细分段数 */
+    // 弧带细分段数
     private static final int SEGMENTS = 32;
-    /** 拖尾最大角度跨度（弧度） */
+    // 拖尾最大弧度
     private static final double MAX_SPAN = Math.toRadians(150.0);
-    /** 小于该跨度时不再渲染刀光 */
+    //小于该跨度时不再渲染刀光
     private static final double MIN_SPAN = 1.0E-3;
-    /** 起手渐长所占整圈进度（越大起手渐长越慢） */
+    //起手渐长所占整圈进度
     private static final double FADE_IN = 0.4;
-    /** 收尾收窄所占整圈进度 */
+    //收尾收窄所占整圈进度
     private static final double FADE_OUT = 0.18;
-    /** 拖尾末端由尖收窄到全宽所占的弧长比例 */
+    //拖尾末端由尖收窄到全宽所占的弧长比例
     private static final float TAIL_FADE = 0.45f;
-    /** 刀光外弧半宽 */
+    //刀光外弧半宽
     private static final float OUTER_WIDTH = 0.75f;
-    /** 刀光内弧半宽 */
+    //刀光内弧半宽
     private static final float INNER_WIDTH = 0.75f;
 
     private ZenithSlashRenderer() {
     }
-
-    /** 渲染一帧天顶剑刀光 */
     public static void render(MissileEntity entity, MatrixStack matrices,
                               VertexConsumerProvider vertexConsumers, float tickDelta) {
         double time = Math.max(1, entity.getTime());

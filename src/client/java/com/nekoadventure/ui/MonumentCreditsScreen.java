@@ -33,8 +33,6 @@ public class MonumentCreditsScreen extends Screen {
         int lineHeight = textRenderer.fontHeight + 6;
         panelHeight = 48 + CREDITS.size() * lineHeight + 28;
         int panelY = (height - panelHeight) / 2;
-
-        // 关闭按钮
         this.addDrawableChild(ButtonWidget.builder(Text.literal("关闭"), button -> this.close())
                 .dimensions(width / 2 - 30, panelY + panelHeight - 24, 60, 20)
                 .build());
@@ -44,26 +42,16 @@ public class MonumentCreditsScreen extends Screen {
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         this.renderBackground(context);
         super.render(context, mouseX, mouseY, delta);
-
         int lineHeight = textRenderer.fontHeight + 6;
         int panelX = (width - PANEL_WIDTH) / 2;
         int panelY = (height - panelHeight) / 2;
-
-        // 面板背景
         context.fill(panelX, panelY, panelX + PANEL_WIDTH, panelY + panelHeight, 0xCC000000);
-        // 面板边框
         context.fill(panelX, panelY, panelX + PANEL_WIDTH, panelY + 1, 0xFFAAAAAA);
         context.fill(panelX, panelY + panelHeight - 1, panelX + PANEL_WIDTH, panelY + panelHeight, 0xFFAAAAAA);
         context.fill(panelX, panelY, panelX + 1, panelY + panelHeight, 0xFFAAAAAA);
         context.fill(panelX + PANEL_WIDTH - 1, panelY, panelX + PANEL_WIDTH, panelY + panelHeight, 0xFFAAAAAA);
-
-        // 标题
         context.drawCenteredTextWithShadow(textRenderer, Text.literal("§6§l感 谢 名 单"), width / 2, panelY + 14, 0xFFFFFF);
-
-        // 分隔线
         context.fill(panelX + 12, panelY + 32, panelX + PANEL_WIDTH - 12, panelY + 33, 0xFF555555);
-
-        // 名单内容
         for (int i = 0; i < CREDITS.size(); i++) {
             int lineY = panelY + 42 + i * lineHeight;
             context.drawCenteredTextWithShadow(textRenderer, Text.literal(CREDITS.get(i)), width / 2, lineY, 0xFFFFFF);

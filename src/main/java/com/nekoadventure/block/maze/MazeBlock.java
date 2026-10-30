@@ -12,9 +12,6 @@ import net.minecraft.state.StateManager;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
-
-
-//给玩家效果是在另外一个方块实体类
 public class MazeBlock extends AbstractMazeBlock implements BlockEntityProvider {
     public MazeBlock(Settings settings) {
         super(settings);

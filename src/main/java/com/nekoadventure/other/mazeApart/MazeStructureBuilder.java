@@ -74,7 +74,6 @@ public class MazeStructureBuilder {
             int impasseCount;
             if (!impasse.isEmpty()) {impasseCount=impasse.size();}
             else {impasseCount=0;}
-
             //这个是处理当死胡同不够的时候的情况
             if (impasseCount < MIN_IMPASSE_COUNT) {
                 System.err.println("Impasse count is less than "+MIN_IMPASSE_COUNT+"!");
@@ -392,19 +391,49 @@ public class MazeStructureBuilder {
     }
 
     private Identifier getPath(World world, String roomType) {
+        MazeDataManager data = MazeDataManager.get(world);
+        int level=1;
+        if (data != null) {
+            level=data.getLevelData();
+        }
+        String roomLevelPath;
+        if (level % 2 == 0) {
+            int level1 = level - 1;
+            roomLevelPath=level1 + "-" + level;
+        }
+        else {
+            int level1 = level + 1;
+            roomLevelPath=level + "-" + level1;
+        }
+
         RegistryKey<World> worldKey = world.getRegistryKey();
         String dimensionPath = worldKey.getValue().getPath();
-        String path = dimensionPath + "/specific_room/" + roomType+"/"+roomType+1;
+        String path = dimensionPath + "/specific_room/" + roomType+"/"+roomLevelPath+"/"+roomType+1;
         if (world instanceof  ServerWorld serverWorld) {
             StructureTemplateManager structureManager = serverWorld.getStructureTemplateManager();
             Optional<StructureTemplate> optional = structureManager.getTemplate(new Identifier(NekoAdventure.MOD_ID,path));
             if (optional.isEmpty()) {
+                path = dimensionPath + "/specific_room/" + roomType+"/"+roomLevelPath+"/"+roomType;
+                optional = structureManager.getTemplate(new Identifier(NekoAdventure.MOD_ID,path));
+                if (optional.isEmpty()){
+                    path = dimensionPath + "/specific_room/" + roomType+"/"+roomType+1;
+                    optional = structureManager.getTemplate(new Identifier(NekoAdventure.MOD_ID,path));
+                    if (optional.isEmpty()){
+                        path = dimensionPath + "/specific_room/" + roomType+"/"+roomType;
+                    }
+                    else {
+                        List<String> allPath=new ArrayList<>();
+                        for (int a = 1; structureManager.getTemplate(new Identifier(NekoAdventure.MOD_ID,path)).isPresent(); a++){
+                            if (a==1){
+                                continue;
+                            }
+                            allPath.add(path);
+                            path=dimensionPath + "/specific_room/" + roomType+"/"+roomType+a;
+                        }
+                        path=allPath.get(Random.create().nextInt(allPath.size()));
 
-                //开发辅助
-                NekoAdventure.LOGGER.warn("room type has simple template for specific room");
-                //开发辅助
-
-                path=dimensionPath + "/specific_room/" + roomType+"/"+roomType;
+                    }
+                }
             }
             else {
                 List<String> allPath=new ArrayList<>();
@@ -413,7 +442,7 @@ public class MazeStructureBuilder {
                         continue;
                     }
                     allPath.add(path);
-                    path=dimensionPath + "/specific_room/" + roomType+"/"+roomType+a;
+                    path=dimensionPath + "/specific_room/" + roomType+"/"+roomLevelPath+"/"+roomType+a;
                 }
                 path=allPath.get(Random.create().nextInt(allPath.size()));
 

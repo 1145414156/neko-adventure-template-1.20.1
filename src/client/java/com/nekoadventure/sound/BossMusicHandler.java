@@ -16,8 +16,7 @@ import java.util.List;
 
 /**
  * Boss 战斗背景音乐：玩家处于 Boss 32 格范围内且非创造/旁观时循环播放 boss_fight。
- * 通过替换 {@link MinecraftClient#getMusicType()} 的返回值交给原版 MusicTracker 播放，
- * 音乐结束后原版逻辑会立即重播，从而实现循环。
+ * 该类由AI辅助完成
  */
 public class BossMusicHandler {
     private static final double BOSS_MUSIC_RANGE = 32.0D;

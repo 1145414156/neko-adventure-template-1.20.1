@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-//用自定义的字段来实现可储存式的墙壁方块储存
+//新增一个自定义的字段来实现拼图方块的自定义方块的自定义方块的NBT储存
 @Mixin(JigsawReplacementStructureProcessor.class)
 public class JigsawReplacementStructureProcessorMixin {
 

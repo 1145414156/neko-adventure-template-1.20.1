@@ -40,7 +40,7 @@ public class ExposedWire extends AbstractNekoAttackItem {
     @Override
     public void changeMainAttackType(PlayerEntity player, float yaw) {
         super.changeMainAttackType(player, yaw);
-        //这里是选择实体部分
+
         World world = player.getWorld();
         double attackRange = 3;
         double strength = 1;
@@ -51,7 +51,6 @@ public class ExposedWire extends AbstractNekoAttackItem {
         List<Entity> entities = getEntitiesInRange(player, player.getWorld() ,(int) attackRange);
         entities=entityChooseHandler(player, entities, world, MAX_CONNECT);
 
-        //这里是伤害部分
         if (!entities.isEmpty()) {
             for (Entity entity : entities) {
                 Vec3d pos=new Vec3d(entity.getX(),entity.getEyeY(),entity.getZ());
@@ -157,7 +156,6 @@ public class ExposedWire extends AbstractNekoAttackItem {
                     .filter(e -> e instanceof LivingEntity)
                     .map(e -> (LivingEntity) e)
                     .collect(Collectors.toList());
-            //为实体排序
             Vec3d pos = owner.getPos();
             livingEntities.sort(Comparator.comparingDouble(e ->
                     e.getPos().squaredDistanceTo(pos)));
@@ -165,8 +163,6 @@ public class ExposedWire extends AbstractNekoAttackItem {
             if (livingEntities.size() > count) {
                 livingEntities.subList(count, livingEntities.size()).clear();
             }
-
-            //这里是特效部分
             List<Entity> chainOrder = new ArrayList<>(livingEntities);
             Entity current = null;
             double nearestDistance = Double.MAX_VALUE;
@@ -197,7 +193,6 @@ public class ExposedWire extends AbstractNekoAttackItem {
                     current = next;
                 }
             }
-            // 限制
             if (chain.size() > count) {
                 chain.subList(count, chain.size()).clear();
             }

@@ -102,9 +102,9 @@ public class TPNextLevelBlock extends Block {
                         ScreenBlackEffectPacket.send(serverPlayer, true);
                     });
                     List<ServerPlayerEntity> finalAllPlayers = allPlayers;
-                    /**这里因为这个方块本身并没有tick方法所以用了服务器那里的计时器（人话：我偷懒了）
-                     * 去PlayerFirstEnterMazeHandler类就可以知道全部过程了
-                    **/
+                    /*这里因为这个方块本身并没有tick方法所以借用了PlayerFirstEnterMazeHandler那里的计时器（人话：我偷懒了）
+                      去PlayerFirstEnterMazeHandler类就可以知道全部过程了
+                    */
                     PlayerFirstEnterMazeHandler.startInfectionScan(serverWorld, dimensionId, () -> {
                     PlayerFirstEnterMazeHandler.delayedTasks.put(dimensionId, 60);
                     PlayerFirstEnterMazeHandler.delayedActions.put(dimensionId, () -> {

@@ -57,7 +57,6 @@ public class WishPoolBlock extends Block {
         return ActionResult.PASS;
     }
 
-    // 辅助方法
     private void giveRandomJunkItem(World world, PlayerEntity player) {
         List<Item> junkItems = List.of(
                 Items.DIRT,

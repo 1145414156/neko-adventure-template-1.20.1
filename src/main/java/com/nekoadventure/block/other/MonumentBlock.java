@@ -15,8 +15,6 @@ public class MonumentBlock extends Block {
     public MonumentBlock(Settings settings) {
         super(settings);
     }
-
-    // 右键纪念碑时向客户端发送打开感谢名单 UI 的请求
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
         if (world.isClient) {

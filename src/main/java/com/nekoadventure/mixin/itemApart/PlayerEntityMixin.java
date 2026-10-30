@@ -37,6 +37,7 @@ public abstract class PlayerEntityMixin extends LivingEntity {
 		super(entityType, world);
 	}
 
+    //这里是整理玩家数据的方法
     @Inject(at = @At("RETURN"), method = "tick")
     private void onTick(CallbackInfo ci) {
         PlayerEntity player = (PlayerEntity) (Object) this;

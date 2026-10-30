@@ -8,6 +8,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+//注入boss音乐
 @Mixin(MinecraftClient.class)
 public class MinecraftClientMusicMixin {
     @Inject(method = "getMusicType", at = @At("HEAD"), cancellable = true)

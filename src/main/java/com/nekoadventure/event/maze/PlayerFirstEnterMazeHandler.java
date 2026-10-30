@@ -31,16 +31,14 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**该类由AI辅助完成(40%?大概吧，大概框架和流程AI写的，细节与bug我来修复的)
  * 主要作用是在玩家第一次进入tag=is_maze的维度的时候生成一个迷宫
- * 同时该类也为该模组的迷宫生成类的总入口的非常重要的部分
- * 阿巴阿巴总之就是这样
+ * 同时该类也为该模组的迷宫生成类的总入口，
+ * 总之就是非常重要的部分
 **/
 public class PlayerFirstEnterMazeHandler {
     public static final Set<Identifier> dimensionHasBeenVisited = ConcurrentHashMap.newKeySet();
 
     public static final Map<Identifier, Integer> delayedTasks = new ConcurrentHashMap<>();
     public static final Map<Identifier, Runnable> delayedActions = new ConcurrentHashMap<>();
-
-    //感染扫描的间隔tick数与最大轮次
     private static final int INFECTION_SCAN_INTERVAL = 10;
     private static final int MAX_INFECTION_SCAN_ROUNDS = 15;
 
@@ -77,7 +75,6 @@ public class PlayerFirstEnterMazeHandler {
 
                     new MazeBuilder().placeMaze(world);
                     MazeStructureBuilder builder = new MazeStructureBuilder();
-
                     //收敛式感染扫描：反复扩散直到无新增房间且区块全部就绪
                     startInfectionScan(world, dimensionId, () -> {
                         delayedTasks.put(dimensionId, 60);
@@ -132,7 +129,7 @@ public class PlayerFirstEnterMazeHandler {
      * 用于替代原先只调用一次getMazeStructureBlockAndApply的写法：感染依赖方块实体的tick转换(本人早期开发知识存量不足导致的漏洞)，
      * 一次性计算可能会因转换/加载时机而随机漏掉房间，因而采用这种反复进行的操作
      * 作用为:上传在MazeBuilder创造的迷宫的全部房间数据并且打上对应的房间类型
-     * 写这么长一串希望现在在看这些方法的时候不会感觉到疑惑了（为什么blockEntity和这里连续写了两个功能差不多的东西）
+     * 写这么长一串希望之后再看这些方法的时候不会感觉到疑惑了（为什么blockEntity和这里连续写了两个功能差不多的东西）
      */
     public static void startInfectionScan(ServerWorld world, Identifier dimensionId, Runnable onConverged) {
         delayedTasks.put(dimensionId, 30);
@@ -181,7 +178,6 @@ public class PlayerFirstEnterMazeHandler {
                     continue;
                 }
                 BlockState neighborState = world.getBlockState(neighborPos);
-                //房间标记方块由方块实体异步tick转换而来，这里要先内联补一次转换，防止因为转换时机过早而漏感染(MazeBlockEntity的转换)
                 if (neighborState.isOf(Blocks.BEDROCK) && world.getBlockState(neighborPos.down()).isOf(ModBlocks.MAZE_BLOCK)) {
                     world.setBlockState(neighborPos, ModBlocks.MAZE_STRUCTURE_BLOCK.getDefaultState());
                     neighborState = world.getBlockState(neighborPos);

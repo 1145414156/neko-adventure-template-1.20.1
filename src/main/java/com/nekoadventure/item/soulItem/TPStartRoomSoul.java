@@ -20,11 +20,11 @@ public class TPStartRoomSoul extends AbstractSoulItem{
         MazeDataManager dataManager=MazeDataManager.get(world);
         if (dataManager != null) {
             BlockPos roomData=dataManager.getMazeCenter().mazeCenter();
-            if (!player.hasStatusEffect(ModStatusEffects.MAZE_CURSE)) {
+            if (!player.hasStatusEffect(ModStatusEffects.MAZE_CURSE)&&!player.hasStatusEffect(ModStatusEffects.BOSS_FIGHT)) {
                 player.teleport(roomData.getX(), roomData.getY()+2, roomData.getZ());
             }
             else {
-                player.giveItemStack(ModItems.TP_START_ROOM_SOUL.getDefaultStack());
+                player.giveItemStack(stack);
             }
         }
     }

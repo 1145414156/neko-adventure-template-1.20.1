@@ -32,21 +32,16 @@ import net.minecraft.world.dimension.DimensionType;
 
 import java.util.List;
 
-//这个类是整个迷宫的核心
+//这个方块是整个迷宫的核心
 //作用是
 //1.在玩家进入这个方块的范围时，给玩家添加战斗效果
 //2.将初等合法的房间上方方块转换成MazeStructure方块
 //3.在清理房间后的奖励发放与清除外壳基岩
 public class MazeBlockEntity extends AbstractMazeBlockEntity{
-
-    //通过NBT设置的替换方块ID（命名空间:方块ID），设置后清理房间时门洞与墙壁优先替换为该方块
     private String customBlockId = null;
-
     public MazeBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntityTypes.MAZE_BLOCK, pos, state);
     }
-
-    // 检测范围内是否有怪物
     private boolean hasMonstersInRange() {
         Box detectionBox = createDetectionBox();
         if (world != null) {
@@ -245,25 +240,20 @@ public class MazeBlockEntity extends AbstractMazeBlockEntity{
         int dx = direction.getOffsetX();
         int dz = direction.getOffsetZ();
         BlockPos gatePos = center.add(dx * range, 0, dz * range);
-        // 优先使用自身NBT中保存的方块ID作为替换源方块，未设置时才走原有的查找逻辑
         BlockState sourceState = getCustomSourceState();
         if (sourceState == null) {
             System.out.println("read NBT fail");
-            // 获取替换源方块位置：大门方块往中心方向移动1格，再向上5格
             BlockPos sourcePos = gatePos.add(-dx, 5, -dz);
             sourceState = world.getBlockState(sourcePos);
             if (sourceState.isAir()) {
                 sourcePos = gatePos.add(-dx * 2, 5, -dz * 2);
                 sourceState = world.getBlockState(sourcePos);
-                // 如果仍是空气则直接返回(房间错误)
                 if (sourceState.isAir()) {
                     return;
                 }
             }
         }
         BlockPos innerPos = gatePos.add(-dx, 0, -dz);
-
-        // 计算左右方向向量（垂直于当前方向）
         Direction leftDirection = direction.rotateYCounterclockwise();
         Direction rightDirection = direction.rotateYClockwise();
         BlockPos[] positionsToReplace = {
@@ -288,27 +278,20 @@ public class MazeBlockEntity extends AbstractMazeBlockEntity{
                 } else {
                     wallPos = center.add(offset, y, fixedZ);
                 }
-
-                // 检查当前方块是否为非空气方块
                 BlockState currentState = world.getBlockState(wallPos);
                 if (y>0&&y<5&&Math.abs(offset)<=1){
                     world.setBlockState(wallPos,Blocks.AIR.getDefaultState());
                 }
                 else if (!currentState.isAir()) {
                     if (currentState.equals(Blocks.BARRIER.getDefaultState())) {
-                        //如果为屏障，则替换成空气
                         world.setBlockState(wallPos, Blocks.BARRIER.getDefaultState());
                     }
-                    // 将非空气方块替换为源方块
                     world.setBlockState(wallPos, sourceState);
                 }
             }
         }
 
     }
-
-
-    //优先使用自身NBT中保存的方块ID作为替换源方块，未设置或无法解析时返回null交给原有逻辑
     private BlockState getCustomSourceState() {
         if (customBlockId == null || customBlockId.isBlank()) {
             return null;

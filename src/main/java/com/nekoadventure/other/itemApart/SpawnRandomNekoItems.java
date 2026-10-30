@@ -95,7 +95,6 @@ public class SpawnRandomNekoItems {
             return ModItems.BINDING_SOUL_SUBSTANCE.getDefaultStack();
         }
 
-        // 在筛选后的集合中随机抽取一个
         Item selected = candidates.get(RANDOM.nextInt(candidates.size()));
         return new ItemStack(selected);
     }

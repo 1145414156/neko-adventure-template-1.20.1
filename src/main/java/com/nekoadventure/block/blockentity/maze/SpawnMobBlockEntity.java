@@ -5,7 +5,7 @@ import com.nekoadventure.block.ModBlocks;
 import com.nekoadventure.block.blockentity.ModBlockEntityTypes;
 import com.nekoadventure.block.maze.MazeRoomStageBlock;
 import com.nekoadventure.block.specialroomblock.BossRoomBlock;
-import com.nekoadventure.network.maze.MobIdInputNetworking;
+import com.nekoadventure.network.maze.SpawnMobBlockIdInputNetworking;
 import com.nekoadventure.other.mazeApart.MazeDataManager;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -38,13 +38,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-//这个类的作用有:
+//这个方块的作用有:
 //1.当有玩家接近时，生成怪物/boss
 //2.在特殊的摆放条件下，可以以硬编码的形式生成boss
 
 public class SpawnMobBlockEntity extends AbstractMazeBlockEntity {
-
-    //创造模式玩家通过右键设置的boss生物ID（命名空间:生物ID），设置后boss按该ID通过代码生成而不是放置结构
     private String customBossEntityId = null;
 
     private int roomRange;
@@ -52,13 +50,9 @@ public class SpawnMobBlockEntity extends AbstractMazeBlockEntity {
     public SpawnMobBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntityTypes.SPAWN_MOB_ENTITY_BLOCK_ENTITY, pos, state);
     }
-
-    //创造模式空手右键时，请求客户端打开生物ID输入界面
     public void requestBossEntityIdInput(ServerPlayerEntity player) {
-        MobIdInputNetworking.sendOpenInput(player, pos, customBossEntityId == null ? "" : customBossEntityId);
+        SpawnMobBlockIdInputNetworking.sendOpenInput(player, pos, customBossEntityId == null ? "" : customBossEntityId);
     }
-
-    //应用玩家输入的boss生物ID：输入为空或没有对应实体时清除设置，恢复原有结构生成逻辑
     public void applyBossEntityIdInput(ServerPlayerEntity player, String input) {
         String trimmed = input == null ? "" : input.trim();
         if (trimmed.isEmpty()) {
@@ -115,7 +109,6 @@ public class SpawnMobBlockEntity extends AbstractMazeBlockEntity {
         World world = this.getWorld();
         BlockPos entityPos = this.getPos();
 
-        // 判断下方方块是否为 BOSS_ROOM_BLOCK
         boolean isBossRoom = world != null
                 && world.getBlockState(entityPos.down(1)).isOf(ModBlocks.BOSS_ROOM_BLOCK);
 
@@ -200,8 +193,6 @@ public class SpawnMobBlockEntity extends AbstractMazeBlockEntity {
         ));
         NekoAdventure.LOGGER.info("spawned boss with structure");
     }
-
-    //当玩家设置的生物ID直接生成boss实体，否则使用原逻辑
     private boolean spawnCustomBossEntity(BlockPos spawnerPos) {
         if (customBossEntityId == null || customBossEntityId.isBlank()) return false;
         if (!(world instanceof ServerWorld serverWorld)) return false;

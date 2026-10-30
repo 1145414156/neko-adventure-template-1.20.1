@@ -13,8 +13,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
-//gateBlock属于单独的一个方块，不在AbstractMazeBlock的范围内
-//关门的效果在另外一个方块实体类
 public class GateBlock extends Block implements BlockEntityProvider {
 
     public GateBlock(Settings settings) {

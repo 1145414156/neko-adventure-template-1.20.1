@@ -20,9 +20,7 @@ public class StrangePotion extends AbstractNekoFunctionItem {
 
     @Override
     public void applyTickFunction(PlayerEntity player) {
-        //只在服务端执行：客户端也会执行本逻辑，导致计时双倍消耗、效果随机不一致
         if (player.getWorld().isClient()) return;
-        //状态按玩家存储，避免物品单例跨玩家共享状态
         int tick = NekoPackageDataManager.getItemIntState(player, "strangePotion");
         if (tick <= 0) {
             applyRandomPotionEffect(player);

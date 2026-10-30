@@ -15,20 +15,16 @@ import java.util.Comparator;
 import java.util.List;
 
 /**
- * 硫磺火（BRIMSTONE）链式光柱的弧形段渲染。
- * <p>
- * 每节以自身位置为起点、沿自身视野出发，弯向下一节：终点通常取下一节视野前方一格，
- * 下一节是尾巴时只连到尾巴位置（尾巴自己再向前收尾），避免尾巴贴图被前一节重复叠一遍。
- * 首尾切线分别对齐本节与下一节的视野方向，因此节与节之间位置与切线都连续。
- * 贴图沿用原逻辑：宽度由调用方给出，整张图沿弧长映射一次（v: 0 -> 1）。
+ * 为硫磺火光柱制作的专门的弧形段渲染。
+ * 每节以自身位置为起点、沿自身视野出发，弯向下一节：终点取下一节视野前方一格，
  */
 public final class BrimstoneBeamRenderer {
 
-    /** 弧线细分数，越大越平滑 */
+    //弧线细分数
     private static final int SEGMENTS = 8;
-    /** 查找下一节光柱的搜索半径 */
-    private static final double SEARCH_RADIUS = 6.0;
-    /** 尾段沿自身视野向前收尾的长度（格） */
+    //查找下一节光柱的半径
+    private static final double SEARCH_RADIUS = 3.0;
+    //尾段沿自身视野向前收尾的长度
     private static final double TAIL_LENGTH = 1.0;
 
     private BrimstoneBeamRenderer() {

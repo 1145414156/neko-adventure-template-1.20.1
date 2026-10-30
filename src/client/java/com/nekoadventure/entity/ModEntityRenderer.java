@@ -23,6 +23,7 @@ public class ModEntityRenderer {
 
         //particle
         EntityModelLayerRegistry.registerModelLayer(ModEntityModelLayers.PARTICLE_TEXT, ParticleTextEntityModel::getTexturedModelData);
+
         //mob
         EntityRendererRegistry.register(ModEntities.TWINE_SOUL, TwineSoulEntityRenderer::new);
         EntityModelLayerRegistry.registerModelLayer(ModEntityModelLayers.TWINE_SOUL, TwineSoulEntityModel::getTexturedModelData);

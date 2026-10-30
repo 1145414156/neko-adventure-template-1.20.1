@@ -24,12 +24,11 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 public class ItemBaseBlock extends Block implements BlockEntityProvider {
-    //这里的冷却系统用AI做的
     private final int[] PROBABILITIES_HEIGHT = {40, 35, 17, 8};
     public static final BooleanProperty INDEPENDENCE = BooleanProperty.of("independence");
     public ItemBaseBlock(Settings settings) {
         super(settings);
-        //默认放置为连锁状态（拿出一个物品，全部物品都会被删除）
+        //默认放置为连锁状态
         setDefaultState(getStateManager().getDefaultState().with(INDEPENDENCE, false));
     }
 
@@ -42,8 +41,6 @@ public class ItemBaseBlock extends Block implements BlockEntityProvider {
     public @Nullable BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
         return new ItemBaseBlockEntity(pos, state);
     }
-
-    // 空手右键的时候取出存储的物品
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
         if (world instanceof ServerWorld) {
@@ -57,13 +54,10 @@ public class ItemBaseBlock extends Block implements BlockEntityProvider {
 
             if (heldItem.isEmpty()) {
                 if (!storedItem.isEmpty()) {
-                    //仍在冷却中:直接忽略这次右键,避免同一次点击被重复处理
                     if (itemBaseBlockEntity.isInUseCooldown()) {
                         return ActionResult.FAIL;
                     }
-                    //记录本次交互,使接下来的一小段时间内的重复右键全部失效
                     itemBaseBlockEntity.markUsed();
-
                     int requiredCoins = itemBaseBlockEntity.getRequiredCoins();
                     if (!hasEnoughCoins(player, requiredCoins)) {
                         player.sendMessage(Text.literal("§c你需要 " + requiredCoins + " 个金币"), true);
@@ -99,8 +93,6 @@ public class ItemBaseBlock extends Block implements BlockEntityProvider {
 
         return coinCount >= requiredAmount;
     }
-
-    // 扣除指定数量的硬币
     private void removeCoins(PlayerEntity player, int amount) {
         int remaining = amount;
 
@@ -109,13 +101,10 @@ public class ItemBaseBlock extends Block implements BlockEntityProvider {
 
             if (stack.getItem() == ModItems.COIN) {
                 int stackCount = stack.getCount();
-
                 if (stackCount >= remaining) {
-                    // 当前物品栏足够扣除
                     stack.decrement(remaining);
                     break;
                 } else {
-                    // 当前物品栏不够，继续查找
                     remaining -= stackCount;
                     stack.setCount(0);
                 }

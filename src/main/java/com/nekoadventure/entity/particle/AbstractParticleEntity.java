@@ -19,6 +19,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Optional;
 import java.util.UUID;
 
+
+//这个类虽然说没有用过，但是未来应该会有点用处吧...先留着
 public class AbstractParticleEntity extends Entity {
     private static final TrackedData<Integer> MODEL_TYPE =
             DataTracker.registerData(AbstractParticleEntity.class, TrackedDataHandlerRegistry.INTEGER);

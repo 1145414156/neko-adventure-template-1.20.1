@@ -48,7 +48,7 @@ public abstract class AbstractNekoItem extends Item {
     }
 
 
-//瞎输的值，特殊意义
+//瞎输的值，没特殊意义
     public float getCalculateYaw(int t){
         return 114514;
     }

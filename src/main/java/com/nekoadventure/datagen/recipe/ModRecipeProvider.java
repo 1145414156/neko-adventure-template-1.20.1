@@ -21,13 +21,13 @@ public class ModRecipeProvider extends FabricRecipeProvider {
 
     @Override
     public void generate(Consumer<RecipeJsonProvider> exporter) {
-        // 任意 all_item_pool 标签道具 -> 2 个绑定灵魂物质
+        // 任意道具 -> 2 个绑定灵魂物质
         ShapelessRecipeJsonBuilder.create(RecipeCategory.MISC, ModItems.BINDING_SOUL_SUBSTANCE, 2)
                 .input(SpawnRandomNekoItems.ALL_POOL)
                 .criterion("has_all_pool_item", conditionsFromTag(SpawnRandomNekoItems.ALL_POOL))
                 .offerTo(exporter, new Identifier(NekoAdventure.MOD_ID, "binding_soul_substance_from_pool"));
 
-        // 4 个绑定灵魂物质 -> 1 个道具原型
+        // 4 个绑定灵魂物质 -> 1 个道具原胚
         ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, ModItems.PROP_PROTOTYPE, 1)
                 .pattern("SS")
                 .pattern("SS")
@@ -35,7 +35,7 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                 .criterion("has_binding_soul_substance", conditionsFromItem(ModItems.BINDING_SOUL_SUBSTANCE))
                 .offerTo(exporter, new Identifier(NekoAdventure.MOD_ID, "prop_prototype_from_soul_substance"));
 
-        // 任意 soul_item 标签道具 -> 1 个绑定灵魂物质
+        // 任意魂石 -> 1 个绑定灵魂物质
         ShapelessRecipeJsonBuilder.create(RecipeCategory.MISC, ModItems.BINDING_SOUL_SUBSTANCE, 1)
                 .input(ModItemTagsProvider.SOUL_ITEM)
                 .criterion("has_soul_item", conditionsFromTag(ModItemTagsProvider.SOUL_ITEM))

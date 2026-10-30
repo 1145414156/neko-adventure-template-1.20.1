@@ -108,7 +108,8 @@ public class MazeRemoveHandler {
 
     //这个是实际开始清除房间的方法
     private static void clearRoomEntities(ServerWorld world, BlockPos center) {
-        // 计算范围：中心点向各个方向延伸 24 格（总共 50 格）
+        // 计算范围：中心点向各个方向延伸24格
+        //因为这里的储存的数据已经不安全了所以说使用自己清除的方法
         int radius = 24;
         int startX = center.getX() - radius;
         int endX = center.getX() + radius;

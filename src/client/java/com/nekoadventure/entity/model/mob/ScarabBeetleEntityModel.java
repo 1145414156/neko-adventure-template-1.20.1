@@ -1,17 +1,12 @@
 package com.nekoadventure.entity.model.mob;
 
-import com.nekoadventure.entity.animation.mob.MuddySpiderModelAnimation;
 import com.nekoadventure.entity.animation.mob.ScarabBeetleModelAnimation;
-import com.nekoadventure.entity.mob.MuddySpiderEntity;
 import com.nekoadventure.entity.mob.ScarabBeetleEntity;
 import net.minecraft.client.model.*;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.entity.model.SinglePartEntityModel;
 import net.minecraft.client.util.math.MatrixStack;
 
-// Made with Blockbench 5.2.2
-// Exported for Minecraft version 1.17+ for Yarn
-// Paste this class into your mod and generate all required imports
 public class ScarabBeetleEntityModel extends SinglePartEntityModel<ScarabBeetleEntity> {
 	private final ModelPart main;
 	private final ModelPart head;

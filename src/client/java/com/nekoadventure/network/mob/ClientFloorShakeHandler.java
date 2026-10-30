@@ -19,12 +19,8 @@ import java.util.Random;
 
 //该类由AI完成
 public class ClientFloorShakeHandler {
-
-    /** 每 tick 上升/下落距离（格） */
     private static final float RISE_SPEED = 0.5F;
-    /** 到达最高点后停留的 tick 数，随后下落 */
     private static final int HOLD_TICKS = 5;
-    /** 最多同时弹跳的方块数（超出后只保留离中心最近的），防止帧率骤降 */
     private static final int MAX_BLOCKS = 512;
 
     private static final List<BouncingBlock> BOUNCING_BLOCKS = new ArrayList<>();
@@ -33,10 +29,10 @@ public class ClientFloorShakeHandler {
     private static class BouncingBlock {
         final BlockPos pos;
         final BlockState state;
-        final float maxHeight; // 本次弹跳的最大抬升高度（随机）
-        float offsetY;         // 当前抬升高度（格）
-        int holdTicks;         // 停留计数
-        boolean falling;       // 是否已开始下落
+        final float maxHeight;
+        float offsetY;
+        int holdTicks;
+        boolean falling;
 
         BouncingBlock(BlockPos pos, BlockState state, float minHeight, float maxHeight) {
             this.pos = pos;
@@ -59,8 +55,6 @@ public class ClientFloorShakeHandler {
         ClientTickEvents.END_CLIENT_TICK.register(client -> tick());
         WorldRenderEvents.AFTER_ENTITIES.register(ClientFloorShakeHandler::render);
     }
-
-    /** 收集影响范围内的地板方块并开始弹跳 */
     private static void startEffect(MinecraftClient client, BlockPos center, double radius,
                                     float minHeight, float maxHeight) {
         List<BouncingBlock> blocks = new ArrayList<>();
@@ -76,7 +70,6 @@ public class ClientFloorShakeHandler {
                 }
                 BlockPos pos = center.add(dx, 0, dz);
                 BlockState state = world.getBlockState(pos);
-                // 跳过空气、无模型方块和不可破坏方块
                 if (state.isAir() || state.getRenderType() == BlockRenderType.INVISIBLE) {
                     continue;
                 }
@@ -87,7 +80,6 @@ public class ClientFloorShakeHandler {
             }
         }
         Random random = new Random();
-
         for (int i = 0; i < blocks.size() / 4 * 3 && !blocks.isEmpty(); i++) {
             int randomIndex = random.nextInt(blocks.size());
             blocks.remove(randomIndex);
@@ -145,8 +137,6 @@ public class ClientFloorShakeHandler {
                     rb.pos.getX() - camera.getPos().x,
                     rb.pos.getY() + rb.offsetY - camera.getPos().y,
                     rb.pos.getZ() - camera.getPos().z);
-
-            // 获取原版光照坐标
             int light = WorldRenderer.getLightmapCoordinates(world, state, rb.pos.up(1));
             int skyLight = (light >> 20) & 0xF;
             int blockLight = (light >> 4) & 0xF;

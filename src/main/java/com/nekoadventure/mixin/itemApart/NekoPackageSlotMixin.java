@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-//纸盒无法放入除玩家背包(含盔甲栏/副手)以外的任何容器（箱子、潜影盒、末影箱等）
+//纸盒无法放入除玩家背包(含盔甲栏/副手)以外的任何容器
 @Mixin(Slot.class)
 public class NekoPackageSlotMixin {
     @Shadow

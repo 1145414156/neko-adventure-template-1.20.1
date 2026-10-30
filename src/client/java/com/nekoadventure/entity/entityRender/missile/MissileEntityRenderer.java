@@ -30,6 +30,8 @@ import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
+
+//全部弹幕的渲染总类
 public class MissileEntityRenderer extends EntityRenderer<MissileEntity> {
 
     private static final Identifier TEXTURE_BULLET =
@@ -40,11 +42,9 @@ public class MissileEntityRenderer extends EntityRenderer<MissileEntity> {
             new Identifier(NekoAdventure.MOD_ID, "textures/entity/missile/joyeuse.png");
     private static final Identifier TEXTURE_BOOMERANG=
             new Identifier(NekoAdventure.MOD_ID, "textures/entity/missile/boomerang.png");
-    //zenith弹幕剑以物品模型渲染，需要一个非空的载体堆（实际模型通过参数显式指定）
     private static final ItemStack ZENITH_STACK = new ItemStack(ModItems.ZENITH);
     private static final ItemStack JOYEUSE_STACK = new ItemStack(ModItems.JOYEUSE);
 
-    //joyeuse物品贴图里剑身沿 45° 对角线绘制（左下剑柄、右上剑尖），模型空间中剑尖方向为归一化的 (1,1,0)
     private static final Vector3f ITEM_BLADE_AXIS = new Vector3f(0.70710678f, 0.70710678f, 0.0f);
 
     private final BoomerangEntityModel modelBoomerang;

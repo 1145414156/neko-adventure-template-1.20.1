@@ -20,7 +20,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
-//开始战斗在另外一个方块实体类
 public class SpawnMobBlock extends AbstractMazeBlock implements BlockEntityProvider {
 
     public static final IntProperty RANGE_MODE = IntProperty.of("range_mode", 0, 1);
@@ -38,8 +37,6 @@ public class SpawnMobBlock extends AbstractMazeBlock implements BlockEntityProvi
     public BlockState getPlacementState(ItemPlacementContext ctx) {
         return getStateManager().getDefaultState().with(RANGE_MODE, 0);
     }
-
-    //创造模式空手右键方块时，打开boss生物ID输入界面
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
         if (world.isClient) {

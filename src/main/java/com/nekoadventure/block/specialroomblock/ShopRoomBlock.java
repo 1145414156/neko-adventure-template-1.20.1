@@ -68,8 +68,6 @@ public class ShopRoomBlock extends AbstractRoomBlock {
         }
         return itemBases;
     }
-
-    //这个是算钱的方法
     private void putPriceOnWhichItemBaseCount(World world, BlockPos pos){
         List<BlockPos> itemBases=scanItemBase(world,pos);
         int itemBaseCount=itemBases.size();

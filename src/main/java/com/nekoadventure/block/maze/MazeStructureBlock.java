@@ -62,18 +62,15 @@ public class MazeStructureBlock extends AbstractMazeBlock {
                             dataManager.markDirty();
                             clearRoomEntity(world,dataManager);
                             NekoAdventure.LOGGER.info("detect room type success in{}type{}", pos, data.gateCount());
-                            //检测房间四个方向的range*2+1的位置，如果说含有MazeStructureBlock，则再次执行这个方块中的apply()操作
                             int offset = roomRange * 2 + 1;
                             for (Direction dir : Direction.Type.HORIZONTAL) {
                                 BlockPos neighborPos = pos.offset(dir, offset);
                                 ChunkPos neighborChunk = new ChunkPos(neighborPos);
-                                //区块未加载时跳过并交给收敛式重试扫描
                                 if (!serverWorld.getChunkManager().isChunkLoaded(neighborChunk.x, neighborChunk.z)) {
                                     NekoAdventure.LOGGER.info("infect skip {} {} chunk not loaded", dir, neighborPos.toShortString());
                                     continue;
                                 }
                                 BlockState neighborState = world.getBlockState(neighborPos);
-                                //房间标记方块是由方块实体异步tick转换而来的，先整一次内联转换，避免因转换时机过早而漏感染(tick异步)
                                 if (neighborState.isOf(Blocks.BEDROCK) && world.getBlockState(neighborPos.down()).isOf(ModBlocks.MAZE_BLOCK)) {
                                     world.setBlockState(neighborPos, ModBlocks.MAZE_STRUCTURE_BLOCK.getDefaultState());
                                     neighborState = world.getBlockState(neighborPos);
@@ -98,8 +95,6 @@ public class MazeStructureBlock extends AbstractMazeBlock {
         int count = 0;
         for (Direction dir :  Direction.Type.HORIZONTAL) {
                 BlockPos checkPos = pos.offset(dir, range);
-                //无用的大门由GateBlockEntity在方块实体tick中异步替换成墙壁，
-                //这里在统计前同步执行一次替换，保证门数统计与大门处理的最终形态一致
                 GateBlockEntity.resolveUselessGate(world, checkPos);
                 if (world.getBlockState(checkPos).isOf(ModBlocks.GATE_BLOCK)) {
                     count++;

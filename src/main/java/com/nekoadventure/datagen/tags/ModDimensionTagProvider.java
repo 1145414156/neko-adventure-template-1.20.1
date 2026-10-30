@@ -10,6 +10,7 @@ import net.minecraft.world.dimension.DimensionType;
 
 import java.util.concurrent.CompletableFuture;
 
+//给维度上标签，接入迷宫生成兼容逻辑
 public class ModDimensionTagProvider extends FabricTagProvider<DimensionType> {
 
 

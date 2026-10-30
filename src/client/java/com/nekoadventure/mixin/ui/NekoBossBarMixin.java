@@ -17,9 +17,6 @@ import java.util.Map;
 
 /**制作这个类是为了:
  * 为指定的特殊生物渲染专属的 BossBar 血条：
- * 当 BossBar 名字命中特殊生物时，改用专属材质
- * assets/neko-adventure/textures/ui/boss_bar/xxx_boss_bar.png绘制。
- * 专属血条相对原版条整体放大 1.5 倍并保持水平居中
  * 该类由AI辅助完成
  */
 @Mixin(BossBarHud.class)
@@ -29,7 +26,7 @@ public class NekoBossBarMixin {
             "entity.neko-adventure.grand_knight",
             new Identifier(NekoAdventure.MOD_ID, "textures/ui/boss_bar/grand_knight_boss_bar.png"));
 
-    // 材质规格：186x48
+    // 单一个血条：186x48
     @Unique
     private static final int NEKO_TEXTURE_WIDTH = 186;
     @Unique
@@ -40,16 +37,11 @@ public class NekoBossBarMixin {
     private static final int NEKO_FILL_STRIP_V = 0;
     @Unique
     private static final int NEKO_TRACK_STRIP_V = 24;
-
-    // 渲染尺寸：相对原版 182 宽的条整体放大 1.5 倍（182*1.5=273），
-    // 高度按材质条带 186x24 等比换算（24*273/186≈35），
-    // 并以 (273-182)/2 的偏移保持水平居中
     @Unique
     private static final int NEKO_BAR_WIDTH = 273;
     @Unique
     private static final int NEKO_BAR_HEIGHT = Math.round(NEKO_STRIP_HEIGHT * ((float) NEKO_BAR_WIDTH / NEKO_TEXTURE_WIDTH));
 
-    //相对屏幕位置
     @Unique
     private static final int NEKO_BAR_X_OFFSET = (NEKO_BAR_WIDTH - 182) / 2;
     @Unique

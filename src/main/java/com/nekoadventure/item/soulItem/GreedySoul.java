@@ -36,7 +36,7 @@ public class GreedySoul extends AbstractSoulItem{
                 itemStack.setCount(0);
             }
         } else {
-            player.giveItemStack(ModItems.GREEDY_SOUL.getDefaultStack());
+            player.giveItemStack(stack);
         }
     }
 

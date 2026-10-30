@@ -17,9 +17,7 @@ public class ScreenShakeNetworking {
         buf.writeFloat(intensity);
         ServerPlayNetworking.send(player, CHANNEL, buf);
     }
-
     //给一个世界里的所有在线玩家发送屏幕震动
-
     public static void sendToAll(ServerWorld world, int ticks, float intensity) {
         for (ServerPlayerEntity player : world.getPlayers()) {
             sendToPlayer(player, ticks, intensity);

@@ -90,7 +90,7 @@ public class ModBlocks {
             "monument_block",new MonumentBlock(AbstractBlock.Settings.copy(Blocks.BEDROCK).nonOpaque())
     );
 
-    //传送迷宫方块
+    //传送至迷宫维度方块
     public static final CommonTPMazeBlock TP_DUNGEON_BLOCK =register(
             "tp_dungeon_block",new CommonTPMazeBlock(AbstractBlock.Settings.copy(Blocks.BEDROCK).nonOpaque(),"dungeon", ModItems.BROKEN_SWORD)
     );

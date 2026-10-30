@@ -8,11 +8,11 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 
-//这里是专门用来禁用牛奶清除效果的
+//在获得迷宫诅咒和boss战
 @Mixin(MilkBucketItem.class)
 public class MixinMilkBucketItem {
     @Redirect(method = "finishUsing", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;clearStatusEffects()Z"))
     private boolean disableClearStatusEffects(LivingEntity user) {
-        return !user.hasStatusEffect(ModStatusEffects.MAZE_CURSE)&&user.hasStatusEffect(ModStatusEffects.BOSS_FIGHT);
+        return !user.hasStatusEffect(ModStatusEffects.MAZE_CURSE)&&!user.hasStatusEffect(ModStatusEffects.BOSS_FIGHT);
     }
 }

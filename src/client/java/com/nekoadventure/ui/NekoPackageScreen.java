@@ -17,7 +17,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
-//这个类是client用来渲染nekoPackage的属性而制作的
 public class NekoPackageScreen implements HudRenderCallback {
     private static final int ITEMS_PER_ROW = 5;
     private static final int ITEM_SIZE = 16;
@@ -48,30 +47,23 @@ public class NekoPackageScreen implements HudRenderCallback {
         TextRenderer textRenderer = client.textRenderer;
         int screenWidth = client.getWindow().getScaledWidth();
         int screenHeight = client.getWindow().getScaledHeight();
-
-        // 获取物品列表
         NbtList items = nbt.getList("Items", NbtCompound.COMPOUND_TYPE);
         List<ItemStack> itemStacks = new ArrayList<>();
         for (int i = 0; i < items.size(); i++) {
             itemStacks.add(ItemStack.fromNbt(items.getCompound(i)));
         }
-
-        // 计算网格尺寸
         int totalItems = itemStacks.size();
         int rows = (int) Math.ceil((double) totalItems / ITEMS_PER_ROW);
         int cols = Math.min(totalItems, ITEMS_PER_ROW);
 
-        // 计算 HUD 尺寸
         int padding = 2;
         int separatorWidth = textRenderer.getWidth(SEPARATOR);
         int gridWidth = cols * SLOT_SIZE + (cols - 1) * separatorWidth + padding * 2;
         int gridHeight = rows * SLOT_SIZE + padding * 2;
 
-        // 右侧位置
         int x = screenWidth - gridWidth;
         int y = screenHeight / 2 - gridHeight / 2;
 
-        // 绘制物品网格
         for (int i = 0; i < totalItems; i++) {
             ItemStack itemStack = itemStacks.get(i);
             int row = i / ITEMS_PER_ROW;
@@ -97,27 +89,15 @@ public class NekoPackageScreen implements HudRenderCallback {
         TextRenderer textRenderer = client.textRenderer;
         int screenHeight = client.getWindow().getScaledHeight();
 
-        // 调用 NekoPackageItem 的 getFinalData 方法获取数据（客户端读网络包同步的缓存）
         double[] finalData = nekoPackageItem.getFinalData(player);
-
-        // 当前楼层（客户端读网络包同步的缓存）
         int level = NekoPackageDataManager.getClientLevel();
-
-        // 构建显示文本
         List<String> dataLines = getLines(finalData);
-
-        // 计算面板尺寸（增加一行用于楼层显示）
         int padding = 4;
         int lineHeight = textRenderer.fontHeight + 2;
         int panelWidth = 100;
-        // 增加一行标题 + 一行楼层 + 一行分隔线 + 数据行数
         int panelHeight = (1 + 1 + 1 + dataLines.size()) * lineHeight + padding * 2;
-
-        // 左侧位置
         int x = 0;
         int y = screenHeight / 2 - panelHeight / 2;
-
-        // 绘制当前楼层（面板预留的第一行）
         if (level>0) {
             int levelY = y + padding;
             drawContext.drawText(textRenderer,
@@ -125,21 +105,15 @@ public class NekoPackageScreen implements HudRenderCallback {
                     x + padding, levelY,
                     0xFFFFFF, true);
         }
-
-        // 绘制属性标题
         int titleY = y + padding + lineHeight;
         drawContext.drawText(textRenderer,
                 Text.literal("§6属性"),
                 x + padding, titleY,
                 0xFFFFFF, true);
-
-        // 绘制分隔线
         int separatorY = titleY + textRenderer.fontHeight + 2;
         drawContext.fill(x + padding, separatorY,
                 x + panelWidth - padding, separatorY + 1,
                 0xFF555555);
-
-        // 绘制数据（每行一个属性）
         for (int i = 0; i < dataLines.size(); i++) {
             int dataY = separatorY + 2 + i * lineHeight;
             drawContext.drawText(textRenderer,

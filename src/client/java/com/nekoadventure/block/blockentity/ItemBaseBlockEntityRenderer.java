@@ -84,7 +84,7 @@ public class ItemBaseBlockEntityRenderer implements BlockEntityRenderer<ItemBase
                     0xF000F0
             );
 
-            // 绘制物品名称（在金币数量上方）
+            // 绘制物品名称
             ItemStack displayItem = entity.getItem();
             if (!displayItem.isEmpty()) {
                 Text itemNameText = displayItem.getName();

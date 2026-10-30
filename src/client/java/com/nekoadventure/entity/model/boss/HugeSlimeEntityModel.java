@@ -31,20 +31,20 @@ public class HugeSlimeEntityModel extends SinglePartEntityModel<HugeSlimeEntity>
 
 		ModelPartData inner = main.addChild("inner", ModelPartBuilder.create().uv(0, 48).cuboid(-11.0F, -11.0F, -11.0F, 22.0F, 22.0F, 22.0F, new Dilation(-1.0F)), ModelTransform.of(0.0F, 0.0F, 0.0F, 0.0F, 3.1416F, 0.0F));
 
-		ModelPartData eyes = inner.addChild("eyes", ModelPartBuilder.create().uv(88, 88).cuboid(4.0F, -3.0F, 7.0F, 4.0F, 4.0F, 4.0F, new Dilation(0.0F))
+		inner.addChild("eyes", ModelPartBuilder.create().uv(88, 88).cuboid(4.0F, -3.0F, 7.0F, 4.0F, 4.0F, 4.0F, new Dilation(0.0F))
 				.uv(0, 92).cuboid(-8.0F, -3.0F, 7.0F, 4.0F, 4.0F, 4.0F, new Dilation(0.0F)), ModelTransform.pivot(0.0F, 0.0F, 0.0F));
 
-		ModelPartData mouth = inner.addChild("mouth", ModelPartBuilder.create().uv(16, 92).cuboid(-1.0F, -1.0F, -1.0F, 2.0F, 2.0F, 2.0F, new Dilation(0.0F)), ModelTransform.pivot(-4.0F, 5.0F, 10.0F));
+		inner.addChild("mouth", ModelPartBuilder.create().uv(16, 92).cuboid(-1.0F, -1.0F, -1.0F, 2.0F, 2.0F, 2.0F, new Dilation(0.0F)), ModelTransform.pivot(-4.0F, 5.0F, 10.0F));
 
-		ModelPartData headLayer = inner.addChild("headLayer", ModelPartBuilder.create().uv(88, 48).cuboid(-12.5F, -16.0F, -12.5F, 25.0F, 5.0F, 25.0F, new Dilation(0.0F)), ModelTransform.pivot(0.0F, 0.0F, 0.0F));
+		inner.addChild("headLayer", ModelPartBuilder.create().uv(88, 48).cuboid(-12.5F, -16.0F, -12.5F, 25.0F, 5.0F, 25.0F, new Dilation(0.0F)), ModelTransform.pivot(0.0F, 0.0F, 0.0F));
 
 		ModelPartData eyes1 = inner.addChild("eyes1", ModelPartBuilder.create(), ModelTransform.pivot(0.0F, 0.0F, 0.0F));
 
-		ModelPartData cube_r1 = eyes1.addChild("cube_r1", ModelPartBuilder.create().uv(88, 83).cuboid(-5.0F, -1.0F, -3.0F, 6.0F, 1.0F, 4.0F, new Dilation(0.0F)), ModelTransform.of(-4.475F, -2.2F, 10.65F, 0.0F, 0.0F, 0.2182F));
+		eyes1.addChild("cube_r1", ModelPartBuilder.create().uv(88, 83).cuboid(-5.0F, -1.0F, -3.0F, 6.0F, 1.0F, 4.0F, new Dilation(0.0F)), ModelTransform.of(-4.475F, -2.2F, 10.65F, 0.0F, 0.0F, 0.2182F));
 
-		ModelPartData cube_r2 = eyes1.addChild("cube_r2", ModelPartBuilder.create().uv(88, 78).cuboid(-1.0F, -1.0F, -3.0F, 6.0F, 1.0F, 4.0F, new Dilation(0.0F)), ModelTransform.of(4.475F, -2.2F, 10.65F, 0.0F, 0.0F, -0.1745F));
+		eyes1.addChild("cube_r2", ModelPartBuilder.create().uv(88, 78).cuboid(-1.0F, -1.0F, -3.0F, 6.0F, 1.0F, 4.0F, new Dilation(0.0F)), ModelTransform.of(4.475F, -2.2F, 10.65F, 0.0F, 0.0F, -0.1745F));
 
-		ModelPartData outer = main.addChild("outer", ModelPartBuilder.create().uv(0, 0).cuboid(-12.0F, -12.0F, -12.0F, 24.0F, 24.0F, 24.0F, new Dilation(0.25F)), ModelTransform.pivot(0.0F, 0.0F, 0.0F));
+		main.addChild("outer", ModelPartBuilder.create().uv(0, 0).cuboid(-12.0F, -12.0F, -12.0F, 24.0F, 24.0F, 24.0F, new Dilation(0.25F)), ModelTransform.pivot(0.0F, 0.0F, 0.0F));
 		return TexturedModelData.of(modelData, 256, 256);
 
 	}

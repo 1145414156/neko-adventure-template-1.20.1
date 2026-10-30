@@ -34,9 +34,7 @@ import java.util.*;
  * 使用某些魂石可以筛选道具
  */
 public class PropPrototypeItem extends Item {
-    // NBT 中储存道具池的键
     private static final String POOL_KEY = "neko_stored_pool";
-    // 扫描房间方块的范围半径（7×7×7 => 每轴 ±3）
     private static final int SCAN_RADIUS = 3;
 
     private final SpawnRandomNekoItems spawnRandomNekoItems = new SpawnRandomNekoItems();
@@ -106,11 +104,6 @@ public class PropPrototypeItem extends Item {
         }
         return TypedActionResult.success(stack);
     }
-
-    /**
-     * 用魂石池道具过滤当前道具池，取两边都拥有的道具（交集）。
-     * 魂石中的方法定义了它从输入池中保留哪些道具。
-     */
     private List<Item> filterPoolBySoul(List<Item> pool, AbstractSoulPoolItem soulPoolItem, PlayerEntity player) {
         List<Item> currentNekoItems = new ArrayList<>();
         for (Item item : pool) {
@@ -147,10 +140,6 @@ public class PropPrototypeItem extends Item {
             return Collections.emptyList();
         }
     }
-
-    /**
-     * 在以玩家为中心的 7×7×7 范围内查找第一个 AbstractRoomBlock
-     */
     private AbstractRoomBlock findNearbyRoomBlock(ServerWorld world, PlayerEntity player) {
         BlockPos center = player.getBlockPos();
         for (BlockPos pos : BlockPos.iterate(
@@ -167,7 +156,6 @@ public class PropPrototypeItem extends Item {
         return readStoredPool(stack);
     }
 
-    //从 NBT 读取储存的道具池
     private List<Item> readStoredPool(ItemStack stack) {
         List<Item> result = new ArrayList<>();
         NbtCompound nbt = stack.getNbt();
@@ -183,9 +171,6 @@ public class PropPrototypeItem extends Item {
         }
         return result;
     }
-
-    //将道具池以注册名（Identifier 字符串）列表的形式写入 NBT。
-
     private void writeStoredPool(ItemStack stack, List<Item> pool) {
         NbtCompound nbt = stack.getOrCreateNbt();
         NbtList list = new NbtList();
@@ -208,7 +193,7 @@ public class PropPrototypeItem extends Item {
                 tooltip.add(Text.literal("按下Shift键了解储存的道具").formatted(Formatting.GRAY));
             }
             else {
-                tooltip.add(Text.literal("尝试将某些特殊魂石放在副手并按下右键来改变道具池吧").formatted(Formatting.GREEN));
+                tooltip.add(Text.literal("尝试将某些特殊魂石放在副手并按下右键来改变道具池吧").formatted(Formatting.YELLOW));
             }
         }
     }

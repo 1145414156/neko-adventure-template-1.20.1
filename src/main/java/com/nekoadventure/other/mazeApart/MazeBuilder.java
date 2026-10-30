@@ -19,8 +19,9 @@ import net.minecraft.world.World;
 import java.util.Optional;
 import java.util.Random;
 
-//这个类由AI辅助完成
-//这个类是用来专门放置地牢的（避免歧义，地牢在代码中叫做maze）
+/**这个类由AI辅助完成
+ * 这个类是用来专门放置地牢的（避免歧义，地牢在代码中叫做maze）
+ **/
 public class MazeBuilder {
     Random random=new Random();
     private int getLevelData(World world) {
@@ -30,9 +31,7 @@ public class MazeBuilder {
         }
         return 1;
     }
-    /**这个方法存在很多for()循环，优化做的其实不太好....
-     * 但是毕竟数据还没有传入，这个维度也处于一种空的状态，所以说....我反正想不到其他的办法了qwq
-     **/
+
     public boolean placeMaze(ServerWorld world) {
         MazeDataManager data = MazeDataManager.get(world);
         int levelData = getLevelData(world);

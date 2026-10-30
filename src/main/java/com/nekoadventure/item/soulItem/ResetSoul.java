@@ -38,7 +38,7 @@ public class ResetSoul extends AbstractSoulItem{
                 itemStack.setCount(0);
             }
         } else {
-            player.giveItemStack(ModItems.RESET_SOUL.getDefaultStack());
+            player.giveItemStack(stack);
         }
     }
 
