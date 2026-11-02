@@ -86,23 +86,20 @@ public class ExposedWire extends AbstractNekoAttackItem {
                     player.getBoundingBox().expand(attackRange*4),
                     entity ->entity.getOwner()!=null&&entity.getOwner().equals(player)
             );
+            if (!missileEntities.isEmpty()) {
+                for (MissileEntity missileEntity : missileEntities) {
+                    if (missileEntity!=null){
+                        List<Entity> entities = getEntitiesInRange(missileEntity, world, attackRange<=4? (int) attackRange :4);
 
-            MissileEntity missileEntity = missileEntities.stream()
-                    .max(Comparator.comparingDouble(
-                            missile -> missile.squaredDistanceTo(player)
-                    ))
-                    .orElse(null);
-
-            if (missileEntity!=null){
-                List<Entity> entities = getEntitiesInRange(missileEntity, world, attackRange<=4? (int) attackRange :4);
-
-                List<LivingEntity> livingEntities = entities.stream()
-                        .filter(e -> e instanceof LivingEntity&&!Objects.equals(missileEntity.getRealOwner(), e)&&e.isAttackable())
-                        .limit(8)
-                        .map(e -> (LivingEntity) e)
-                        .collect(Collectors.toList());
-                entityChooseHandler(missileEntity, livingEntities, world, MAX_CONNECT);
-                applyDamageHandler(missileEntity, entities);
+                        List<LivingEntity> livingEntities = entities.stream()
+                                .filter(e -> e instanceof LivingEntity&&!Objects.equals(missileEntity.getRealOwner(), e)&&e.isAttackable())
+                                .limit(8)
+                                .map(e -> (LivingEntity) e)
+                                .collect(Collectors.toList());
+                        entityChooseHandler(missileEntity, livingEntities, world, MAX_CONNECT);
+                        applyDamageHandler(missileEntity, entities);
+                    }
+                }
             }
         }
     }

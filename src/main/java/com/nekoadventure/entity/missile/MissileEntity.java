@@ -31,6 +31,8 @@ public class MissileEntity extends Entity {
     private static final TrackedData<Integer> MISSILE_MODEL_TYPE =
             DataTracker.registerData(MissileEntity.class, TrackedDataHandlerRegistry.INTEGER);
     private static final TrackedData<Optional<UUID>> OWNER_UUID = DataTracker.registerData(MissileEntity.class, TrackedDataHandlerRegistry.OPTIONAL_UUID);
+    private static final TrackedData<Optional<UUID>> REAL_OWNER_UUID =
+            DataTracker.registerData(MissileEntity.class, TrackedDataHandlerRegistry.OPTIONAL_UUID);
     private static final TrackedData<Integer> FLAG =
             DataTracker.registerData(MissileEntity.class, TrackedDataHandlerRegistry.INTEGER);
     private static final TrackedData<Integer> TIME =
@@ -45,6 +47,7 @@ public class MissileEntity extends Entity {
     private double speed = 0;
     private AttackTypes attackTypes;
     private Entity owner;
+    private Entity realOwner;
     private boolean isTreadable;
     private double damage;
     private int skillType=-1;
@@ -54,6 +57,12 @@ public class MissileEntity extends Entity {
     // 攻击弹幕构造1
     public MissileEntity(EntityType<? extends MissileEntity> entityType, World world, Entity owner,
                         AttackTypes attackTypes, boolean isTreadable, double range,double time,double damage) {
+        this(entityType, world, owner, attackTypes, isTreadable, range, time, damage, (Entity) null);
+    }
+    // 攻击弹幕构造1（指定实际发射者）
+    public MissileEntity(EntityType<? extends MissileEntity> entityType, World world, Entity owner,
+                        AttackTypes attackTypes, boolean isTreadable, double range,double time,double damage,
+                        @Nullable Entity realOwner) {
         super(entityType, world);
         this.setOwner(owner);
         this.setAttackType(attackTypes);
@@ -63,10 +72,19 @@ public class MissileEntity extends Entity {
         this.setTime((int) time);
         this.setNoGravity(true);
         this.speed = range/time;
+        if (realOwner != null) {
+            this.setRealOwner(realOwner);
+        }
     }
     // 攻击弹幕构造2
     public MissileEntity(EntityType<? extends MissileEntity> entityType, World world, Entity owner,
                          AttackTypes attackTypes, boolean isTreadable, double range,double time,double damage,int flag) {
+        this(entityType, world, owner, attackTypes, isTreadable, range, time, damage, flag, null);
+    }
+    // 攻击弹幕构造2（指定实际发射者）
+    public MissileEntity(EntityType<? extends MissileEntity> entityType, World world, Entity owner,
+                         AttackTypes attackTypes, boolean isTreadable, double range,double time,double damage,int flag,
+                         @Nullable Entity realOwner) {
         super(entityType, world);
         this.setOwner(owner);
         this.setAttackType(attackTypes);
@@ -77,10 +95,19 @@ public class MissileEntity extends Entity {
         this.setNoGravity(true);
         this.speed = range/time;
         this.setFlag(flag);
+        if (realOwner != null) {
+            this.setRealOwner(realOwner);
+        }
     }
     //boss特殊弹幕构造
     public MissileEntity(EntityType<? extends MissileEntity> entityType, World world, Entity owner,
                          AttackTypes attackTypes,int skillType, double range,double time,double damage) {
+        this(entityType, world, owner, attackTypes, skillType, range, time, damage, null);
+    }
+    //boss特殊弹幕构造（指定实际发射者）
+    public MissileEntity(EntityType<? extends MissileEntity> entityType, World world, Entity owner,
+                         AttackTypes attackTypes,int skillType, double range,double time,double damage,
+                         @Nullable Entity realOwner) {
         super(entityType,world);
         this.setOwner(owner);
         this.setAttackType(attackTypes);
@@ -90,6 +117,9 @@ public class MissileEntity extends Entity {
         this.setTime((int) time);
         this.setNoGravity(true);
         this.speed = range/time;
+        if (realOwner != null) {
+            this.setRealOwner(realOwner);
+        }
     }
 
     public MissileEntity(EntityType<MissileEntity> entityEntityType, World world) {
@@ -195,6 +225,7 @@ public class MissileEntity extends Entity {
     protected void initDataTracker() {
         this.dataTracker.startTracking(MISSILE_MODEL_TYPE, MissileModelType.BULLET.ordinal());
         this.dataTracker.startTracking(OWNER_UUID,Optional.empty());
+        this.dataTracker.startTracking(REAL_OWNER_UUID, Optional.empty());
         this.dataTracker.startTracking(FLAG, 0);
         this.dataTracker.startTracking(TIME, 1);
         this.dataTracker.startTracking(ALIVE_DURATION, 0);
@@ -223,6 +254,11 @@ public class MissileEntity extends Entity {
 
         if (this.getOwner()!=null) {
             nbt.putUuid("Owner", this.owner.getUuid());
+        }
+
+        Optional<UUID> realOwnerUuid = this.dataTracker.get(REAL_OWNER_UUID);
+        if (realOwnerUuid.isPresent()) {
+            nbt.putUuid("RealOwner", realOwnerUuid.get());
         }
 
         if (this.attackTypes != null && this.attackTypes.getType() != null) {
@@ -255,6 +291,16 @@ public class MissileEntity extends Entity {
                 Entity ownerEntity = serverWorld.getEntity(ownerUuid);
                 if (ownerEntity != null) {
                     this.owner = ownerEntity;
+                }
+            }
+        }
+        if (nbt.containsUuid("RealOwner")) {
+            UUID realOwnerUuid = nbt.getUuid("RealOwner");
+            this.dataTracker.set(REAL_OWNER_UUID, Optional.of(realOwnerUuid));
+            if (this.getWorld() instanceof ServerWorld serverWorld) {
+                Entity realOwnerEntity = serverWorld.getEntity(realOwnerUuid);
+                if (realOwnerEntity != null) {
+                    this.realOwner = realOwnerEntity;
                 }
             }
         }
@@ -340,6 +386,17 @@ public class MissileEntity extends Entity {
 
     @Nullable
     public Entity getRealOwner() {
+        if (this.realOwner != null && !this.realOwner.isRemoved()) {
+            return this.realOwner;
+        }
+        Optional<UUID> realOwnerUuid = this.dataTracker.get(REAL_OWNER_UUID);
+        if (realOwnerUuid.isPresent()) {
+            Entity resolvedRealOwner = this.resolveOwnerByUuid(realOwnerUuid.get());
+            if (resolvedRealOwner != null) {
+                this.realOwner = resolvedRealOwner;
+                return resolvedRealOwner;
+            }
+        }
         Entity current = this.getOwner();
         int depth = 0;
         while (current instanceof MissileEntity missileOwner && depth < 16) {
@@ -362,6 +419,14 @@ public class MissileEntity extends Entity {
     public void setOwner(@Nullable Entity owner) {
         this.owner = owner;
         this.dataTracker.set(OWNER_UUID, owner != null ? Optional.of(owner.getUuid()) : Optional.empty());
+        Entity inheritedRealOwner = owner instanceof MissileEntity missileOwner ? missileOwner.getRealOwner() : owner;
+        if (inheritedRealOwner != null) {
+            this.setRealOwner(inheritedRealOwner);
+        }
+    }
+    public void setRealOwner(@Nullable Entity realOwner){
+        this.realOwner = realOwner;
+        this.dataTracker.set(REAL_OWNER_UUID, realOwner != null ? Optional.of(realOwner.getUuid()) : Optional.empty());
     }
     public void setAliveDuration(int aliveDuration){this.dataTracker.set(ALIVE_DURATION,aliveDuration);}
     public void setDamage(double damage){this.damage=damage;}

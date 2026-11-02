@@ -42,6 +42,6 @@ public class NekoAdventure implements ModInitializer {
 
 		ModEntities.initialize();
 
-		LOGGER.info("create by Inf;version:0.0.3");
+		LOGGER.info("create by Inf;version:0.1.3");
 	}
 }

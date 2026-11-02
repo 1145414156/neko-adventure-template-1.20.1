@@ -58,8 +58,15 @@ public class BrimStone extends AbstractNekoAttackItem {
                 float initialYaw = yaw;
                 float pitch = player.getPitch();
                 float currentYaw = initialYaw;
+                MissileEntity missile = getMissileEntity(player, range, damage, 1);
                 for (int length = 1; length <= range; length++) {
-                    MissileEntity missile = getMissileEntity(player, range, damage, length);
+                    if (length > 1) {
+                        if (length < range) {
+                            missile = getMissileEntity(missile, range, damage, length);
+                        } else {
+                            missile = getMissileEntity(player, range, damage, length);
+                        }
+                    }
                     int t = (int) ((length - 1) / (double) range * missile.getTime());
                     float calculateYaw = getCalculateYawFromNekoItems(player, t);
                     yaw = calculateYaw != 114514 ? initialYaw + calculateYaw : initialYaw;
@@ -75,7 +82,7 @@ public class BrimStone extends AbstractNekoAttackItem {
                         SoundCategory.PLAYERS, 0.8F, 1.0F);
                 if (damage>100){
                         player.getWorld().playSound(null, player.getBlockPos(), ModSoundEvents.BRIMSTONE_FIERCE_ATTACK,
-                                SoundCategory.PLAYERS, 20.0F, 1.0F);
+                                SoundCategory.PLAYERS, 15.0F, 1.0F);
                         if (player instanceof ServerPlayerEntity) {
                             ScreenShakeNetworking.sendToPlayer((ServerPlayerEntity) player,30,0.3f);
                         }

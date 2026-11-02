@@ -29,7 +29,7 @@ public class AttackTypes {
 
     private final AttackType type;
     private Vec3d lastOwnerPos = null;
-    private Vec3d lastTargetPos =null;
+     private LivingEntity nearest=null;
     public AttackTypes(AttackType type) {
         this.type = type;
     }
@@ -118,29 +118,16 @@ public class AttackTypes {
 
     }
 
-    private void delayMovement(MissileEntity entity,double range,double speed) {
+    private void delayMovement(MissileEntity entity, double range, double speed) {
         lazyMovement(entity);
-        if (entity.getAliveDuration() == entity.getTime()/ 2) {
+        if (entity.getAliveDuration() == entity.getTime() / 2) {
             if (entity.getOwner() != null) {
-                List<LivingEntity> targets = entity.getWorld().getEntitiesByClass(
-                        LivingEntity.class,
-                        entity.getOwner().getBoundingBox().expand(range),
-                        z ->
-                                z instanceof LivingEntity &&
-                                z != entity.getOwner()&&
-                                z.isAttackable()
-                );
-                Entity nearest = targets.stream()
-                        .min(Comparator.comparingDouble(entity::distanceTo))
-                        .orElse(null);
-                if (entity.getOwner() instanceof HostileEntity hostileEntity) {
-                    nearest = hostileEntity.getTarget();
-                }
+                nearest = findNearestTarget(entity, range);
                 if (nearest != null) {
-                    lastTargetPos = nearest.getEyePos();
-                    Vec3d direction = lastTargetPos.subtract(entity.getPos()).normalize();
+                    Vec3d direction = nearest.getEyePos().subtract(entity.getPos()).normalize();
                     double yaw = Math.toDegrees(Math.atan2(-direction.x, direction.z));
-                    double pitch = Math.toDegrees(Math.atan2(-direction.y, Math.sqrt(direction.x * direction.x + direction.z * direction.z)));
+                    double pitch = Math.toDegrees(Math.atan2(-direction.y,
+                            Math.sqrt(direction.x * direction.x + direction.z * direction.z)));
                     entity.setYaw((float) yaw);
                     entity.setPitch((float) pitch);
                 } else {
@@ -148,10 +135,10 @@ public class AttackTypes {
                 }
             }
         }
-        else if (entity.getAliveDuration()==(entity.getTime()/ 2)+1){
-            if (lastTargetPos!=null){
-                Vec3d direction = lastTargetPos.subtract(entity.getPos()).normalize();
-                Vec3d desiredVelocity = direction.multiply(speed*3.0);
+        else if (entity.getAliveDuration() == (entity.getTime() / 2) + 1) {
+            if (nearest != null) {
+                Vec3d direction = nearest.getEyePos().subtract(entity.getPos()).normalize();
+                Vec3d desiredVelocity = direction.multiply(speed*5);
                 entity.addVelocity(
                         (desiredVelocity.x - entity.getVelocity().x) * 0.5,
                         (desiredVelocity.y - entity.getVelocity().y) * 0.5,
@@ -159,9 +146,7 @@ public class AttackTypes {
                 );
             }
         }
-
     }
-
     private void brimstoneMovement(MissileEntity entity) {
         entity.setVelocity(Vec3d.ZERO);
         followOwnerMovement(entity);
@@ -232,5 +217,25 @@ public class AttackTypes {
     private void zenithMovement(MissileEntity entity, double range) {
         ellipsoidMovement(entity,range);
         followOwnerMovement(entity);
+    }
+
+//===================================================================================================
+    private LivingEntity findNearestTarget(MissileEntity entity, double range) {
+        Entity owner = entity.getOwner();
+        if (owner == null) {
+            return null;
+        }
+        List<LivingEntity> targets = entity.getWorld().getEntitiesByClass(
+                LivingEntity.class,
+                owner.getBoundingBox().expand(range),
+                z -> z != owner && z.isAttackable()
+        );
+        Entity nearest = targets.stream()
+                .min(Comparator.comparingDouble(entity::distanceTo))
+                .orElse(null);
+        if (owner instanceof HostileEntity hostileEntity) {
+            nearest = hostileEntity.getTarget();
+        }
+        return nearest instanceof LivingEntity living ? living : null;
     }
 }

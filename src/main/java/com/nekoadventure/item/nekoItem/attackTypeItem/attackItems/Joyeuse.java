@@ -67,7 +67,6 @@ public class Joyeuse extends AbstractNekoAttackItem {
             missileEntity.setPitch(player.getPitch());
             player.getWorld().spawnEntity(missileEntity);
             double[] finalData = NekoPackageDataManager.getFinalData(player);
-            System.out.println("flag="+flag);
             double attackSpeed = finalData != null ? finalData[3] : 0;
             int cooldown = (int) (60 - (attackSpeed / NekoPackageDataManager.MAX_ATTACK_SPEED) * 60);
             cooldown = Math.max(4, Math.min(60, cooldown));
