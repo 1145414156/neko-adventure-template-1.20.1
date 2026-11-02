@@ -50,16 +50,14 @@ public class MissileEntity extends Entity {
     private Entity realOwner;
     private boolean isTreadable;
     private double damage;
-    private int skillType=-1;
     private float initialYaw;
     private float initialPitch;
 
     // 攻击弹幕构造1
     public MissileEntity(EntityType<? extends MissileEntity> entityType, World world, Entity owner,
                         AttackTypes attackTypes, boolean isTreadable, double range,double time,double damage) {
-        this(entityType, world, owner, attackTypes, isTreadable, range, time, damage, (Entity) null);
+        this(entityType, world, owner, attackTypes, isTreadable, range, time, damage, owner);
     }
-    // 攻击弹幕构造1（指定实际发射者）
     public MissileEntity(EntityType<? extends MissileEntity> entityType, World world, Entity owner,
                         AttackTypes attackTypes, boolean isTreadable, double range,double time,double damage,
                         @Nullable Entity realOwner) {
@@ -79,9 +77,8 @@ public class MissileEntity extends Entity {
     // 攻击弹幕构造2
     public MissileEntity(EntityType<? extends MissileEntity> entityType, World world, Entity owner,
                          AttackTypes attackTypes, boolean isTreadable, double range,double time,double damage,int flag) {
-        this(entityType, world, owner, attackTypes, isTreadable, range, time, damage, flag, null);
+        this(entityType, world, owner, attackTypes, isTreadable, range, time, damage, flag, owner);
     }
-    // 攻击弹幕构造2（指定实际发射者）
     public MissileEntity(EntityType<? extends MissileEntity> entityType, World world, Entity owner,
                          AttackTypes attackTypes, boolean isTreadable, double range,double time,double damage,int flag,
                          @Nullable Entity realOwner) {
@@ -99,29 +96,6 @@ public class MissileEntity extends Entity {
             this.setRealOwner(realOwner);
         }
     }
-    //boss特殊弹幕构造
-    public MissileEntity(EntityType<? extends MissileEntity> entityType, World world, Entity owner,
-                         AttackTypes attackTypes,int skillType, double range,double time,double damage) {
-        this(entityType, world, owner, attackTypes, skillType, range, time, damage, null);
-    }
-    //boss特殊弹幕构造（指定实际发射者）
-    public MissileEntity(EntityType<? extends MissileEntity> entityType, World world, Entity owner,
-                         AttackTypes attackTypes,int skillType, double range,double time,double damage,
-                         @Nullable Entity realOwner) {
-        super(entityType,world);
-        this.setOwner(owner);
-        this.setAttackType(attackTypes);
-        this.skillType=skillType;
-        this.setRange(range);
-        this.damage = damage;
-        this.setTime((int) time);
-        this.setNoGravity(true);
-        this.speed = range/time;
-        if (realOwner != null) {
-            this.setRealOwner(realOwner);
-        }
-    }
-
     public MissileEntity(EntityType<MissileEntity> entityEntityType, World world) {
         super(entityEntityType,world);
     }
@@ -138,7 +112,7 @@ public class MissileEntity extends Entity {
             initialPitch=this.getPitch();
         }
         if (this.getOwner() instanceof PlayerEntity player) {
-            NekoPackageItem.applyOffAttackTypeItem(player,player.getYaw());
+            NekoPackageItem.applyOffAttackTypeItem(player,this,player.getYaw());
         }
 
         if (!this.getWorld().isClient&&attackTypes != null) {
@@ -146,7 +120,7 @@ public class MissileEntity extends Entity {
             this.move(MovementType.SELF, this.getVelocity());
             this.setAliveDuration(this.getAliveDuration() + 1);
         }
-        if (this.getOwner()==null) {this.kill();return;}
+        if (this.getRealOwner()==null) {this.kill();return;}
         if (this.age>2000){this.kill();}
         if (this.getAliveDuration()==this.getTime()){this.kill();}
         if (entityCheckCollision()) this.kill();
@@ -157,7 +131,8 @@ public class MissileEntity extends Entity {
         Vec3d velocity = this.getVelocity();
         boolean stationary = velocity.lengthSquared() < 1.0E-6;
         if (stationary && this.getAttackType() != AttackTypes.AttackType.HOMING&&
-                this.getAttackType() != AttackTypes.AttackType.LAZY) {
+                this.getAttackType() != AttackTypes.AttackType.LAZY&&
+                this.getAttackType() != AttackTypes.AttackType.BRIMSTONE) {
             return false;
         }
         Vec3d direction = stationary ? Vec3d.ZERO : velocity.normalize();
@@ -226,7 +201,7 @@ public class MissileEntity extends Entity {
         this.dataTracker.startTracking(MISSILE_MODEL_TYPE, MissileModelType.BULLET.ordinal());
         this.dataTracker.startTracking(OWNER_UUID,Optional.empty());
         this.dataTracker.startTracking(REAL_OWNER_UUID, Optional.empty());
-        this.dataTracker.startTracking(FLAG, 0);
+        this.dataTracker.startTracking(FLAG, -1);
         this.dataTracker.startTracking(TIME, 1);
         this.dataTracker.startTracking(ALIVE_DURATION, 0);
         this.dataTracker.startTracking(RANGE, 0.0f);
@@ -242,7 +217,6 @@ public class MissileEntity extends Entity {
     protected void writeCustomDataToNbt(NbtCompound nbt) {
         nbt.putInt("time", this.getTime());
         nbt.putInt("aliveDuration", this.getAliveDuration());
-        nbt.putInt("skillType",skillType);
         nbt.putDouble("speed", this.speed);
         nbt.putDouble("range", this.getRange());
         nbt.putInt("flag", this.getFlag());
@@ -255,10 +229,8 @@ public class MissileEntity extends Entity {
         if (this.getOwner()!=null) {
             nbt.putUuid("Owner", this.owner.getUuid());
         }
-
-        Optional<UUID> realOwnerUuid = this.dataTracker.get(REAL_OWNER_UUID);
-        if (realOwnerUuid.isPresent()) {
-            nbt.putUuid("RealOwner", realOwnerUuid.get());
+        if (this.getRealOwner()!=null) {
+            nbt.putUuid("RealOwner", this.getRealOwner().getUuid());
         }
 
         if (this.attackTypes != null && this.attackTypes.getType() != null) {
@@ -271,7 +243,6 @@ public class MissileEntity extends Entity {
     protected void readCustomDataFromNbt(NbtCompound nbt) {
         this.setTime(nbt.getInt("time"));
         this.setAliveDuration(nbt.getInt("aliveDuration"));
-        this.skillType=nbt.getInt("skillType");
         this.setFlag(nbt.getInt("flag"));
         this.initialYaw=nbt.getFloat("initialYaw");
         this.initialPitch=nbt.getFloat("initialPitch");
@@ -446,7 +417,6 @@ public class MissileEntity extends Entity {
     public int getAliveDuration(){return this.dataTracker.get(ALIVE_DURATION);}
     public double getRange(){return this.dataTracker.get(RANGE);}
     public void setRange(double range){this.dataTracker.set(RANGE,(float) range);}
-    public int getSkillType(){return this.skillType;}
     public void setAttackType(@Nullable AttackTypes attackType){
         this.attackTypes=attackType;
         this.dataTracker.set(ATTACK_TYPE, attackType != null ? attackType.getType().ordinal() : -1);

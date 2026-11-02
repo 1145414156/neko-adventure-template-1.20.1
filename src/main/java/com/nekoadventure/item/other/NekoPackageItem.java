@@ -2,6 +2,7 @@ package com.nekoadventure.item.other;
 
 import com.nekoadventure.NekoAdventure;
 import com.nekoadventure.client.ShiftKeyHelper;
+import com.nekoadventure.entity.missile.MissileEntity;
 import com.nekoadventure.item.ModItems;
 import com.nekoadventure.item.nekoItem.AbstractNekoItem;
 import com.nekoadventure.item.nekoItem.attackTypeItem.AbstractNekoAttackItem;
@@ -325,7 +326,7 @@ public class NekoPackageItem extends Item {
         }
     }
 
-    public static void applyOffAttackTypeItem(PlayerEntity player,float yaw) {
+    public static void applyOffAttackTypeItem(PlayerEntity player, MissileEntity missileEntity, float yaw) {
         AbstractNekoAttackItem finalAttackOffItem=null;
         AbstractNekoAttackItem finalAttackMainItem = null;
         ItemStack stack = player.getStackInHand(Hand.OFF_HAND);
@@ -345,13 +346,12 @@ public class NekoPackageItem extends Item {
                 }
             }
             if (finalAttackOffItem != null) {
-                finalAttackOffItem.changeOffAttackType(player, yaw);
+                finalAttackOffItem.changeOffAttackType(player,missileEntity,yaw);
             }
 
         }
     }
 
-    //这些方法用来取出最后算出来的数值（数据按玩家存储，所以都要传玩家）
     public double getAttackRange(PlayerEntity player) {
         double[] finalData = NekoPackageDataManager.getFinalData(player);
         if (finalData == null || finalData[4] <= 0) {
@@ -365,6 +365,14 @@ public class NekoPackageItem extends Item {
             return 1;
         }
         return finalData[2];
+    }
+
+    public double getAttackSpeed(PlayerEntity player){
+        double[] finalData = NekoPackageDataManager.getFinalData(player);
+        if (finalData == null || finalData[3] <= 0) {
+            return 1;
+        }
+        return finalData[3];
     }
 
     public double[] getFinalData(PlayerEntity player){

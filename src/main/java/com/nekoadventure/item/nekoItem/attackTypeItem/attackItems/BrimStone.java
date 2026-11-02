@@ -40,15 +40,13 @@ public class BrimStone extends AbstractNekoAttackItem {
         World world=player.getWorld();
         int range=0;
         double damage=0;
-        double attackRange = 3;
         if (player.getOffHandStack().getItem() instanceof NekoPackageItem nekoPackage){
             damage=nekoPackage.getStrength(player);
             range= (int) nekoPackage.getAttackRange(player);
-            attackRange = nekoPackage.getAttackRange(player);
         }
         List<MissileEntity> brimStones = world.getEntitiesByClass(
                 MissileEntity.class,
-                player.getBoundingBox().expand(attackRange*4),
+                player.getBoundingBox().expand(2),
                 entity -> Objects.equals(entity.getOwner(), player) && AttackTypes.AttackType.BRIMSTONE.equals(entity.getAttackType()));
         if (!world.isClient) {
             if (brimStones.isEmpty()) {
@@ -96,51 +94,80 @@ public class BrimStone extends AbstractNekoAttackItem {
         player.getItemCooldownManager().set(player.getOffHandStack().getItem(), cooldown);
     }
     @Override
-    public void changeOffAttackType(PlayerEntity player, float yaw) {
-        super.changeOffAttackType(player, yaw);
-        World world=player.getWorld();
-        double damage=1;
-        double attackRange = 3;
+    public void changeOffAttackType(PlayerEntity player,MissileEntity missile,float yaw) {
+            World world=player.getWorld();
+            double damage=1;
+            double attackRange = 3;
+            List<MissileEntity> brimStones = world.getEntitiesByClass(
+                    MissileEntity.class,
+                    missile.getBoundingBox().expand(8),
+                    entity-> Objects.equals(entity.getOwner(), missile) && AttackTypes.AttackType.BRIMSTONE.equals(entity.getAttackType())
+            );
         if (player.getOffHandStack().getItem() instanceof NekoPackageItem nekoPackage){
             damage=nekoPackage.getStrength(player);
             attackRange = nekoPackage.getAttackRange(player);
             ArrayList<AbstractNekoItem> attackItems=NekoPackageItem.getNekoItems(player.getOffHandStack(),true,3);
             if (attackItems.get(attackItems.size()-1).equals(ModItems.BRIMSTONE)) return;
+            if (attackItems.get(attackItems.size()-1).equals(ModItems.MISSILE)) {
+                if (missile.getAliveDuration()==62&&brimStones.size()<=12) {
+                    specialAttackWithMissile(player, missile, world, damage);
+                }
+                return;
+            }
         }
-        List<MissileEntity> missileEntities = world.getEntitiesByClass(
-                MissileEntity.class,
-                player.getBoundingBox().expand(attackRange*4),
-                entity -> Objects.equals(entity.getOwner(), player)&&!Objects.equals(entity.getAttackType(), AttackTypes.AttackType.BRIMSTONE)
-        ).stream().limit(5).toList();
-            int count = 16;
+            int count = 12;
             double radius = 2.0;
-            if (!missileEntities.isEmpty()){
-                for (MissileEntity missile : missileEntities) {
-                    List<MissileEntity> brimStones = world.getEntitiesByClass(
-                            MissileEntity.class,
-                            missile.getBoundingBox().expand(attackRange*4),
-                            entity-> Objects.equals(entity.getOwner(), missile) && AttackTypes.AttackType.BRIMSTONE.equals(entity.getAttackType())
-                    );
-                    if (brimStones.isEmpty()) {
-                        player.getWorld().playSound(null, player.getBlockPos(), ModSoundEvents.BRIMSTONE_ATTACK,
-                                SoundCategory.PLAYERS, 0.3F, 1.0F);
-                        Vec3d centerPos = missile.getPos();
-                        for (int i = 0; i < count; i++) {
-                            double angle = (2 * Math.PI / count) * i;
-                            double x = centerPos.x + radius * Math.cos(angle);
-                            double z = centerPos.z + radius * Math.sin(angle);
-                            double y = centerPos.y;
+        if (canExecute(player, missile, 15)){
+            if (Objects.equals(missile.getRealOwner(), player)) {
+                if (brimStones.size()<=12) {
+                    Vec3d centerPos = missile.getPos();
+                    for (int i = 0; i < count; i++) {
+                        double angle = (2 * Math.PI / count) * i;
+                        double x = centerPos.x + radius * Math.cos(angle);
+                        double z = centerPos.z + radius * Math.sin(angle);
+                        double y = centerPos.y;
 
-                            MissileEntity brimStone = getMissileEntity(missile, attackRange, damage, i + 1);
-                            brimStone.setPosition(x, y, z);
-                            brimStone.setPitch(0);
-                            brimStone.setYaw((float) Math.toDegrees(angle));
-                            world.spawnEntity(brimStone);
+                        MissileEntity brimStone = getMissileEntity(missile, attackRange, damage, player);
+                        brimStone.setPosition(x, y, z);
+                        brimStone.setPitch(0);
+                        brimStone.setYaw((float) Math.toDegrees(angle));
+                        world.spawnEntity(brimStone);
                         }
-                    }
+                    player.getWorld().playSound(null, player.getBlockPos(),
+                            ModSoundEvents.BRIMSTONE_ATTACK, SoundCategory.PLAYERS, 0.3F, 1.5F);
                 }
             }
+        }
     }
+
+    private void specialAttackWithMissile(PlayerEntity player, MissileEntity missile, World world, double damage) {
+        double range= Math.min(missile.getRange(), 12);
+        double spacing = 1.0;
+        double cubeSize = 0.5;
+        Vec3d centerPos = missile.getPos();
+        int directionCount = 8;
+        for (int directionIndex = 0; directionIndex < directionCount; directionIndex++) {
+            float initialYaw = 360.0F / directionCount * directionIndex;
+            float currentYaw = initialYaw;
+            Vec3d spawnPos = centerPos;
+            for (int length = 1; length <= range; length++) {
+                MissileEntity missileEntity = getMissileEntity(missile, range, damage, length, player);
+                int t = (int) ((length - 1) / range * missileEntity.getTime());
+                float calculateYaw = getCalculateYawFromNekoItems(player, t);
+                float segmentYaw = calculateYaw != 114514 ? initialYaw + calculateYaw : initialYaw;
+                Vec3d direction = getRotationVector(0, currentYaw);
+                spawnPos = spawnPos.add(direction.multiply(length == 1 ? spacing - cubeSize / 2 : spacing));
+                missileEntity.setPos(spawnPos.x, spawnPos.y, spawnPos.z);
+                missileEntity.setYaw(segmentYaw);
+                missileEntity.setPitch(0);
+                world.spawnEntity(missileEntity);
+                currentYaw = segmentYaw;
+            }
+        }
+        player.getWorld().playSound(null, player.getBlockPos(), ModSoundEvents.BRIMSTONE_ATTACK,
+                SoundCategory.PLAYERS, 1.0F, 1.0F);
+    }
+
     private float getCalculateYawFromNekoItems(PlayerEntity player, int t) {
         if (player.getOffHandStack().getItem() instanceof NekoPackageItem) {
             List<AbstractNekoItem> attackItems = NekoPackageItem.getNekoItems(player.getOffHandStack(), true, 0);
@@ -155,6 +182,9 @@ public class BrimStone extends AbstractNekoAttackItem {
                         return addYaw;
                     }
                 }
+            }
+            if (addYaw==0){
+                return 114514;
             }
             return addYaw;
         }
@@ -172,6 +202,37 @@ public class BrimStone extends AbstractNekoAttackItem {
                 60,
                 damage /2,
                 flag);
+        missile.setMissileModelType(MissileModelType.BRIMSTONE);
+        return  missile;
+    }
+    private @NotNull MissileEntity getMissileEntity(Entity owner, double range, double damage,int flag,Entity realOwner) {
+        AttackTypes brimstoneType = new AttackTypes(AttackTypes.AttackType.BRIMSTONE);
+        MissileEntity missile= new MissileEntity(ModEntities.MISSILE,
+                owner.getWorld(),
+                owner,
+                brimstoneType,
+                true,
+                range,
+                60,
+                damage /2,
+                flag,
+                realOwner);
+        missile.setMissileModelType(MissileModelType.BRIMSTONE);
+        return  missile;
+    }
+    private @NotNull MissileEntity getMissileEntity(MissileEntity owner, double range, double damage, PlayerEntity realOwner) {
+        AttackTypes brimstoneType = new AttackTypes(AttackTypes.AttackType.BRIMSTONE);
+        int time=owner.getTime()<=10? 3:30;
+        MissileEntity missile= new MissileEntity(ModEntities.MISSILE,
+                owner.getWorld(),
+                owner,
+                brimstoneType,
+                true,
+                range,
+                time,
+                damage /2,
+                -1,
+                realOwner);
         missile.setMissileModelType(MissileModelType.BRIMSTONE);
         return  missile;
     }

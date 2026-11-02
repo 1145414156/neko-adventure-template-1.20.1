@@ -4,6 +4,7 @@ import com.nekoadventure.client.ShiftKeyHelper;
 import com.nekoadventure.entity.ModEntities;
 import com.nekoadventure.entity.missile.MissileEntity;
 import com.nekoadventure.item.ModItems;
+import com.nekoadventure.item.nekoItem.AbstractNekoItem;
 import com.nekoadventure.item.nekoItem.attackTypeItem.AbstractNekoAttackItem;
 import com.nekoadventure.item.other.NekoPackageItem;
 import com.nekoadventure.other.itemApart.NekoPackageDataManager;
@@ -22,7 +23,9 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class Zenith extends AbstractNekoAttackItem {
@@ -45,10 +48,10 @@ public class Zenith extends AbstractNekoAttackItem {
         if (!entities.isEmpty()){
            double distance=entities.size()>1? entities.get(player.getWorld().random.nextInt(entities.size()-1)).
                    distanceTo(player):entities.get(0).distanceTo(player)-0.5;
-           range=Math.min(range,distance);
+           range=Math.min(range,distance<=3?range:distance);
         }
         range=Math.min(15,range)+(!entities.isEmpty()?0.0F:player.getWorld().getRandom().nextInt(10)-4);
-        MissileEntity missileEntity = getMissileEntity(player, range, damage);
+        MissileEntity missileEntity = getMissileEntity(player, range, damage,player);
         missileEntity.setYaw(yaw+(!entities.isEmpty()?0.0F:player.getWorld().random.nextInt(40)-19));
         missileEntity.setPitch(0);
         player.getWorld().spawnEntity(missileEntity);
@@ -77,7 +80,7 @@ public class Zenith extends AbstractNekoAttackItem {
                 range=Math.min(range,distance);
             }
             range=Math.min(15,range)+(!entities.isEmpty()?0.0F:player.getWorld().getRandom().nextInt(10)-4);
-            MissileEntity missileEntity = getMissileEntity(player, range, damage);
+            MissileEntity missileEntity = getMissileEntity(player, range, damage,player);
             missileEntity.setYaw(yaw+(!entities.isEmpty()?0.0F:player.getWorld().random.nextInt(40)-19+20*i));
             missileEntity.setPitch(0);
             player.getWorld().spawnEntity(missileEntity);
@@ -85,22 +88,27 @@ public class Zenith extends AbstractNekoAttackItem {
     }
 
     @Override
-    public void changeOffAttackType(PlayerEntity player, float yaw) {
-        super.changeOffAttackType(player, yaw);
-        if (canExecute(player, 10)) {
-            double range = 2;
-            double damage = 2;
-            List<MissileEntity> missileEntities = player.getWorld().getEntitiesByClass(
-                    MissileEntity.class,
-                    player.getBoundingBox().expand(range*2),
-                    entity -> entity.getOwner()!=null&&entity.getOwner().equals(player)
-            );
-            if (!missileEntities.isEmpty()) {
-                MissileEntity missile=missileEntities.get(player.getWorld().random.nextInt(missileEntities.size()));
-                if (player.getOffHandStack().getItem() instanceof NekoPackageItem nekoPackage){
-                    range=nekoPackage.getAttackRange(player);
-                    damage=nekoPackage.getStrength(player);
+    public void changeOffAttackType(PlayerEntity player,MissileEntity missile ,float yaw) {
+        double range = 2;
+        double damage = 2;
+        if (player.getOffHandStack().getItem() instanceof NekoPackageItem nekoPackage){
+            range=nekoPackage.getAttackRange(player);
+            damage=nekoPackage.getStrength(player);
+            double attackSpeed=-nekoPackage.getAttackSpeed(player)*5/8+20;
+            ArrayList<AbstractNekoItem> attackItems=NekoPackageItem.getNekoItems(player.getOffHandStack(),true,3);
+            if (attackItems.get(attackItems.size()-1).equals(ModItems.BRIMSTONE)) return;
+            if (attackItems.get(attackItems.size()-1).equals(ModItems.MISSILE)) {
+                if (missile.getAliveDuration()>61) {
+                    if (canExecute(player, missile,(int) attackSpeed)) {
+                        specialAttackWithMissile(player, missile, range, damage);
+                    }
+
                 }
+                return;
+            }
+        }
+        if (canExecute(player, missile, 10)) {
+            if (Objects.equals(missile.getRealOwner(), player)) {
                 Vec3d look = missile.getRotationVec(1.0F);
                 Vec3d horizontalLook = new Vec3d(look.x, 0, look.z).normalize();
                 List<LivingEntity> entities=getEntitiesOnLine(missile,missile.getEyePos(),horizontalLook,range);
@@ -110,7 +118,7 @@ public class Zenith extends AbstractNekoAttackItem {
                     range=Math.min(range,distance);
                 }
                 range=Math.min(15,range)+(!entities.isEmpty()?0.0F:player.getWorld().getRandom().nextInt(10)-4);
-                MissileEntity missileEntity = getMissileEntity(missile, range, damage);
+                MissileEntity missileEntity = getMissileEntity(missile, range, damage,player);
                 missileEntity.setYaw(missile.getYaw()+(!entities.isEmpty()?0.0F:player.getWorld().random.nextInt(40)-19));
                 missileEntity.setPitch(0);
                 player.getWorld().spawnEntity(missileEntity);
@@ -118,7 +126,22 @@ public class Zenith extends AbstractNekoAttackItem {
         }
     }
 
-    private @NotNull MissileEntity getMissileEntity(Entity owner, double range, double damage) {
+    private void specialAttackWithMissile(PlayerEntity player, MissileEntity missile, double range, double damage) {
+        for (int i=0;i<4;i++) {
+            range=range/2;
+            MissileEntity missileEntity = getMissileEntity(missile, range, damage,player);
+            float directionYaw=i*90;
+            missileEntity.setYaw(directionYaw);
+            missileEntity.setPitch(0);
+            Vec3d spawnPos = missileEntity.getPos()
+                    .add(getRotationVector(0, directionYaw).multiply(1.5))
+                    .add(0.0, 1.5, 0.0);
+            missileEntity.setPos(spawnPos.x, spawnPos.y, spawnPos.z);
+            player.getWorld().spawnEntity(missileEntity);
+        }
+    }
+
+    private @NotNull MissileEntity getMissileEntity(Entity owner, double range, double damage,Entity realOwner) {
         AttackTypes bulletType = new AttackTypes(owner instanceof PlayerEntity?AttackTypes.AttackType.ZENITH:AttackTypes.AttackType.ELLIPSE);
         MissileEntity missileEntity = new MissileEntity(ModEntities.MISSILE,
                 owner.getWorld(),
@@ -128,7 +151,8 @@ public class Zenith extends AbstractNekoAttackItem {
                 range,
                 15+owner.getWorld().getRandom().nextInt(10),
                 damage,
-                owner.getWorld().random.nextInt(21)
+                owner.getWorld().getRandom().nextInt(21),
+                realOwner
         );
         missileEntity.setMissileModelType(MissileModelType.ZENITH);
         missileEntity.setPos(owner.getX(), owner.getEyeY()-0.3, owner.getZ());

@@ -454,7 +454,7 @@ public class GrandKnightEntity extends HostileEntity implements Monster {
         if (!bullets.isEmpty()){
             for (MissileEntity bullet:bullets){
                 //技能0
-                if (bullet.getSkillType()==0&&bullet.getAliveDuration()==bullet.getTime()/2){
+                if (bullet.getFlag()==0&&bullet.getAliveDuration()==bullet.getTime()/2){
                         for (int i = 0; i < 2; i++) {
                             MissileEntity missile = getMissileEntity(this, 32, 200);
                             missile.setPitch(0);
@@ -464,7 +464,7 @@ public class GrandKnightEntity extends HostileEntity implements Monster {
                         }
                 }
                 //技能4
-                if (bullet.getSkillType()==4&&bullet.getAliveDuration()%5==0){
+                if (bullet.getFlag()==4&&bullet.getAliveDuration()%5==0){
                         MissileEntity missile = getMissileEntity(this, 32, 200);
                         missile.setUuid(UUID.randomUUID());
                         if (this.getTarget() != null) {
@@ -477,7 +477,7 @@ public class GrandKnightEntity extends HostileEntity implements Monster {
                         }
                 }
                 //技能5
-                if (bullet.getSkillType()==5&&bullet.getAliveDuration()%40==0&&bullet.getAliveDuration()>bullet.getTime()/2){
+                if (bullet.getFlag()==5&&bullet.getAliveDuration()%40==0&&bullet.getAliveDuration()>bullet.getTime()/2){
                     if (this.getTarget() != null) {
                         for (int i=0;i<8;i++) {
                             MissileEntity missile = getMissileEntity(this, 32, 200);
@@ -991,16 +991,17 @@ public class GrandKnightEntity extends HostileEntity implements Monster {
         missile.setMissileModelType(MissileModelType.BULLET);
         return missile;
     }
-    private @NotNull MissileEntity getMissileEntity(Entity owner, double range, int time,int skillType) {
+    private @NotNull MissileEntity getMissileEntity(Entity owner, double range, int time,int flag) {
         AttackTypes bulletType = new AttackTypes(AttackTypes.AttackType.BULLET);
         MissileEntity missile= new MissileEntity(ModEntities.MISSILE,
                 owner.getWorld(),
                 owner,
                 bulletType,
-                skillType,
+                false,
                 range,
                 time,
-                this.getDamageAmount());
+                this.getDamageAmount(),
+                flag);
         missile.setMissileModelType(MissileModelType.BULLET);
         return missile;
     }

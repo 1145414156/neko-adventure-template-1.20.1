@@ -21,7 +21,7 @@ import java.util.List;
 public final class BrimstoneBeamRenderer {
 
     //弧线细分数
-    private static final int SEGMENTS = 8;
+    private static final int SEGMENTS = 6;
     //查找下一节光柱的半径
     private static final double SEARCH_RADIUS = 3.0;
     //尾段沿自身视野向前收尾的长度

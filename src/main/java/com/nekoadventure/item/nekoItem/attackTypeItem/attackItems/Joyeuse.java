@@ -19,6 +19,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -75,23 +76,17 @@ public class Joyeuse extends AbstractNekoAttackItem {
     }
 
     @Override
-    public void changeOffAttackType(PlayerEntity player, float yaw) {
-        super.changeOffAttackType(player, yaw);
-        if (canExecute(player,10)){
+    public void changeOffAttackType(PlayerEntity player,MissileEntity missile,float yaw) {
+        if (canExecute(player, missile, 10)){
             double range = 1;
             double damage = 1;
             if (player.getOffHandStack().getItem() instanceof NekoPackageItem nekoPackage){
                 range= nekoPackage.getAttackRange(player);
                 damage=nekoPackage.getStrength(player);
             }
-            MissileEntity missile=player.getWorld().getEntitiesByClass(
-                    MissileEntity.class,
-                    player.getBoundingBox().expand(range*4),
-                    e -> e.getOwner()!=null&&e.getOwner().equals(player)
-            ).stream().limit(1).findFirst().orElse(null);
-            if (missile!=null) {
+            if (missile!=null&& Objects.equals(missile.getRealOwner(), player)) {
                 AttackTypes bulletType = new AttackTypes(AttackTypes.AttackType.BULLET);
-                    MissileEntity missileEntity = getMissileEntity(missile, range, damage,bulletType);
+                    MissileEntity missileEntity = getMissileEntity(missile, range, damage,bulletType,player);
                     missileEntity.setPos(player.getX(), player.getEyeY(), player.getZ());
                     missileEntity.setYaw(yaw);
                     missileEntity.setPitch(player.getPitch());
@@ -100,7 +95,7 @@ public class Joyeuse extends AbstractNekoAttackItem {
         }
     }
 
-    private @NotNull MissileEntity getMissileEntity(Entity owner, double range, double damage, AttackTypes attackTypes) {
+    private @NotNull MissileEntity getMissileEntity(Entity owner, double range, double damage, AttackTypes attackTypes,PlayerEntity realOwner) {
         MissileEntity missileEntity=new MissileEntity(ModEntities.MISSILE,
                 owner.getWorld(),
                 owner,
@@ -108,7 +103,8 @@ public class Joyeuse extends AbstractNekoAttackItem {
                 true,
                 range,
                 30,
-                damage);
+                damage,
+                realOwner);
         missileEntity.setMissileModelType(MissileModelType.JOYEUSE);
         return missileEntity;
     }

@@ -63,39 +63,31 @@ public class Parry extends AbstractNekoAttackItem {
     }
 
     @Override
-    public void changeOffAttackType(PlayerEntity player, float yaw) {
-        super.changeOffAttackType(player, yaw);
+    public void changeOffAttackType(PlayerEntity player,MissileEntity missile,float yaw) {
         if (player.getWorld().isClient) return;
-        if (!canExecute(player, 5)) {
+        if (!canExecute(player, missile, 5)) {
         double damage = 1;
         double range = 1;
         if (player.getOffHandStack().getItem() instanceof NekoPackageItem nekoPackage) {
             damage = nekoPackage.getStrength(player);
             range = nekoPackage.getAttackRange(player);
         }
-        List<MissileEntity> ownMissiles = player.getWorld().getEntitiesByClass(
-                MissileEntity.class,
-                player.getBoundingBox().expand(range * 4),
-                missile -> missile.getOwner() == player
-        );
         boolean isParried = false;
-        for (MissileEntity ownMissile : ownMissiles) {
             List<MissileEntity> contactedMissiles = player.getWorld().getEntitiesByClass(
                     MissileEntity.class,
-                    ownMissile.getBoundingBox().expand(0.2),
-                    missile -> !(missile.getOwner() instanceof PlayerEntity)
+                    missile.getBoundingBox().expand(0.2),
+                    missileEntity -> !(missile.getOwner() instanceof PlayerEntity)
             );
-            for (MissileEntity missile : contactedMissiles) {
-                missile.setOwner(player);
-                missile.setDamage(Math.max(missile.getDamage(), damage));
-                missile.setVelocity(missile.getVelocity().x * -1, missile.getVelocity().y * -1, missile.getVelocity().z * -1);
-                missile.move(MovementType.SELF, missile.getVelocity());
-                missile.setYaw(missile.getYaw() + 180);
-                missile.setPitch(missile.getPitch() * -1);
-                missile.setAliveDuration(0);
+            for (MissileEntity missileEntity : contactedMissiles) {
+                missileEntity.setOwner(player);
+                missileEntity.setDamage(Math.max(missileEntity.getDamage(), damage));
+                missileEntity.setVelocity(missileEntity.getVelocity().x * -1, missileEntity.getVelocity().y * -1, missileEntity.getVelocity().z * -1);
+                missileEntity.move(MovementType.SELF, missileEntity.getVelocity());
+                missileEntity.setYaw(missileEntity.getYaw() + 180);
+                missileEntity.setPitch(missileEntity.getPitch() * -1);
+                missileEntity.setAliveDuration(0);
                 isParried = true;
             }
-        }
         if (isParried) {
             player.getWorld().playSound(null, player.getBlockPos(), ModSoundEvents.PARRY_ATTACK,
                     SoundCategory.PLAYERS, 1.0F, 0.9F);

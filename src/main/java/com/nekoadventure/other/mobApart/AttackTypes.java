@@ -24,7 +24,8 @@ public class AttackTypes {
         BOOMERANG,
         HOMING,
         ELLIPSE,
-        ZENITH
+        ZENITH,
+        MISSILE,
     }
 
     private final AttackType type;
@@ -50,23 +51,24 @@ public class AttackTypes {
             case HOMING -> homingMovement(entity,range,speed);
             case ELLIPSE -> ellipsoidMovement(entity,range);
             case ZENITH -> zenithMovement(entity, range);
+            case MISSILE -> missileMovement(entity,range);
         }
     }
     private void lazyMovement(MissileEntity entity) {
         entity.setVelocity(entity.getVelocity().add(0, 0.1, 0));
         entity.setVelocity(entity.getVelocity().add(0, -0.1, 0));
     }
-    public void followOwnerMovement(MissileEntity entity) {
-        if (entity.getOwner() == null) return;
+    public void followOwnerMovement(MissileEntity missile) {
+        if (missile.getOwner() == null) return;
 
-        Vec3d currentOwnerPos = entity.getOwner().getPos();
+        Vec3d currentOwnerPos = missile.getOwner().getPos();
 
         if (lastOwnerPos != null) {
             Vec3d displacement = currentOwnerPos.subtract(lastOwnerPos);
-            entity.addVelocity(displacement.x, displacement.y, displacement.z);
+            missile.addVelocity(displacement.x, displacement.y, displacement.z);
         }
         lastOwnerPos = currentOwnerPos;
-        lazyMovement(entity);
+        lazyMovement(missile);
     }
 
     private void homingMovement(MissileEntity entity,double range,double speed) {
@@ -217,6 +219,62 @@ public class AttackTypes {
     private void zenithMovement(MissileEntity entity, double range) {
         ellipsoidMovement(entity,range);
         followOwnerMovement(entity);
+    }
+
+    private void missileMovement(MissileEntity entity, double range) {
+        int t = entity.getAliveDuration();
+        if (t < 30) {
+            entity.setVelocity(Vec3d.ZERO);
+            followOwnerMovement(entity);
+        }
+        else if (t==30){
+            nearest = findNearestTarget(entity, range);
+        }
+        else if (t <= 40) {
+            entity.addVelocity(0,  0.5, 0);
+            Entity owner = entity.getOwner();
+            entity.setYaw(owner != null ? owner.getYaw() : entity.getYaw());
+            entity.setPitch(-90.0F);
+        }
+        else if (t == 50) {
+            if (nearest != null) {
+                entity.setPosition(nearest.getX(), nearest.getY() + 20.0, nearest.getZ());
+                entity.setVelocity(Vec3d.ZERO);
+            }
+            else {
+                entity.setAliveDuration(entity.getTime());
+            }
+        }
+        else if (t <= 60) {
+            if (nearest != null && nearest.isAlive()) {
+                Vec3d targetPos = new Vec3d(nearest.getX(), nearest.getY(), nearest.getZ());
+                Vec3d currentPos = entity.getPos().add(0,-1,0);
+                Vec3d diff = targetPos.subtract(currentPos);
+                double dist = diff.length();
+
+                int remainingTicks = 60 - t + 1;
+
+                if (remainingTicks <= 1 || dist < 0.01) {
+                    entity.setPosition(targetPos.x, targetPos.y+1, targetPos.z);
+                    entity.setVelocity(Vec3d.ZERO);
+                } else {
+                    Vec3d dir = diff.normalize();
+                    Vec3d velocity = dir.multiply(dist / remainingTicks);
+                    entity.setVelocity(velocity);
+                    entity.setYaw((float) Math.toDegrees(Math.atan2(-dir.x, dir.z)));
+                    entity.setPitch((float) Math.toDegrees(Math.atan2(-dir.y,
+                            Math.sqrt(dir.x * dir.x + dir.z * dir.z))));
+                }
+            }
+        }
+        else {
+            lazyMovement(entity);
+            if (entity.getRealOwner() instanceof PlayerEntity player) {
+                if (player.getOffHandStack().getItem() instanceof NekoPackageItem){
+                    NekoPackageItem.applyOffAttackTypeItem(player,entity,entity.getYaw());
+                }
+            }
+        }
     }
 
 //===================================================================================================

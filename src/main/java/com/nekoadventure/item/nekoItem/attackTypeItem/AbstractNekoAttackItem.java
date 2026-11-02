@@ -1,14 +1,15 @@
 package com.nekoadventure.item.nekoItem.attackTypeItem;
 
+import com.nekoadventure.entity.missile.MissileEntity;
 import com.nekoadventure.item.nekoItem.AbstractNekoItem;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 
-import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
+import java.util.WeakHashMap;
 
 public abstract class AbstractNekoAttackItem extends AbstractNekoItem {
-    private final Map<UUID, Long> lastOffAttackTimes = new HashMap<>();
+    private final Map<Entity, Long> lastOffAttackTimes = new WeakHashMap<>();
     public AbstractNekoAttackItem(Settings settings, double health, double strength, double speed, double attackSpeed,
                                   double attackRange, double attackMultiplier, double attackSpeedMultiplier) {
         super(settings);
@@ -24,12 +25,12 @@ public abstract class AbstractNekoAttackItem extends AbstractNekoItem {
 
     public void changeMainAttackType(PlayerEntity player,float yaw){}
 
-    public void changeOffAttackType(PlayerEntity player,float yaw){}
-    public boolean canExecute(PlayerEntity player,int tick) {
+    public void changeOffAttackType(PlayerEntity player, MissileEntity missileEntity, float yaw){}
+    public boolean canExecute(PlayerEntity player, Entity missile, int tick) {
         long now = player.getWorld().getTime();
-        Long last = lastOffAttackTimes.get(player.getUuid());
+        Long last = lastOffAttackTimes.get(missile);
         if (last == null || now - last >= tick) {
-            lastOffAttackTimes.put(player.getUuid(), now);
+            lastOffAttackTimes.put(missile, now);
             return true;
         }
         return false;

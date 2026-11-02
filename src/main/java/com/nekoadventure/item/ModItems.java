@@ -197,6 +197,8 @@ public class ModItems {
             new Zenith(new Item.Settings().rarity(Rarity.EPIC),0,1.5,0.5,0,0,0.3,0));
     public static final ShortHook SHORT_HOOK=register("short_hook",
             new ShortHook(new Item.Settings().rarity(Rarity.UNCOMMON),0,0.2,0.5,-0.3,-1,0,0));
+    public static final Missile MISSILE=register("missile",
+            new Missile(new Item.Settings().rarity(Rarity.RARE),0,0,0,0,0,0,0));
 
     //特效类道具
     public static final Fever FEVER=register("fever",

@@ -73,24 +73,15 @@ public class ExposedWire extends AbstractNekoAttackItem {
     }
 
     @Override
-    public void changeOffAttackType(PlayerEntity player, float yaw) {
-        super.changeOffAttackType(player, yaw);
-        if (canExecute(player,10)){
+    public void changeOffAttackType(PlayerEntity player,MissileEntity missileEntity,float yaw) {
+        if (canExecute(player, missileEntity, 10)){
             World world = player.getWorld();
             double attackRange = 3;
             if (player.getOffHandStack().getItem() instanceof NekoPackageItem nekoPackage) {
                 attackRange = nekoPackage.getAttackRange(player);
             }
-            List<MissileEntity> missileEntities = world.getEntitiesByClass(
-                    MissileEntity.class,
-                    player.getBoundingBox().expand(attackRange*4),
-                    entity ->entity.getOwner()!=null&&entity.getOwner().equals(player)
-            );
-            if (!missileEntities.isEmpty()) {
-                for (MissileEntity missileEntity : missileEntities) {
-                    if (missileEntity!=null){
+            if (missileEntity!=null&& Objects.equals(missileEntity.getRealOwner(), player)) {
                         List<Entity> entities = getEntitiesInRange(missileEntity, world, attackRange<=4? (int) attackRange :4);
-
                         List<LivingEntity> livingEntities = entities.stream()
                                 .filter(e -> e instanceof LivingEntity&&!Objects.equals(missileEntity.getRealOwner(), e)&&e.isAttackable())
                                 .limit(8)
@@ -99,8 +90,6 @@ public class ExposedWire extends AbstractNekoAttackItem {
                         entityChooseHandler(missileEntity, livingEntities, world, MAX_CONNECT);
                         applyDamageHandler(missileEntity, entities);
                     }
-                }
-            }
         }
     }
 

@@ -118,43 +118,28 @@ public class Lance extends AbstractNekoAttackItem {
     }
 
     @Override
-    public void changeOffAttackType(PlayerEntity player, float yaw) {
-        super.changeOffAttackType(player, yaw);
-        if (canExecute(player,10)) {
+    public void changeOffAttackType(PlayerEntity player, MissileEntity missileEntity,float yaw) {
+        if (canExecute(player, missileEntity, 10)) {
             World world = player.getWorld();
             double damage;
-            double attackRange = 3;
             if (player.getOffHandStack().getItem() instanceof NekoPackageItem nekoPackage) {
                 damage= nekoPackage.getStrength(player);
-                attackRange = nekoPackage.getAttackRange(player);
             } else {
                 damage = 1;
             }
-            List<MissileEntity> missileEntities = world.getEntitiesByClass(
-                    MissileEntity.class,
-                    player.getBoundingBox().expand(attackRange * 4),
-                    entity -> entity.getOwner() != null && entity.getOwner().equals(player)
-            );
-
-            if (missileEntities.isEmpty()) {
-                return;
-            }
-            MissileEntity nearestMissile = missileEntities.stream()
-                    .min(Comparator.comparingDouble(m -> m.squaredDistanceTo(player)))
-                    .orElse(null);
             Optional<LivingEntity> nearestTarget = world.getEntitiesByClass(
                     LivingEntity.class,
-                    nearestMissile.getBoundingBox().expand(5),
-                    entity -> nearestMissile.getOwner() != entity && entity.isAlive()&&entity.isAttackable()
-            ).stream().min(Comparator.comparingDouble(entity -> entity.squaredDistanceTo(nearestMissile)));
+                    missileEntity.getBoundingBox().expand(5),
+                    entity -> missileEntity.getOwner() != entity && entity.isAlive()&&entity.isAttackable()
+            ).stream().min(Comparator.comparingDouble(entity -> entity.squaredDistanceTo(missileEntity)));
 
             nearestTarget.ifPresent(target -> {
-                MissileEntity missile = getMissileEntity(nearestMissile, damage);
+                MissileEntity missile = getMissileEntity(missileEntity, damage);
                 missile.setPosition(target.getEyePos());
                 world.spawnEntity(missile);
                 target.takeKnockback(0.5f,
-                        nearestMissile.getX() - target.getX(),
-                        nearestMissile.getZ() - target.getZ());
+                        missileEntity.getX() - target.getX(),
+                        missileEntity.getZ() - target.getZ());
                 player.getWorld().playSound(null, player.getBlockPos(), ModSoundEvents.LANCE_ATTACK,
                         SoundCategory.PLAYERS, 0.5F, 1.0F);
             });

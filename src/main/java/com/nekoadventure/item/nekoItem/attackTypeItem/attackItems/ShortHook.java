@@ -98,9 +98,8 @@ public class ShortHook extends AbstractNekoAttackItem {
     }
 
     @Override
-    public void changeOffAttackType(PlayerEntity player, float yaw) {
-        super.changeOffAttackType(player, yaw);
-        if (canExecute(player,5)) {
+    public void changeOffAttackType(PlayerEntity player, MissileEntity missileEntity ,float yaw) {
+        if (canExecute(player, missileEntity, 5)) {
             World world = player.getWorld();
             double damage;
             double attackRange = 3;
@@ -110,27 +109,19 @@ public class ShortHook extends AbstractNekoAttackItem {
             } else {
                 damage = 1;
             }
-            List<MissileEntity> missileEntities = world.getEntitiesByClass(
-                    MissileEntity.class,
-                    player.getBoundingBox().expand(attackRange * 4),
-                    entity -> entity.getOwner() != null && entity.getOwner().equals(player)
-            );
-            if (missileEntities.isEmpty()) {return;}
-            MissileEntity farthestMissile = missileEntities.stream()
-                    .max(Comparator.comparingDouble(m -> m.squaredDistanceTo(player)))
-                    .orElse(null);
+
             Optional<LivingEntity> farthestTarget = world.getEntitiesByClass(
                     LivingEntity.class,
-                    farthestMissile.getBoundingBox().expand(4),
-                    entity -> farthestMissile.getOwner() != entity && entity.isAlive()&&entity.isAttackable()
-            ).stream().max(Comparator.comparingDouble(entity -> entity.squaredDistanceTo(farthestMissile)));
+                    missileEntity.getBoundingBox().expand(4),
+                    entity -> missileEntity.getOwner() != entity && entity.isAlive()&&entity.isAttackable()
+            ).stream().max(Comparator.comparingDouble(entity -> entity.squaredDistanceTo(missileEntity)));
 
             farthestTarget.ifPresent(target -> {
-                MissileEntity missile = getMissileEntity(farthestMissile, damage);
+                MissileEntity missile = getMissileEntity(missileEntity, damage);
                 missile.setPosition(target.getEyePos());
                 world.spawnEntity(missile);
 
-                Vec3d pullDirection = farthestMissile.getPos().subtract(target.getPos()).normalize();
+                Vec3d pullDirection = missileEntity.getPos().subtract(target.getPos()).normalize();
                 double pullStrength = 1.0;
                 target.setVelocity(pullDirection.multiply(pullStrength));
                 target.velocityModified = true;

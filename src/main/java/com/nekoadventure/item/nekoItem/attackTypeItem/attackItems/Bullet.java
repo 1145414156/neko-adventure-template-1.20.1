@@ -44,7 +44,7 @@ public class Bullet extends AbstractNekoAttackItem {
         double[] finalData = NekoPackageDataManager.getFinalData(player);
         double attackSpeed = finalData != null ? finalData[3] : 0;
         int cooldown = (int) (60 - (attackSpeed / NekoPackageDataManager.MAX_ATTACK_SPEED) * 60);
-        cooldown = Math.max(1, Math.min(60, cooldown));
+        cooldown = Math.max(5, Math.min(60, cooldown));
         player.getItemCooldownManager().set(player.getOffHandStack().getItem(), cooldown);
     }
 

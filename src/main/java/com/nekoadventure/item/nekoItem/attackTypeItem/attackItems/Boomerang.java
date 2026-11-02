@@ -23,6 +23,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 
 public class Boomerang extends AbstractNekoAttackItem {
     public Boomerang(Settings settings, double health, double strength, double speed, double attackSpeed, double attackRange, double attackMultiplier, double attackSpeedMultiplier) {
@@ -37,7 +38,7 @@ public class Boomerang extends AbstractNekoAttackItem {
             range= nekoPackage.getAttackRange(player);
             damage=nekoPackage.getStrength(player);
         }
-        MissileEntity missileEntity = getMissileEntity(player, range, damage);
+        MissileEntity missileEntity = getMissileEntity(player, player, range, damage);
         missileEntity.setYaw(yaw);
         player.getWorld().playSound(null, player.getBlockPos(), SoundEvents.BLOCK_DISPENSER_LAUNCH,
                 SoundCategory.PLAYERS, 1.0F, 1.0F);
@@ -50,25 +51,15 @@ public class Boomerang extends AbstractNekoAttackItem {
     }
 
     @Override
-    public void changeOffAttackType(PlayerEntity player, float yaw) {
-        super.changeOffAttackType(player, yaw);
-        if (canExecute(player,10)){
+    public void changeOffAttackType(PlayerEntity player,MissileEntity missileEntity,float yaw) {
+        if (canExecute(player, missileEntity, 10)){
             double range = 2;
             double damage = 2;
             if (player.getOffHandStack().getItem() instanceof NekoPackageItem nekoPackage) {
                 range = nekoPackage.getAttackRange(player);
                 damage = nekoPackage.getStrength(player);
             }
-            MissileEntity missileEntity = player.getWorld().getEntitiesByClass(
-                    MissileEntity.class,
-                    player.getBoundingBox().expand(range*4),
-                    entity -> entity.getOwner()!=null&&entity.getOwner().equals(player)
-            ).stream()
-                    .max(Comparator.comparingDouble(
-                            missile -> missile.squaredDistanceTo(player)
-                    ))
-                    .orElse(null);
-            if (missileEntity !=null) {
+            if (missileEntity !=null&& Objects.equals(missileEntity.getRealOwner(), player)) {
                 LivingEntity target = missileEntity.getWorld().getEntitiesByClass(
                             LivingEntity.class,
                             player.getBoundingBox().expand(range*4),
@@ -76,7 +67,7 @@ public class Boomerang extends AbstractNekoAttackItem {
                     ).stream().min(Comparator.comparingDouble(entity -> entity.distanceTo(missileEntity))).orElse(null);
                     if (target != null) {
                         Vec3d pos = missileEntity.getPos();
-                        MissileEntity offMissile = getMissileEntity(missileEntity, range, damage);
+                        MissileEntity offMissile = getMissileEntity(player, missileEntity, range, damage);
                         Vec3d direction = target.getEyePos().subtract(pos).normalize();
                         yaw = (float) Math.toDegrees(Math.atan2(-direction.x, direction.z));
                         double pitch = Math.toDegrees(Math.atan2(-direction.y, Math.sqrt(direction.x * direction.x + direction.z * direction.z)));
@@ -90,7 +81,7 @@ public class Boomerang extends AbstractNekoAttackItem {
         }
     }
 
-    private @NotNull MissileEntity getMissileEntity(Entity owner, double range, double damage) {
+    private @NotNull MissileEntity getMissileEntity(PlayerEntity realOwner,Entity owner, double range, double damage) {
         AttackTypes bulletType = new AttackTypes(AttackTypes.AttackType.BOOMERANG);
         MissileEntity missileEntity=new MissileEntity(ModEntities.MISSILE,
                 owner.getWorld(),
@@ -99,7 +90,8 @@ public class Boomerang extends AbstractNekoAttackItem {
                 true,
                 range,
                 40,
-                damage);
+                damage,
+                realOwner);
         missileEntity.setMissileModelType(MissileModelType.BOOMERANG);
         missileEntity.setPos(owner.getX(), owner.getEyeY(), owner.getZ());
         missileEntity.setPitch(owner.getPitch());
