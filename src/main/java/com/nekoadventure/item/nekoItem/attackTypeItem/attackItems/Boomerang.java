@@ -99,6 +99,20 @@ public class Boomerang extends AbstractNekoAttackItem {
     }
 
     @Override
+    public float getCalculateYaw(int t, int maxTime) {
+        if (maxTime <= 0) {
+            return 0f;
+        }
+        double ratio = (double) t / maxTime;
+        if (ratio < 3.0 / 7.0) {
+            return 0f;
+        }
+        double base = 30.0;
+        double k1 = Math.min(Math.max(14.0 * (ratio - 3.0 / 7.0), 0.0), 1.0);
+        double k2 = Math.min(Math.max(14.0 * (ratio - 0.5), 0.0), 1.0);
+        return (float) (base + 60.0 * k1 + 90.0 * k2);
+    }
+    @Override
     public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
         super.appendTooltip(stack, world, tooltip, context);
         Text moreText=Text.of("主攻击：发射一枚会回旋的可以穿透生物的\"力量\"伤害的弹幕");

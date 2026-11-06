@@ -17,7 +17,6 @@ public class GetFoodPoolSoul extends AbstractSoulPoolItem{
     public GetFoodPoolSoul(Settings settings, int maxCharge) {
         super(settings, maxCharge);
         text= Text.literal("使用时，提取出道具池中涉及到食物池的道具").formatted(Formatting.GOLD);
-
     }
 
     @Override

@@ -6,5 +6,6 @@ public enum MissileModelType {
     JOYEUSE,
     BOOMERANG,
     ZENITH,
-    NULL
+    MISSILE,
+    NULL,
 }

@@ -1,6 +1,7 @@
 package com.nekoadventure.entity.missile;
 
 
+import com.nekoadventure.item.nekoItem.AbstractNekoItem;
 import com.nekoadventure.item.nekoItem.attackTypeItem.AbstractNekoSpecificItem;
 import com.nekoadventure.item.other.NekoPackageItem;
 import com.nekoadventure.other.mobApart.AttackTypes;
@@ -16,6 +17,7 @@ import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -43,6 +45,11 @@ public class MissileEntity extends Entity {
             DataTracker.registerData(MissileEntity.class, TrackedDataHandlerRegistry.FLOAT);
     private static final TrackedData<Integer> ATTACK_TYPE =
             DataTracker.registerData(MissileEntity.class, TrackedDataHandlerRegistry.INTEGER);
+    // 初始朝向：需同步给客户端用于重建椭圆轨道
+    private static final TrackedData<Float> INITIAL_YAW =
+            DataTracker.registerData(MissileEntity.class, TrackedDataHandlerRegistry.FLOAT);
+    private static final TrackedData<Float> INITIAL_PITCH =
+            DataTracker.registerData(MissileEntity.class, TrackedDataHandlerRegistry.FLOAT);
 
     private double speed = 0;
     private AttackTypes attackTypes;
@@ -50,8 +57,11 @@ public class MissileEntity extends Entity {
     private Entity realOwner;
     private boolean isTreadable;
     private double damage;
-    private float initialYaw;
-    private float initialPitch;
+    // 每 tick 至多真正执行一次碰撞检测：movement 内已触发时，tick 中的调用直接复用结果
+    private int lastEntityCheckTick = Integer.MIN_VALUE;
+    private boolean lastEntityCheckHit;
+    private int lastBlockCheckTick = Integer.MIN_VALUE;
+    private boolean lastBlockCheckHit;
 
     // 攻击弹幕构造1
     public MissileEntity(EntityType<? extends MissileEntity> entityType, World world, Entity owner,
@@ -108,8 +118,8 @@ public class MissileEntity extends Entity {
         if (this.getWorld().isClient) {return;}
 
         if(getAliveDuration()==0) {
-            initialYaw=this.getYaw();
-            initialPitch=this.getPitch();
+            this.setInitialYaw(this.getYaw());
+            this.setInitialPitch(this.getPitch());
         }
         if (this.getOwner() instanceof PlayerEntity player) {
             NekoPackageItem.applyOffAttackTypeItem(player,this,player.getYaw());
@@ -122,39 +132,43 @@ public class MissileEntity extends Entity {
         }
         if (this.getRealOwner()==null) {this.kill();return;}
         if (this.age>2000){this.kill();}
-        if (this.getAliveDuration()==this.getTime()){this.kill();}
-        if (entityCheckCollision()) this.kill();
+        if (entityCheckCollision() && !this.isTreadable) this.kill();
         blockCheckCollision();
+        if (this.getAliveDuration()>=this.getTime()){this.kill();}
     }
 
-    private boolean entityCheckCollision() {
+    public boolean entityCheckCollision() {
+        if (this.lastEntityCheckTick == this.age) {
+            return this.lastEntityCheckHit;
+        }
+        this.lastEntityCheckTick = this.age;
+        this.lastEntityCheckHit = doEntityCheckCollision();
+        return this.lastEntityCheckHit;
+    }
+
+    private boolean doEntityCheckCollision() {
         Vec3d velocity = this.getVelocity();
         boolean stationary = velocity.lengthSquared() < 1.0E-6;
-        if (stationary && this.getAttackType() != AttackTypes.AttackType.HOMING&&
-                this.getAttackType() != AttackTypes.AttackType.LAZY&&
-                this.getAttackType() != AttackTypes.AttackType.BRIMSTONE) {
-            return false;
-        }
         Vec3d direction = stationary ? Vec3d.ZERO : velocity.normalize();
         double forwardExpand = stationary ? 0.0 : speed * 0.3;
         double expandX = Math.abs(direction.x) * forwardExpand + 0.1;
         double expandY = Math.abs(direction.y) * forwardExpand + 0.1;
         double expandZ = Math.abs(direction.z) * forwardExpand + 0.1;
         Entity realOwner = getRealOwner();
-        boolean ownerIsPlayer = realOwner instanceof PlayerEntity;
-        var targets = this.getWorld().getEntitiesByClass(
-                Entity.class,
-                this.getBoundingBox().expand(expandX, expandY, expandZ),
-                e -> e != this
-                        && e != realOwner
-                        && (ownerIsPlayer || e instanceof PlayerEntity)
-        );
-        if (targets.isEmpty()) {
-            return false;
-        }
         DamageSource damageSource = realOwner instanceof LivingEntity livingOwner
                 ? this.getDamageSources().mobProjectile(this, livingOwner)
                 : this.getDamageSources().mobProjectile(this, null);
+        var targets = this.getWorld().getEntitiesByClass(
+                Entity.class,
+                this.getBoundingBox().expand(expandX, expandY, expandZ),
+                e -> !(e instanceof MissileEntity)
+                        && e != realOwner
+                        && (!(e instanceof LivingEntity livingTarget) || canHurt(livingTarget, realOwner, damageSource))
+        );
+
+        if (targets.isEmpty()) {
+            return false;
+        }
         PlayerEntity player = this.getOwner() instanceof PlayerEntity p ? p : null;
         List<AbstractNekoSpecificItem> specificItems = List.of();
         if (player != null) {
@@ -162,7 +176,7 @@ public class MissileEntity extends Entity {
             if (offhand.getItem() instanceof NekoPackageItem
                     && NekoPackageItem.getIsFinished(offhand) != 2) {
                 List<AbstractNekoSpecificItem> collected = new ArrayList<>();
-                for (Object obj : NekoPackageItem.getNekoItems(offhand, true, 1)) {
+                for (AbstractNekoItem obj : NekoPackageItem.getNekoItems(offhand, true, 1)) {
                     if (obj instanceof AbstractNekoSpecificItem item) {
                         collected.add(item);
                     }
@@ -170,31 +184,57 @@ public class MissileEntity extends Entity {
                 specificItems = collected;
             }
         }
+        boolean contacted = false;
         for (Entity target : targets) {
             if (target instanceof LivingEntity livingEntity) {
+                contacted |= livingEntity.isAlive();
                 boolean damaged = target.damage(damageSource, (float) damage);
                 if (damaged && player != null) {
                     for (AbstractNekoSpecificItem item : specificItems) {
                         item.applySpecificItem(player, livingEntity);
                     }
                 }
-                if (!isTreadable) {
-                    return true;
-                }
             }
         }
-        return false;
+        if (!isTreadable) {
+            return true;
+        }
+        return contacted;
     }
 
-    private void blockCheckCollision() {
-        if (!this.getWorld().isClient) {
-            if (!isTreadable) {
-                var blockCollisions = this.getWorld().getBlockCollisions(this, this.getBoundingBox().expand(0.1));
-                if (blockCollisions.iterator().hasNext()) {
-                    this.kill();
-                }
-            }
+    private boolean canHurt(LivingEntity target, Entity owner, DamageSource source) {
+        if (!target.isAlive() || !target.canTakeDamage() || target.isInvulnerableTo(source)) {
+            return false;
         }
+        return !(owner instanceof PlayerEntity attacker
+                && target instanceof ServerPlayerEntity victim
+                && !victim.shouldDamagePlayer(attacker));
+    }
+
+    public boolean blockCheckCollision() {
+        if (this.lastBlockCheckTick == this.age) {
+            return this.lastBlockCheckHit;
+        }
+        this.lastBlockCheckTick = this.age;
+        this.lastBlockCheckHit = doBlockCheckCollision();
+        return this.lastBlockCheckHit;
+    }
+
+    private boolean doBlockCheckCollision() {
+        if (this.getWorld().isClient) {
+            return false;
+        }
+        AttackTypes.AttackType attackType = this.getAttackType();
+        if (attackType == AttackTypes.AttackType.SINGULARITY_HOLD) {
+            return false;
+        }
+        if (!this.getWorld().getBlockCollisions(this, this.getBoundingBox().expand(0.1)).iterator().hasNext()) {
+            return false;
+        }
+        if (!isTreadable && attackType != AttackTypes.AttackType.SINGULARITY) {
+            this.kill();
+        }
+        return true;
     }
     @Override
     protected void initDataTracker() {
@@ -206,6 +246,8 @@ public class MissileEntity extends Entity {
         this.dataTracker.startTracking(ALIVE_DURATION, 0);
         this.dataTracker.startTracking(RANGE, 0.0f);
         this.dataTracker.startTracking(ATTACK_TYPE, -1);
+        this.dataTracker.startTracking(INITIAL_YAW, 0.0f);
+        this.dataTracker.startTracking(INITIAL_PITCH, 0.0f);
     }
 
     @Override
@@ -221,8 +263,8 @@ public class MissileEntity extends Entity {
         nbt.putDouble("range", this.getRange());
         nbt.putInt("flag", this.getFlag());
         nbt.putDouble("damage", this.damage);
-        nbt.putFloat("initialYaw",this.initialYaw);
-        nbt.putFloat("initialPitch", this.initialPitch);
+        nbt.putFloat("initialYaw",this.getInitialYaw());
+        nbt.putFloat("initialPitch", this.getInitialPitch());
 
         nbt.putBoolean("isTreadable", this.isTreadable);
 
@@ -236,7 +278,7 @@ public class MissileEntity extends Entity {
         if (this.attackTypes != null && this.attackTypes.getType() != null) {
             nbt.putString("AttackType", this.attackTypes.getType().name());
         }
-        nbt.putString("MissileType", this.getMissileType().name());
+        nbt.putString("MissileType", this.getMissileModelType().name());
     }
 
     @Override
@@ -244,8 +286,8 @@ public class MissileEntity extends Entity {
         this.setTime(nbt.getInt("time"));
         this.setAliveDuration(nbt.getInt("aliveDuration"));
         this.setFlag(nbt.getInt("flag"));
-        this.initialYaw=nbt.getFloat("initialYaw");
-        this.initialPitch=nbt.getFloat("initialPitch");
+        this.setInitialYaw(nbt.getFloat("initialYaw"));
+        this.setInitialPitch(nbt.getFloat("initialPitch"));
 
         this.setRange(nbt.getDouble("range"));
         this.damage = nbt.getDouble("damage");
@@ -380,11 +422,19 @@ public class MissileEntity extends Entity {
     }
 
     public float getInitialYaw() {
-        return initialYaw;
+        return this.dataTracker.get(INITIAL_YAW);
+    }
+
+    public void setInitialYaw(float initialYaw) {
+        this.dataTracker.set(INITIAL_YAW, initialYaw);
     }
 
     public float getInitialPitch() {
-        return initialPitch;
+        return this.dataTracker.get(INITIAL_PITCH);
+    }
+
+    public void setInitialPitch(float initialPitch) {
+        this.dataTracker.set(INITIAL_PITCH, initialPitch);
     }
 
     public void setOwner(@Nullable Entity owner) {
@@ -402,6 +452,7 @@ public class MissileEntity extends Entity {
     public void setAliveDuration(int aliveDuration){this.dataTracker.set(ALIVE_DURATION,aliveDuration);}
     public void setDamage(double damage){this.damage=damage;}
     public double getDamage(){return damage;}
+    public double getSpeed(){return speed;}
     @Nullable
     public AttackTypes.AttackType getAttackType(){
         int ordinal = this.dataTracker.get(ATTACK_TYPE);
@@ -411,7 +462,7 @@ public class MissileEntity extends Entity {
     public void setMissileModelType(MissileModelType type) {
         this.dataTracker.set(MISSILE_MODEL_TYPE, type.ordinal());
     }
-    public MissileModelType getMissileType() {return MissileModelType.values()[this.dataTracker.get(MISSILE_MODEL_TYPE)];}
+    public MissileModelType getMissileModelType() {return MissileModelType.values()[this.dataTracker.get(MISSILE_MODEL_TYPE)];}
     public int getFlag(){return this.dataTracker.get(FLAG);}
     public void setFlag(int flag){this.dataTracker.set(FLAG,flag);}
     public int getAliveDuration(){return this.dataTracker.get(ALIVE_DURATION);}

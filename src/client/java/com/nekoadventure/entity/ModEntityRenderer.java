@@ -9,7 +9,8 @@ import com.nekoadventure.entity.model.boss.GrandKnightEntityModel;
 import com.nekoadventure.entity.model.boss.GrandKnightLevelTwoEntityModel;
 import com.nekoadventure.entity.model.boss.HugeSlimeEntityModel;
 import com.nekoadventure.entity.model.boss.PriestSkeletonEntityModel;
-import com.nekoadventure.entity.model.missile.BoomerangEntityModel;
+import com.nekoadventure.entity.model.missile.BoomerangModel;
+import com.nekoadventure.entity.model.missile.MissileModel;
 import com.nekoadventure.entity.model.mob.*;
 import com.nekoadventure.entity.model.particle.ParticleTextEntityModel;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
@@ -18,7 +19,8 @@ import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 public class ModEntityRenderer {
     public static void register() {
         //missile
-        EntityModelLayerRegistry.registerModelLayer(ModEntityModelLayers.BOOMERANG, BoomerangEntityModel::getTexturedModelData);
+        EntityModelLayerRegistry.registerModelLayer(ModEntityModelLayers.BOOMERANG, BoomerangModel::getTexturedModelData);
+        EntityModelLayerRegistry.registerModelLayer(ModEntityModelLayers.MISSILE, MissileModel::getTexturedModelData);
         EntityRendererRegistry.register(ModEntities.MISSILE, MissileEntityRenderer::new);
 
         //particle
@@ -46,6 +48,8 @@ public class ModEntityRenderer {
         EntityRendererRegistry.register(ModEntities.SCARAB_BEETLE, ScarabBeetleRenderer::new);
         EntityModelLayerRegistry.registerModelLayer(ModEntityModelLayers.SCARAB_BEETLE, ScarabBeetleEntityModel::getTexturedModelData);
 
+        EntityRendererRegistry.register(ModEntities.JAR_GREMLIN, JarGremlinRenderer::new);
+        EntityModelLayerRegistry.registerModelLayer(ModEntityModelLayers.JAR_GREMLIN, JarGremlinEntityModel::getTexturedModelData);
 
         //boss
         EntityRendererRegistry.register(ModEntities.HUGE_SLIME, HugeSlimeRenderer::new);

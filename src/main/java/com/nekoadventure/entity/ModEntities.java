@@ -91,6 +91,13 @@ public class ModEntities  {
                     ScarabBeetleEntity::new)
                     .dimensions(EntityDimensions.fixed(1.0f,0.5f)).build()
     );
+    public static final EntityType<JarGremlinEntity> JAR_GREMLIN=Registry.register(
+            Registries.ENTITY_TYPE,
+            new Identifier(NekoAdventure.MOD_ID,"jar_gremlin"),
+            FabricEntityTypeBuilder.create(SpawnGroup.MONSTER,
+                    JarGremlinEntity::new)
+                    .dimensions(EntityDimensions.fixed(0.5f,1.0f)).build()
+    );
 
 
 
@@ -125,6 +132,7 @@ public class ModEntities  {
         FabricDefaultAttributeRegistry.register(ModEntities.MINDER,MinderEntity.createMinderAttributes());
         FabricDefaultAttributeRegistry.register(ModEntities.SHOOTER, ShooterEntity.createShooterAttributes());
         FabricDefaultAttributeRegistry.register(ModEntities.SCARAB_BEETLE,ScarabBeetleEntity.createScarabBeetleAttributes());
+        FabricDefaultAttributeRegistry.register(ModEntities.JAR_GREMLIN,JarGremlinEntity.createAttributes());
 
         FabricDefaultAttributeRegistry.register(ModEntities.HUGE_SLIME,HugeSlimeEntity.createHugeSlimeAttributes());
         FabricDefaultAttributeRegistry.register(ModEntities.PRIEST_SKELETON,PriestSkeletonEntity.createPriestSkeletonAttributes());

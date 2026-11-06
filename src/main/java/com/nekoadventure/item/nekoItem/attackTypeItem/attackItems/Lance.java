@@ -19,6 +19,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
@@ -36,7 +37,6 @@ public class Lance extends AbstractNekoAttackItem {
 
     @Override
     public void changeMainAttackType(PlayerEntity player, float yaw) {
-        super.changeMainAttackType(player, yaw);
         if (player.getWorld().isClient) return;
         double range = 4;
         double damage=1;
@@ -45,7 +45,7 @@ public class Lance extends AbstractNekoAttackItem {
             damage= nekoPackage.getStrength(player);
         }
         double attackDistance = Math.min(range / 2.0, 8.0);
-        Vec3d look = player.getRotationVec(1.0F);
+        Vec3d look =getRotationVector(player.getPitch(),yaw);
         Vec3d horizontalLook = new Vec3d(look.x, 0, look.z).normalize();
         Vec3d startPos = player.getEyePos();
         List<LivingEntity> targets = getEntitiesOnLine(player, startPos, horizontalLook, attackDistance);
@@ -169,5 +169,14 @@ public class Lance extends AbstractNekoAttackItem {
             tooltip.add(moreText);
             tooltip.add(moreText1);
         }
+    }
+    protected final Vec3d getRotationVector(float pitch, float yaw) {
+        float f = pitch * (float) (Math.PI / 180.0);
+        float g = -yaw * (float) (Math.PI / 180.0);
+        float h = MathHelper.cos(g);
+        float i = MathHelper.sin(g);
+        float j = MathHelper.cos(f);
+        float k = MathHelper.sin(f);
+        return new Vec3d(i * j, -k, h * j);
     }
 }

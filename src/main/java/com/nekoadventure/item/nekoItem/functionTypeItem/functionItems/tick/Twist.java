@@ -10,7 +10,7 @@ public class Twist extends AbstractNekoFunctionItem {
     }
 
     @Override
-    public float getCalculateYaw(int t) {
-        return (float) Math.sin(t*0.5)*40;
+    public float getCalculateYaw(int t,int  maxTime) {
+        return (float) (Math.sin(8.0 * Math.PI * t / maxTime) * 40.0);
     }
 }

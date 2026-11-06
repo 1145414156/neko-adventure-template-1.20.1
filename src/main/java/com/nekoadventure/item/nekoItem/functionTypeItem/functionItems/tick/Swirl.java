@@ -11,7 +11,7 @@ public class Swirl extends AbstractNekoFunctionItem {
     }
 
     @Override
-    public float getCalculateYaw(int t) {
-        return 90+t*-10;
+    public float getCalculateYaw(int t, int maxTime) {
+        return 360.0f * t / maxTime-90.0f;
     }
 }

@@ -151,6 +151,9 @@ public class ModModelProvider extends FabricModelProvider {
         itemModelGenerator.register(ModItems.BATTERY,Models.GENERATED);
         itemModelGenerator.register(ModItems.BROKEN_CROWN,Models.GENERATED);
         itemModelGenerator.register(ModItems.SANDWORM_FANG,Models.GENERATED);
+        itemModelGenerator.register(ModItems.SINGULARITY,Models.GENERATED);
+        itemModelGenerator.register(ModItems.THIRD_ATTACKS,Models.GENERATED);
+        itemModelGenerator.register(ModItems.MISSILE,Models.GENERATED);
 
         itemModelGenerator.register(ModItems.INSTANCE_HEALTH_SOUL,Models.GENERATED);
         itemModelGenerator.register(ModItems.TP_START_ROOM_SOUL,Models.GENERATED);
@@ -171,6 +174,7 @@ public class ModModelProvider extends FabricModelProvider {
         itemModelGenerator.register(ModItems.FRENZY_SOUL,Models.GENERATED);
         itemModelGenerator.register(ModItems.GET_CENTROSYMMETRY_SOUL,Models.GENERATED);
         itemModelGenerator.register(ModItems.RESET_SOUL,Models.GENERATED);
+        itemModelGenerator.register(ModItems.GET_FORGE_POOL_SOUL,Models.GENERATED);
 
         itemModelGenerator.register(ModItems.BROKEN_SWORD,Models.GENERATED);
         itemModelGenerator.register(ModItems.BINDING_SOUL_SUBSTANCE,Models.GENERATED);

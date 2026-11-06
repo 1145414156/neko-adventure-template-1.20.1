@@ -49,19 +49,21 @@ public final class ZenithSlashRenderer {
         double a = entity.getRange() / 2.0;
         double b = 3.0;
         double omega = 2.0 * Math.PI / time;
-        double sign = entity.getFlag() < 11 ? 1.0 : -1.0;
+        // 左右剑共用同一倾斜平面，仅短轴方向镜像，与运动端约定一致
+        double lateralSign = entity.getFlag() < 11 ? -1.0 : 1.0;
         int alive = entity.getAliveDuration();
-        double yawTheta = omega * Math.max(0, alive - 1);
-        double phi = Math.atan2(b * Math.cos(yawTheta), -a * Math.sin(yawTheta) * sign);
-        double baseYaw = Math.toRadians(entity.getYaw()) - phi;
-        Vec3d forward = new Vec3d(-Math.sin(baseYaw), 0.0, Math.cos(baseYaw));
-        Vec3d right = new Vec3d(-forward.z, 0.0, forward.x);
+        double baseYaw = Math.toRadians(entity.getInitialYaw());
+        double pitchRad = Math.toRadians(entity.getInitialPitch());
+        Vec3d forward = new Vec3d(-Math.sin(baseYaw) * Math.cos(pitchRad), -Math.sin(pitchRad),
+                Math.cos(baseYaw) * Math.cos(pitchRad));
+        Vec3d right = new Vec3d(-Math.cos(baseYaw), 0.0, -Math.sin(baseYaw));
         Vec3d renderPos = entity.getLerpedPos(tickDelta);
         Vec3d center = entity.getPos().subtract(renderPos)
-                .subtract(ellipseOffset(forward, right, a, b, sign, omega * alive));
+                .subtract(ellipseOffset(forward, right, a, b, lateralSign, omega * alive));
         double thetaNominal = omega * Math.max(0.0, alive - 1 + tickDelta);
         Vec3d rel = center.multiply(-1.0);
-        double thetaReal = Math.atan2(rel.dotProduct(right) / b, rel.dotProduct(forward) / (a * sign));
+        double thetaReal = Math.atan2(rel.dotProduct(right) / (b * lateralSign),
+                rel.dotProduct(forward) / -a);
         double theta = thetaReal
                 + Math.round((thetaNominal - thetaReal) / (2.0 * Math.PI)) * (2.0 * Math.PI);
         double progress = MathHelper.clamp(theta / (2.0 * Math.PI), 0.0, 1.0);
@@ -88,10 +90,10 @@ public final class ZenithSlashRenderer {
             double angle1 = thetaStart + (theta - thetaStart) * s1;
             float width0 = (float) smoothStep(s0 / TAIL_FADE);
             float width1 = (float) smoothStep(s1 / TAIL_FADE);
-            Vec3d point0 = center.add(ellipseOffset(forward, right, a, b, sign, angle0));
-            Vec3d point1 = center.add(ellipseOffset(forward, right, a, b, sign, angle1));
-            Vec3d normal0 = ellipseNormal(forward, right, a, b, sign, angle0);
-            Vec3d normal1 = ellipseNormal(forward, right, a, b, sign, angle1);
+            Vec3d point0 = center.add(ellipseOffset(forward, right, a, b, lateralSign, angle0));
+            Vec3d point1 = center.add(ellipseOffset(forward, right, a, b, lateralSign, angle1));
+            Vec3d normal0 = ellipseNormal(forward, right, a, b, lateralSign, angle0);
+            Vec3d normal1 = ellipseNormal(forward, right, a, b, lateralSign, angle1);
             Vec3d inner0 = point0.subtract(normal0.multiply(INNER_WIDTH * width0));
             Vec3d outer0 = point0.add(normal0.multiply(OUTER_WIDTH * width0));
             Vec3d inner1 = point1.subtract(normal1.multiply(INNER_WIDTH * width1));
@@ -104,13 +106,15 @@ public final class ZenithSlashRenderer {
             slashVertex(vc, mat, normalMat, inner1, u1, 0.0f, cr, cg, cb);
         }
     }
-    private static Vec3d ellipseOffset(Vec3d forward, Vec3d right, double a, double b, double sign, double theta) {
-        return forward.multiply(a * sign * Math.cos(theta))
-                .add(right.multiply(b * Math.sin(theta)));
+    private static Vec3d ellipseOffset(Vec3d forward, Vec3d right, double a, double b,
+                                       double lateralSign, double theta) {
+        return forward.multiply(-a * Math.cos(theta))
+                .add(right.multiply(b * lateralSign * Math.sin(theta)));
     }
-    private static Vec3d ellipseNormal(Vec3d forward, Vec3d right, double a, double b, double sign, double theta) {
-        return forward.multiply(b * Math.cos(theta))
-                .add(right.multiply(a * sign * Math.sin(theta)))
+    private static Vec3d ellipseNormal(Vec3d forward, Vec3d right, double a, double b,
+                                       double lateralSign, double theta) {
+        return forward.multiply(b * lateralSign * Math.cos(theta))
+                .add(right.multiply(-a * Math.sin(theta)))
                 .normalize();
     }
     private static void slashVertex(VertexConsumer vc, Matrix4f mat, Matrix3f normalMat, Vec3d pos,

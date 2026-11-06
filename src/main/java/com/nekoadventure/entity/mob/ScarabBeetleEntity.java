@@ -1,5 +1,9 @@
 package com.nekoadventure.entity.mob;
 
+import com.nekoadventure.entity.ModEntities;
+import com.nekoadventure.entity.missile.MissileEntity;
+import com.nekoadventure.other.mobApart.AttackTypes;
+import com.nekoadventure.other.mobApart.MissileModelType;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.BlockState;
@@ -20,18 +24,25 @@ import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.mob.Monster;
 import net.minecraft.entity.mob.PathAwareEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 public class ScarabBeetleEntity extends HostileEntity implements Monster {
     private static final TrackedData<Boolean> ATTACKING = DataTracker.registerData(ScarabBeetleEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     private int attackTicks = 0;
 
+    private static final double RANGED_RANGE = 8.0;
+    private static final int SHOOT_INTERVAL = 40;
+    private int shootCooldown = 0;
+
     public ScarabBeetleEntity(EntityType<? extends HostileEntity> entityType, World world) {
         super(entityType, world);
     }
+
     public static DefaultAttributeContainer.Builder createScarabBeetleAttributes() {
         return MobEntity.createMobAttributes()
                 .add(EntityAttributes.GENERIC_MAX_HEALTH, 28.0D)
@@ -39,8 +50,9 @@ public class ScarabBeetleEntity extends HostileEntity implements Monster {
                 .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.3D)
                 .add(EntityAttributes.GENERIC_FOLLOW_RANGE, 32.0D)
                 .add(EntityAttributes.GENERIC_KNOCKBACK_RESISTANCE, 0.3D)
-                .add(EntityAttributes.GENERIC_ARMOR,8);
+                .add(EntityAttributes.GENERIC_ARMOR, 8);
     }
+
     @Override
     protected void initGoals() {
         this.targetSelector.add(0, new RevengeGoal(this));
@@ -63,7 +75,7 @@ public class ScarabBeetleEntity extends HostileEntity implements Monster {
                 this.resetCooldown();
                 this.mob.tryAttack(target);
                 if (this.mob instanceof ScarabBeetleEntity entity) {
-                    target.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS,40,1));
+                    target.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 40, 1));
                     entity.heal(2);
                     entity.dataTracker.set(ATTACKING, true);
                 }
@@ -92,8 +104,7 @@ public class ScarabBeetleEntity extends HostileEntity implements Monster {
             } else {
                 attackAnimationState.stop();
             }
-        }
-        else {
+        } else {
             if (this.dataTracker.get(ATTACKING)) {
                 attackTicks++;
                 if (attackTicks > 10) {
@@ -101,8 +112,70 @@ public class ScarabBeetleEntity extends HostileEntity implements Monster {
                     attackTicks = 0;
                 }
             }
+
+            if (shootCooldown > 0) {
+                shootCooldown--;
+            } else {
+                tryShoot();
+            }
         }
     }
+
+    private void tryShoot() {
+        LivingEntity target = this.getTarget();
+        if (target == null || !target.isAlive()) {
+            return;
+        }
+        if (target instanceof PlayerEntity player) {
+            if (player.isCreative() || player.isSpectator()) {
+                return;
+            }
+        }
+        if (!this.canSee(target)) {
+            return;
+        }
+        double sqDist = this.squaredDistanceTo(target);
+        if (sqDist <= RANGED_RANGE * RANGED_RANGE) {
+            return;
+        }
+        double followRange = this.getAttributeValue(EntityAttributes.GENERIC_FOLLOW_RANGE);
+        if (sqDist > followRange * followRange) {
+            return;
+        }
+
+        shootMissile(target);
+        this.playSound(SoundEvents.BLOCK_DISPENSER_LAUNCH, 1.0F, 1.0F);
+        this.shootCooldown = SHOOT_INTERVAL;
+    }
+
+    private void shootMissile(LivingEntity target) {
+        if (this.getWorld() instanceof ServerWorld serverWorld) {
+            Vec3d pos = this.getEyePos();
+            Vec3d direction = target.getEyePos().subtract(pos).normalize();
+            createMissile(serverWorld, pos, direction);
+        }
+    }
+
+    private void createMissile(ServerWorld world, Vec3d pos, Vec3d direction) {
+        MissileEntity missile = new MissileEntity(
+                ModEntities.MISSILE,
+                world,
+                this,
+                new AttackTypes(AttackTypes.AttackType.BULLET),
+                false,
+                30.0,
+                40,
+                4.0);
+        double yaw = Math.toDegrees(Math.atan2(-direction.x, direction.z));
+        double pitch = Math.toDegrees(Math.atan2(-direction.y,
+                Math.sqrt(direction.x * direction.x + direction.z * direction.z)));
+        missile.setMissileModelType(MissileModelType.BULLET);
+        missile.setPosition(pos);
+        missile.setYaw((float) yaw);
+        missile.setPitch((float) pitch);
+        world.spawnEntity(missile);
+    }
+
     @Override
     protected SoundEvent getAmbientSound() {
         return SoundEvents.ENTITY_SKELETON_AMBIENT;

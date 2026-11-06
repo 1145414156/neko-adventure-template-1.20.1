@@ -226,12 +226,14 @@ public class NekoPackageItem extends Item {
         //strength
         double strength = data[2];
         double attackMultiplier = data[5];
-        strength = strength * attackMultiplier + strength;
         if (attackMultiplier < 0 && strength < 0) {
-            strength = Math.abs(strength) * attackMultiplier + strength;
+            strength = -strength * attackMultiplier + strength;
         }
-        if (strength == 0) {
-            strength += attackMultiplier;
+        else if (strength == 0) {
+            strength = attackMultiplier;
+        }
+        else {
+            strength = strength * attackMultiplier + strength;
         }
         data[2] = Math.max(strength, 0.1);
 
@@ -239,14 +241,16 @@ public class NekoPackageItem extends Item {
         double attackSpeed = data[3];
         double attackSpeedMultiplier = data[6];
 
-        attackSpeed = attackSpeed + attackSpeed * attackSpeedMultiplier;
         if (attackSpeedMultiplier < 0 && attackSpeed < 0) {
-            attackSpeed = Math.abs(attackSpeed) * attackSpeedMultiplier + attackSpeed;
+            attackSpeed = -attackSpeed * attackSpeedMultiplier + attackSpeed;
         }
-        if (attackSpeed == 0) {
+        else if (attackSpeed == 0) {
             attackSpeed += attackSpeedMultiplier;
         }
-        data[3] = Math.min(NekoPackageDataManager.MAX_ATTACK_SPEED,Math.max(attackSpeed, -12));
+        else {
+            attackSpeed = attackSpeed + attackSpeed * attackSpeedMultiplier;
+        }
+        data[3] = Math.min(NekoPackageDataManager.MAX_ATTACK_SPEED,Math.max(attackSpeed, -24));
 
 
         //attackRange

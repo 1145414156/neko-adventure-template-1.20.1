@@ -1,18 +1,31 @@
 package com.nekoadventure.item.nekoItem.attackTypeItem.attackItems;
 
+import com.nekoadventure.client.ShiftKeyHelper;
 import com.nekoadventure.entity.ModEntities;
 import com.nekoadventure.entity.missile.MissileEntity;
+import com.nekoadventure.item.ModItems;
+import com.nekoadventure.item.nekoItem.AbstractNekoItem;
 import com.nekoadventure.item.nekoItem.attackTypeItem.AbstractNekoAttackItem;
 import com.nekoadventure.item.other.NekoPackageItem;
 import com.nekoadventure.other.itemApart.NekoPackageDataManager;
 import com.nekoadventure.other.mobApart.AttackTypes;
 import com.nekoadventure.other.mobApart.MissileModelType;
+import com.nekoadventure.sound.ModSoundEvents;
+import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 public class Missile extends AbstractNekoAttackItem {
     public Missile(Settings settings, double health, double strength, double speed, double attackSpeed, double attackRange, double attackMultiplier, double attackSpeedMultiplier) {
@@ -35,18 +48,42 @@ public class Missile extends AbstractNekoAttackItem {
         missileEntity.setPosition(pos.x, player.getEyePos().y, pos.z);
         player.getWorld().playSound(null, player.getBlockPos(), SoundEvents.BLOCK_DISPENSER_LAUNCH,
                 SoundCategory.PLAYERS, 1.0F, 1.0F);
+        player.getWorld().playSound(null, player.getBlockPos(), ModSoundEvents.MISSILE_SHOOT,
+                SoundCategory.PLAYERS, 1.0F, 1.0F);
 
         player.getWorld().spawnEntity(missileEntity);
         double[] finalData = NekoPackageDataManager.getFinalData(player);
         double attackSpeed = finalData != null ? finalData[3] : 0;
-        int cooldown = (int) (120 - (attackSpeed / NekoPackageDataManager.MAX_ATTACK_SPEED) * 120);
-        cooldown = Math.max(20, Math.min(120, cooldown));
+        int cooldown = (int) (240 - (attackSpeed / NekoPackageDataManager.MAX_ATTACK_SPEED) * 240);
+        cooldown = Math.max(80, Math.min(240, cooldown));
         player.getItemCooldownManager().set(player.getOffHandStack().getItem(), cooldown);
     }
 
     @Override
     public void changeOffAttackType(PlayerEntity player, MissileEntity missileEntity, float yaw) {
+        if (Objects.equals(missileEntity.getAttackType(), AttackTypes.AttackType.MISSILE)) {
+        return;
+        }
+        if (player.getOffHandStack().getItem() instanceof NekoPackageItem){
+            ArrayList<AbstractNekoItem> attackItems=NekoPackageItem.getNekoItems(player.getOffHandStack(),true,3);
+            if (attackItems.get(attackItems.size()-1).equals(ModItems.SINGULARITY)) {
+                if (missileEntity.getAliveDuration()<missileEntity.getTime()-1)return;
+            }
+        }
 
+        boolean shouldExplode = missileEntity.entityCheckCollision();
+        if (!shouldExplode) {
+            return;
+        }
+        Vec3d pos = missileEntity.getEyePos();
+        Entity realOwner = missileEntity.getRealOwner();
+        player.getWorld().createExplosion(
+                realOwner,
+                pos.x, pos.y, pos.z,
+                Math.min(4.0F,(float) missileEntity.getDamage()/50),
+                World.ExplosionSourceType.NONE
+        );
+        missileEntity.setAliveDuration(missileEntity.getTime()-1);
     }
 
 
@@ -61,7 +98,18 @@ public class Missile extends AbstractNekoAttackItem {
                 100,
                 damage*2
         );
-        missile.setMissileModelType(MissileModelType.JOYEUSE);
+        missile.setMissileModelType(MissileModelType.MISSILE);
         return  missile;
+    }
+
+    @Override
+    public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
+        super.appendTooltip(stack, world, tooltip, context);
+        Text moreText=Text.of("主攻击：弹幕随机锁定\"射程\"范围的一名生物,经过一段时间后落下并造成\"力量\"*2伤害");
+        Text moreText1=Text.of("次攻击：弹幕接触到生物后会产生爆炸并消失(爆炸程度与\"力量\"呈正相关)");
+        if (ShiftKeyHelper.isShiftDown()) {
+            tooltip.add(moreText);
+            tooltip.add(moreText1);
+        }
     }
 }

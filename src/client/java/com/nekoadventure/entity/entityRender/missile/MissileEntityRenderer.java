@@ -4,7 +4,8 @@ package com.nekoadventure.entity.entityRender.missile;
 import com.nekoadventure.NekoAdventure;
 import com.nekoadventure.entity.ModEntityModelLayers;
 import com.nekoadventure.entity.missile.MissileEntity;
-import com.nekoadventure.entity.model.missile.BoomerangEntityModel;
+import com.nekoadventure.entity.model.missile.BoomerangModel;
+import com.nekoadventure.entity.model.missile.MissileModel;
 import com.nekoadventure.item.ModItems;
 import com.nekoadventure.other.mobApart.MissileModelType;
 import com.nekoadventure.particle.ModParticleTypes;
@@ -40,15 +41,21 @@ public class MissileEntityRenderer extends EntityRenderer<MissileEntity> {
             new Identifier(NekoAdventure.MOD_ID, "textures/entity/missile/joyeuse.png");
     private static final Identifier TEXTURE_BOOMERANG=
             new Identifier(NekoAdventure.MOD_ID, "textures/entity/missile/boomerang.png");
+    private static final Identifier TEXTURE_MISSILE=
+            new Identifier(NekoAdventure.MOD_ID, "textures/entity/missile/missile.png");
+
     private static final ItemStack ZENITH_STACK = new ItemStack(ModItems.ZENITH);
     private static final ItemStack JOYEUSE_STACK = new ItemStack(ModItems.JOYEUSE);
 
     private static final Vector3f ITEM_BLADE_AXIS = new Vector3f(0.70710678f, 0.70710678f, 0.0f);
 
-    private final BoomerangEntityModel modelBoomerang;
+    private final BoomerangModel modelBoomerang;
+    private final MissileModel modelMissile;
+
     public MissileEntityRenderer(EntityRendererFactory.Context ctx) {
         super(ctx);
-        this.modelBoomerang=new BoomerangEntityModel(ctx.getPart(ModEntityModelLayers.BOOMERANG));
+        this.modelBoomerang=new BoomerangModel(ctx.getPart(ModEntityModelLayers.BOOMERANG));
+        this.modelMissile = new MissileModel(ctx.getPart(ModEntityModelLayers.MISSILE));
     }
 
     @Override
@@ -61,7 +68,7 @@ public class MissileEntityRenderer extends EntityRenderer<MissileEntity> {
         float green = isPlayer ? 0.0f : 1.0f;
         float blue = isPlayer ? 0.0f : 1.0f;
 
-        if (entity.getMissileType() == MissileModelType.BRIMSTONE) {
+        if (entity.getMissileModelType() == MissileModelType.BRIMSTONE) {
             if (entity.getFlag()<=0){
                 if (entity.getWorld() instanceof ClientWorld clientWorld) {
                     double x = MathHelper.lerp(tickDelta, entity.prevX, entity.getX());
@@ -122,7 +129,7 @@ public class MissileEntityRenderer extends EntityRenderer<MissileEntity> {
             }
         }
 
-        else if (entity.getMissileType() == MissileModelType.JOYEUSE) {
+        else if (entity.getMissileModelType() == MissileModelType.JOYEUSE) {
             BakedModel model = MinecraftClient.getInstance().getItemRenderer()
                     .getModel(JOYEUSE_STACK, entity.getWorld(), null, entity.getId());
             if (model != null) {
@@ -160,7 +167,7 @@ public class MissileEntityRenderer extends EntityRenderer<MissileEntity> {
             }
         }
 
-        else if (entity.getMissileType() == MissileModelType.BOOMERANG) {
+        else if (entity.getMissileModelType() == MissileModelType.BOOMERANG) {
             matrices.push();
             this.modelBoomerang.setAngles(entity, 0, 0, entity.age, yaw, entity.getPitch());
             var vertexConsumer = vertexConsumers.getBuffer(
@@ -172,7 +179,7 @@ public class MissileEntityRenderer extends EntityRenderer<MissileEntity> {
             matrices.pop();
         }
 
-        else if (entity.getMissileType()==MissileModelType.BULLET){
+        else if (entity.getMissileModelType()==MissileModelType.BULLET){
             matrices.push();
             matrices.multiply(this.dispatcher.getRotation());
             matrices.translate(0, 0.1, 0);
@@ -211,7 +218,7 @@ public class MissileEntityRenderer extends EntityRenderer<MissileEntity> {
                     .next();
             matrices.pop();
         }
-        else if (entity.getMissileType() == MissileModelType.ZENITH) {
+        else if (entity.getMissileModelType() == MissileModelType.ZENITH) {
             boolean isLeft = entity.getFlag() < 11;
 
             ZenithSlashRenderer.render(entity, matrices, vertexConsumers, tickDelta);
@@ -240,15 +247,27 @@ public class MissileEntityRenderer extends EntityRenderer<MissileEntity> {
                 matrices.pop();
             }
         }
+        else if (entity.getMissileModelType() == MissileModelType.MISSILE) {
+            float bodyPitch = MathHelper.lerp(tickDelta, entity.prevPitch, entity.getPitch());
+            matrices.push();
+            matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(-yaw));
+            matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(-90.0f + bodyPitch));
+            var vertexConsumer = vertexConsumers.getBuffer(
+                    modelMissile.getLayer(TEXTURE_MISSILE));
+            modelMissile.render(matrices, vertexConsumer, light,
+                    OverlayTexture.DEFAULT_UV, red, green, blue, 1.0f);
+            matrices.pop();
+        }
     }
 
     @Override
     public Identifier getTexture(MissileEntity entity) {
-        return switch (entity.getMissileType()) {
+        return switch (entity.getMissileModelType()) {
             case BRIMSTONE -> TEXTURE_BRIMSTONE;
             case JOYEUSE -> TEXTURE_JOYEUSE;
             case BOOMERANG -> TEXTURE_BOOMERANG;
             case BULLET -> TEXTURE_BULLET;
+            case MISSILE-> TEXTURE_MISSILE;
             default -> null;
         };
     }

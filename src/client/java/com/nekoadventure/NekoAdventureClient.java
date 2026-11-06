@@ -14,7 +14,9 @@ import com.nekoadventure.network.maze.ClientMobIdInputHandler;
 import com.nekoadventure.network.maze.ClientMonumentCreditsHandler;
 import com.nekoadventure.network.maze.ClientScreenEffectHandler;
 import com.nekoadventure.network.mob.ClientFloorShakeHandler;
+import com.nekoadventure.network.mob.ClientScreenFlashHandler;
 import com.nekoadventure.network.mob.ClientScreenShakeHandler;
+import com.nekoadventure.network.mob.ClientScreenSwayHandler;
 import com.nekoadventure.particle.ModClientParticle;
 import com.nekoadventure.sound.BossMusicHandler;
 import com.nekoadventure.ui.NekoPackageScreen;
@@ -43,6 +45,8 @@ public class NekoAdventureClient implements ClientModInitializer {
 		ClientMobIdInputHandler.init();
 		ClientScreenEffectHandler.register();
 		ClientScreenShakeHandler.init();
+		ClientScreenFlashHandler.init();
+		ClientScreenSwayHandler.init();
 		ClientFloorShakeHandler.init();
 		ClientNekoPackageDataHandler.init();
 		ModClientParticle.init();

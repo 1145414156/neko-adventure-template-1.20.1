@@ -222,9 +222,7 @@ public class ExposedWire extends AbstractNekoAttackItem {
     }
     private static void spawnParticle(World world, ParticleEffect particle,
                                       double x, double y, double z, double speed) {
-        if (world.isClient) {
-            world.addParticle(particle, x, y, z, 0, 0, 0);
-        } else {
+        if (world instanceof ServerWorld) {
             ((ServerWorld) world).spawnParticles(particle,
                     x, y, z, 1, 0, 0, 0, speed);
         }

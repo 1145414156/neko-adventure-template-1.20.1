@@ -16,6 +16,7 @@ public class ModSoundEvents {
     public static final SoundEvent SHORT_HOOK_ATTACK=register("short_hook_attack");
     public static final SoundEvent SKELETON_PRIEST_JEWEL=register("skeleton_priest_jewel");
     public static final SoundEvent POKER_EXTRACT=register("poker_extract");
+    public static final SoundEvent MISSILE_SHOOT=register("missile_shoot");
 
     public static final SoundEvent ENTITY_GRAND_KNIGHT_AMBIENT =register("grand_knight_ambient");
     public static final SoundEvent ENTITY_GRAND_KNIGHT_WALK =register("grand_knight_walk");

@@ -85,7 +85,7 @@ public class ModItems {
     public static final NumItem BROKEN_SOUL=register("broken_soul",
             new NumItem(new Item.Settings().rarity(Rarity.UNCOMMON),2,0.2,0.5,0.2,2,0.1,0.1));
     public static final NumItem SLASH=register("slash",
-            new NumItem(new Item.Settings().rarity(Rarity.EPIC),0,6,0.7,6,7,0.6,0.6));
+            new NumItem(new Item.Settings().rarity(Rarity.EPIC),0,6,0.7,6,7,0,0));
     public static final NumItem SULFUR_BLOCK=register("sulfur_block",
             new NumItem(new Item.Settings().rarity(Rarity.COMMON),-1.0,1.5,1.5,0,0,0,0));
     public static final NumItem NAGA_SCALE =register("naga_scale",
@@ -192,13 +192,21 @@ public class ModItems {
     public static final Parry PARRY=register("parry",
             new Parry(new Item.Settings().rarity(Rarity.UNCOMMON),0,0.4,1.3,0.1,0,0,0));
     public static final Boomerang BOOMERANG=register("boomerang",
-            new Boomerang(new Item.Settings().rarity(Rarity.RARE),0,0,0.5,0.5,5,0,0));
+            new Boomerang(new Item.Settings().rarity(Rarity.UNCOMMON),0,0,0.5,0.5,5,0,0));
     public static final Zenith ZENITH=register("zenith",
             new Zenith(new Item.Settings().rarity(Rarity.EPIC),0,1.5,0.5,0,0,0.3,0));
     public static final ShortHook SHORT_HOOK=register("short_hook",
             new ShortHook(new Item.Settings().rarity(Rarity.UNCOMMON),0,0.2,0.5,-0.3,-1,0,0));
+
     public static final Missile MISSILE=register("missile",
-            new Missile(new Item.Settings().rarity(Rarity.RARE),0,0,0,0,0,0,0));
+            new Missile(new Item.Settings().rarity(Rarity.UNCOMMON),0,2.0,-0.5,0,4.0,0,0));
+    public static final Singularity SINGULARITY=register("singularity",
+            new Singularity(new Item.Settings().rarity(Rarity.RARE),0,1.0,0,-0.5,4,0,0));
+    public static final ThirdAttacks THIRD_ATTACKS=register("third_attacks",
+            new ThirdAttacks(new Item.Settings().rarity(Rarity.RARE),0,-3,0,-3,0,-0.5,-0.5));
+
+
+
 
     //特效类道具
     public static final Fever FEVER=register("fever",
@@ -253,6 +261,28 @@ public class ModItems {
             new InstanceHealthSoul(new Item.Settings().rarity(Rarity.RARE),3));
     public static final TPStartRoomSoul TP_START_ROOM_SOUL=register("tp_start_room_soul",
             new TPStartRoomSoul(new Item.Settings().rarity(Rarity.RARE),2));
+    public static final StrengthSoul STRENGTH_SOUL=register("strength_soul",
+            new StrengthSoul(new Item.Settings().rarity(Rarity.RARE),4));
+    public static final DesireSoul DESIRE_SOUL=register("desire_soul",
+            new DesireSoul(new Item.Settings().rarity(Rarity.RARE),6));
+    public static final ResetSoul RESET_SOUL=register("reset_soul",
+            new ResetSoul(new Item.Settings().rarity(Rarity.RARE),4));
+    public static final GreedySoul GREEDY_SOUL=register("greedy_soul",
+            new GreedySoul(new Item.Settings().rarity(Rarity.RARE),6));
+    public static final RestoreSoul RESTORE_SOUL=register("restore_soul",
+            new RestoreSoul(new Item.Settings().rarity(Rarity.RARE),3));
+    public static final FrenzySoul FRENZY_SOUL=register("frenzy_soul",
+            new FrenzySoul(new Item.Settings().rarity(Rarity.RARE),4));
+    public static final GetCentrosymmetrySoul GET_CENTROSYMMETRY_SOUL=register("get_centrosymmetry_soul",
+            new GetCentrosymmetrySoul(new Item.Settings().rarity(Rarity.RARE),2));
+    public static final GetForgePoolSoul GET_FORGE_POOL_SOUL=register("get_forge_pool_soul",
+            new GetForgePoolSoul(new Item.Settings().rarity(Rarity.RARE),3));
+    public static final GetTreasurePoolSoul GET_TREASURE_POOL_SOUL =register("get_treasure_pool_soul",
+            new GetTreasurePoolSoul(new Item.Settings().rarity(Rarity.RARE),1));
+    public static final GetFoodPoolSoul GET_FOOD_POOL_SOUL =register("get_food_pool_soul",
+            new GetFoodPoolSoul(new Item.Settings().rarity(Rarity.RARE),1));
+    public static final GetBossPoolSoul GET_BOSS_POOL_SOUL=register("get_boss_pool_soul",
+            new GetBossPoolSoul(new Item.Settings().rarity(Rarity.RARE),1));
     public static final GetFirstPoolSoul GET_FIRST_POOL_SOUL=register("get_first_pool_soul",
             new GetFirstPoolSoul(new Item.Settings().rarity(Rarity.RARE),1));
     public static final GetLastPoolSoul GET_LAST_POOL_SOUL=register("get_last_pool_soul",
@@ -267,26 +297,6 @@ public class ModItems {
             new GetApartPoolSoul(new Item.Settings().rarity(Rarity.RARE),2));
     public static final GetChaoPoolSoul GET_CHAO_POOL_SOUL=register("get_chao_pool_soul",
             new GetChaoPoolSoul(new Item.Settings().rarity(Rarity.RARE),1));
-    public static final StrengthSoul STRENGTH_SOUL=register("strength_soul",
-            new StrengthSoul(new Item.Settings().rarity(Rarity.RARE),4));
-    public static final DesireSoul DESIRE_SOUL=register("desire_soul",
-            new DesireSoul(new Item.Settings().rarity(Rarity.RARE),6));
-    public static final ResetSoul RESET_SOUL=register("reset_soul",
-            new ResetSoul(new Item.Settings().rarity(Rarity.RARE),4));
-    public static final GreedySoul GREEDY_SOUL=register("greedy_soul",
-            new GreedySoul(new Item.Settings().rarity(Rarity.RARE),6));
-    public static final GetTreasurePoolSoul GET_TREASURE_POOL_SOUL =register("get_treasure_pool_soul",
-            new GetTreasurePoolSoul(new Item.Settings().rarity(Rarity.RARE),1));
-    public static final GetFoodPoolSoul GET_FOOD_POOL_SOUL =register("get_food_pool_soul",
-            new GetFoodPoolSoul(new Item.Settings().rarity(Rarity.RARE),1));
-    public static final GetBossPoolSoul GET_BOSS_POOL_SOUL=register("get_boss_pool_soul",
-            new GetBossPoolSoul(new Item.Settings().rarity(Rarity.RARE),1));
-    public static final RestoreSoul RESTORE_SOUL=register("restore_soul",
-            new RestoreSoul(new Item.Settings().rarity(Rarity.RARE),3));
-    public static final FrenzySoul FRENZY_SOUL=register("frenzy_soul",
-            new FrenzySoul(new Item.Settings().rarity(Rarity.RARE),4));
-    public static final GetCentrosymmetrySoul GET_CENTROSYMMETRY_SOUL=register("get_centrosymmetry_soul",
-            new GetCentrosymmetrySoul(new Item.Settings().rarity(Rarity.RARE),2));
 
 
     //传送物品

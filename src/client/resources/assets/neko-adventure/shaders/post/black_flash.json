@@ -1,0 +1,35 @@
+{
+    "targets": [
+        "swap",
+        "swap2"
+    ],
+    "passes": [
+        {
+            "name": "neko_black_flash_saturate",
+            "intarget": "minecraft:main",
+            "outtarget": "swap",
+            "uniforms": [
+                {
+                    "name": "Saturation",
+                    "values": [ 0.0 ]
+                }
+            ]
+        },
+        {
+            "name": "neko_black_flash_invert",
+            "intarget": "swap",
+            "outtarget": "swap2",
+            "uniforms": [
+                {
+                    "name": "InverseAmount",
+                    "values": [ 1.0 ]
+                }
+            ]
+        },
+        {
+            "name": "blit",
+            "intarget": "swap2",
+            "outtarget": "minecraft:main"
+        }
+    ]
+}

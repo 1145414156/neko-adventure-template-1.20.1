@@ -3,16 +3,26 @@ package com.nekoadventure.other.mobApart;
 import com.nekoadventure.entity.missile.MissileEntity;
 import com.nekoadventure.item.nekoItem.AbstractNekoItem;
 import com.nekoadventure.item.other.NekoPackageItem;
+import com.nekoadventure.network.mob.ScreenFlashNetworking;
+import com.nekoadventure.network.mob.ScreenShakeNetworking;
+import com.nekoadventure.network.mob.ScreenSwayNetworking;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.TargetPredicate;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.particle.ParticleTypes;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 
 import java.util.Comparator;
 import java.util.List;
+
+//这个类是执行每种不一样的弹幕的技能轴与运动效果
 
 public class AttackTypes {
     public enum AttackType {
@@ -26,6 +36,8 @@ public class AttackTypes {
         ELLIPSE,
         ZENITH,
         MISSILE,
+        SINGULARITY,
+        SINGULARITY_HOLD
     }
 
     private final AttackType type;
@@ -39,7 +51,6 @@ public class AttackTypes {
         return type;
     }
 
-    //执行移动逻辑的方法
     public void executeMovement(MissileEntity entity,double range,double speed) {
         switch (type) {
             case BULLET -> bulletMovement(entity, speed);
@@ -52,8 +63,10 @@ public class AttackTypes {
             case ELLIPSE -> ellipsoidMovement(entity,range);
             case ZENITH -> zenithMovement(entity, range);
             case MISSILE -> missileMovement(entity,range);
+            case SINGULARITY, SINGULARITY_HOLD -> singularMovement(entity, range);
         }
     }
+    // ==============================================================
     private void lazyMovement(MissileEntity entity) {
         entity.setVelocity(entity.getVelocity().add(0, 0.1, 0));
         entity.setVelocity(entity.getVelocity().add(0, -0.1, 0));
@@ -100,8 +113,8 @@ public class AttackTypes {
                 float addYaw=initialYaw;
                 for(int l=attackItems.size()-1;l>=0;l--){
                     AbstractNekoItem attackItem=attackItems.get(l);
-                    if (attackItem.getCalculateYaw(entity.getAliveDuration())!=114514){
-                        addYaw+=(attackItem.getCalculateYaw(entity.getAliveDuration()));
+                    if (attackItem.getCalculateYaw(entity.getAliveDuration(),entity.getTime())!=114514){
+                        addYaw+=(attackItem.getCalculateYaw(entity.getAliveDuration(),entity.getTime()));
                         count++;
                         if (count>=3){
                             entity.setYaw(addYaw);
@@ -132,7 +145,8 @@ public class AttackTypes {
                             Math.sqrt(direction.x * direction.x + direction.z * direction.z)));
                     entity.setYaw((float) yaw);
                     entity.setPitch((float) pitch);
-                } else {
+                }
+                else {
                     entity.remove(Entity.RemovalReason.DISCARDED);
                 }
             }
@@ -171,6 +185,7 @@ public class AttackTypes {
             entity.setYaw(owner.getYaw());
             entity.setPitch(owner.getPitch());
         }
+
     }
 
     private void boomerangMovement(MissileEntity entity,double range,double speed) {
@@ -187,21 +202,27 @@ public class AttackTypes {
     }
 
     private void ellipsoidMovement(MissileEntity entity,double range) {
+        ellipsoidMovement(entity, range, 0.0f);
+    }
+
+    private void ellipsoidMovement(MissileEntity entity, double range, float trackPitch) {
         int time =  entity.getTime();
         int t = entity.getAliveDuration();
         double a = range / 2.0;
         double b = 3;
         double omega = 2 * Math.PI / time;
         boolean isLeft = entity.getFlag() < 11;
-        double sign = isLeft ? 1.0 : -1.0;
-        float baseYaw = entity.getInitialYaw() + (isLeft ? 180.0f : 0.0f);
+        double lateralSign = isLeft ? -1.0 : 1.0;
+        float baseYaw = entity.getInitialYaw();
         double bYRad = Math.toRadians(baseYaw);
-        Vec3d forward = new Vec3d(-Math.sin(bYRad), 0, Math.cos(bYRad));
-        Vec3d right = new Vec3d(-forward.z, 0, forward.x);
+        double pRad = Math.toRadians(trackPitch);
+        Vec3d forward = new Vec3d(-Math.sin(bYRad) * Math.cos(pRad), -Math.sin(pRad),
+                Math.cos(bYRad) * Math.cos(pRad));
+        Vec3d right = new Vec3d(-Math.cos(bYRad), 0, -Math.sin(bYRad));
         double theta = omega * t;
         double thetaNext = omega * (t + 1);
-        Vec3d step = forward.multiply(a * sign * (Math.cos(thetaNext) - Math.cos(theta)))
-                .add(right.multiply(b * (Math.sin(thetaNext) - Math.sin(theta))));
+        Vec3d step = forward.multiply(-a * (Math.cos(thetaNext) - Math.cos(theta)))
+                .add(right.multiply(b * lateralSign * (Math.sin(thetaNext) - Math.sin(theta))));
 
         Vec3d currentVelocity = entity.getVelocity();
         entity.addVelocity(
@@ -209,32 +230,30 @@ public class AttackTypes {
                 step.y - currentVelocity.y,
                 step.z - currentVelocity.z
         );
-        double sinT = Math.sin(theta) * sign;
-        double cosT = Math.cos(theta);
-        Vec3d tangent = forward.multiply(-a * sinT * omega)
-                .add(right.multiply(b * cosT * omega));
+        Vec3d tangent = forward.multiply(a * Math.sin(theta) * omega)
+                .add(right.multiply(b * lateralSign * Math.cos(theta) * omega));
         float displayYaw = (float) Math.toDegrees(Math.atan2(-tangent.x, tangent.z));
         entity.setYaw(displayYaw);
     }
     private void zenithMovement(MissileEntity entity, double range) {
-        ellipsoidMovement(entity,range);
+        ellipsoidMovement(entity, range, entity.getInitialPitch());
         followOwnerMovement(entity);
     }
 
     private void missileMovement(MissileEntity entity, double range) {
         int t = entity.getAliveDuration();
-        if (t < 30) {
-            entity.setVelocity(Vec3d.ZERO);
-            followOwnerMovement(entity);
-        }
-        else if (t==30){
-            nearest = findNearestTarget(entity, range);
+        if (t==0){
+            nearest = findRandomTarget(entity, range);
         }
         else if (t <= 40) {
             entity.addVelocity(0,  0.5, 0);
             Entity owner = entity.getOwner();
             entity.setYaw(owner != null ? owner.getYaw() : entity.getYaw());
             entity.setPitch(-90.0F);
+            if (entity.getWorld() instanceof ServerWorld) {
+                ((ServerWorld) entity.getWorld()).spawnParticles(ParticleTypes.CLOUD,
+                        entity.getX(), entity.getY(), entity.getZ(), 1, 0.1, 0, 0, 0.1);
+            }
         }
         else if (t == 50) {
             if (nearest != null) {
@@ -242,22 +261,46 @@ public class AttackTypes {
                 entity.setVelocity(Vec3d.ZERO);
             }
             else {
-                entity.setAliveDuration(entity.getTime());
+                entity.kill();
             }
         }
         else if (t <= 60) {
             if (nearest != null && nearest.isAlive()) {
-                Vec3d targetPos = new Vec3d(nearest.getX(), nearest.getY(), nearest.getZ());
+                Vec3d targetPos = new Vec3d(nearest.getX(), nearest.getY()+1, nearest.getZ());
                 Vec3d currentPos = entity.getPos().add(0,-1,0);
                 Vec3d diff = targetPos.subtract(currentPos);
                 double dist = diff.length();
-
                 int remainingTicks = 60 - t + 1;
-
-                if (remainingTicks <= 1 || dist < 0.01) {
-                    entity.setPosition(targetPos.x, targetPos.y+1, targetPos.z);
+                if (entityCollision(entity) || remainingTicks <= 1) {
+                    entity.setPosition(targetPos.x, targetPos.y+0.5, targetPos.z);
                     entity.setVelocity(Vec3d.ZERO);
-                } else {
+                    if (entity.getMissileModelType().equals(MissileModelType.MISSILE)) {
+                        entity.setMissileModelType(MissileModelType.NULL);
+                        entity.getWorld().playSound(null, entity.getBlockPos(), SoundEvents.ENTITY_GENERIC_EXPLODE,
+                                SoundCategory.PLAYERS, 1.0f+ (float) entity.getDamage() /50, 1.0F);
+                        if (entity.getWorld() instanceof ServerWorld) {
+                            ((ServerWorld) entity.getWorld()).spawnParticles(ParticleTypes.EXPLOSION,
+                                    entity.getX(), entity.getY(), entity.getZ(), 5+(int)entity.getDamage(), 2, 2, 2, 0);
+                        }
+                        if (entity.getDamage()>=100) {
+                            List<PlayerEntity> playerEntities=entity.getWorld().getEntitiesByClass(
+                                    PlayerEntity.class,
+                                    entity.getBoundingBox().expand(range),
+                                    player -> true
+                            );
+                            if (!playerEntities.isEmpty()) {
+                                for (PlayerEntity playerEntity : playerEntities) {
+                                    if (playerEntity instanceof ServerPlayerEntity) {
+                                        ScreenFlashNetworking.sendToPlayer((ServerPlayerEntity) playerEntity,7);
+                                        ScreenShakeNetworking.sendToPlayer((ServerPlayerEntity)playerEntity,60,0.5f);
+                                        ScreenSwayNetworking.sendToPlayer((ServerPlayerEntity) playerEntity,50,30,5);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                else {
                     Vec3d dir = diff.normalize();
                     Vec3d velocity = dir.multiply(dist / remainingTicks);
                     entity.setVelocity(velocity);
@@ -267,17 +310,49 @@ public class AttackTypes {
                 }
             }
         }
-        else {
-            lazyMovement(entity);
-            if (entity.getRealOwner() instanceof PlayerEntity player) {
-                if (player.getOffHandStack().getItem() instanceof NekoPackageItem){
-                    NekoPackageItem.applyOffAttackTypeItem(player,entity,entity.getYaw());
-                }
+    }
+
+    private void singularMovement(MissileEntity entity, double range) {
+        if (entity.getAttackType() == AttackType.SINGULARITY_HOLD) {
+            entity.setVelocity(Vec3d.ZERO);
+            singularPull(entity, range);
+            return;
+        }
+        if (blockCollision(entity) || entityCollision(entity)) {
+            entity.setVelocity(Vec3d.ZERO);
+            entity.setAttackType(new AttackTypes(AttackType.SINGULARITY_HOLD));
+            singularPull(entity, range);
+            return;
+        }
+        singularPull(entity, range);
+        bulletMovement(entity, entity.getSpeed());
+    }
+
+    private void singularPull(MissileEntity entity, double range) {
+        if (range <= 0) {
+            return;
+        }
+        Vec3d center = entity.getBoundingBox().getCenter();
+        Entity realOwner = entity.getRealOwner();
+        List<LivingEntity> targets = entity.getWorld().getEntitiesByClass(
+                LivingEntity.class,
+                entity.getBoundingBox().expand(Math.min(8,range)),
+                e -> e != realOwner && e.isAlive()
+        );
+        for (LivingEntity target : targets) {
+            Vec3d diff = center.subtract(target.getBoundingBox().getCenter());
+            double distance = diff.length();
+            if (distance < 0.01) {
+                continue;
             }
+            double strength = 0.04 + 0.15 * (1.0 - Math.min(distance / range, 1.0));
+            Vec3d pull = diff.multiply(strength / distance);
+            target.addVelocity(pull.x, pull.y, pull.z);
+            target.velocityModified = true;
         }
     }
 
-//===================================================================================================
+    //===================================================================================================
     private LivingEntity findNearestTarget(MissileEntity entity, double range) {
         Entity owner = entity.getOwner();
         if (owner == null) {
@@ -295,5 +370,32 @@ public class AttackTypes {
             nearest = hostileEntity.getTarget();
         }
         return nearest instanceof LivingEntity living ? living : null;
+    }
+    private LivingEntity findRandomTarget(MissileEntity entity, double range) {
+        Entity owner = entity.getOwner();
+        if (owner == null) {
+            return null;
+        }
+        List<LivingEntity> targets = entity.getWorld().getEntitiesByClass(
+                LivingEntity.class,
+                owner.getBoundingBox().expand(range),
+                z -> z != owner && z.isAttackable()
+        );
+        if (!targets.isEmpty()) {
+            Entity random = targets.get(entity.getWorld().getRandom().nextInt(targets.size()));
+            if (owner instanceof HostileEntity hostileEntity) {
+                random = hostileEntity.getTarget();
+            }
+            return random instanceof LivingEntity living ? living : null;
+        }
+        else {
+            return null;
+        }
+    }
+    public boolean entityCollision(MissileEntity entity) {
+        return entity.entityCheckCollision();
+    }
+    public boolean blockCollision(MissileEntity entity) {
+        return entity.blockCheckCollision();
     }
 }

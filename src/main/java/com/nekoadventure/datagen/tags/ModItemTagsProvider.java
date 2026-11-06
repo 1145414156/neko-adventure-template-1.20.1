@@ -120,6 +120,9 @@ public class ModItemTagsProvider extends FabricTagProvider<Item> {
         treasurePoolItems.add(ModItems.CLOUD_BOOTS);
         treasurePoolItems.add(ModItems.ADRENALINE);
         treasurePoolItems.add(ModItems.JUG);
+        treasurePoolItems.add(ModItems.MISSILE);
+        treasurePoolItems.add(ModItems.SINGULARITY);
+        treasurePoolItems.add(ModItems.THIRD_ATTACKS);
 
         return treasurePoolItems;
     }
@@ -186,6 +189,7 @@ public class ModItemTagsProvider extends FabricTagProvider<Item> {
         shopPoolItems.add(ModItems.ABUNDANT_ITEM_BASE);
         shopPoolItems.add(ModItems.ADRENALINE);
         shopPoolItems.add(ModItems.JUG);
+        shopPoolItems.add(ModItems.THIRD_ATTACKS);
 
         return shopPoolItems;
     }
@@ -251,6 +255,7 @@ public class ModItemTagsProvider extends FabricTagProvider<Item> {
         forgePoolItems.add(ModItems.ZENITH);
         forgePoolItems.add(ModItems.CAT_TEACUP);
         forgePoolItems.add(ModItems.OXIDIZED_COPPER_INGOT);
+        forgePoolItems.add(ModItems.MISSILE);
 
         return forgePoolItems;
     }
@@ -358,6 +363,7 @@ public class ModItemTagsProvider extends FabricTagProvider<Item> {
         concealPoolItems.add(ModItems.ADRENALINE);
         concealPoolItems.add(ModItems.BATTERY);
         concealPoolItems.add(ModItems.SANDWORM_FANG);
+        concealPoolItems.add(ModItems.SINGULARITY);
 
         return concealPoolItems;
     }

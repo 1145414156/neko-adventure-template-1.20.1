@@ -8,7 +8,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 import net.minecraft.world.World;
-import net.minecraft.world.explosion.Explosion;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -21,18 +20,14 @@ public class ABundleOfTNT extends AbstractNekoSpecificItem {
 
     @Override
     public void applySpecificItem(PlayerEntity player, LivingEntity target) {
-        Explosion explosion = new Explosion(
-                target.getWorld(),
+        player.getWorld().createExplosion(
                 player,
                 target.getX(),
-                target.getY(),
+                target.getEyeY(),
                 target.getZ(),
                 0.5F,
-                false,
-                Explosion.DestructionType.KEEP
+                World.ExplosionSourceType.NONE
         );
-        explosion.collectBlocksAndDamageEntities();
-        explosion.affectWorld(true);
     }
 
     @Override

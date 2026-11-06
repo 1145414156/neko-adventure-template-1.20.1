@@ -66,7 +66,7 @@ public class BrimStone extends AbstractNekoAttackItem {
                         }
                     }
                     int t = (int) ((length - 1) / (double) range * missile.getTime());
-                    float calculateYaw = getCalculateYawFromNekoItems(player, t);
+                    float calculateYaw = getCalculateYawFromNekoItems(player,missile,t);
                     yaw = calculateYaw != 114514 ? initialYaw + calculateYaw : initialYaw;
                     Vec3d direction = getRotationVector(pitch, currentYaw);
                     spawnPos = spawnPos.add(direction.multiply(length == 1 ? spacing - cubeSize / 2 : spacing));
@@ -153,7 +153,7 @@ public class BrimStone extends AbstractNekoAttackItem {
             for (int length = 1; length <= range; length++) {
                 MissileEntity missileEntity = getMissileEntity(missile, range, damage, length, player);
                 int t = (int) ((length - 1) / range * missileEntity.getTime());
-                float calculateYaw = getCalculateYawFromNekoItems(player, t);
+                float calculateYaw = getCalculateYawFromNekoItems(player,missile,t);
                 float segmentYaw = calculateYaw != 114514 ? initialYaw + calculateYaw : initialYaw;
                 Vec3d direction = getRotationVector(0, currentYaw);
                 spawnPos = spawnPos.add(direction.multiply(length == 1 ? spacing - cubeSize / 2 : spacing));
@@ -168,15 +168,15 @@ public class BrimStone extends AbstractNekoAttackItem {
                 SoundCategory.PLAYERS, 1.0F, 1.0F);
     }
 
-    private float getCalculateYawFromNekoItems(PlayerEntity player, int t) {
+    private float getCalculateYawFromNekoItems(PlayerEntity player,MissileEntity missile,int t) {
         if (player.getOffHandStack().getItem() instanceof NekoPackageItem) {
             List<AbstractNekoItem> attackItems = NekoPackageItem.getNekoItems(player.getOffHandStack(), true, 0);
             int count=0;
             float addYaw=0;
             for(int l=attackItems.size()-1;l>=0;l--){
                 AbstractNekoItem attackItem=attackItems.get(l);
-                if (attackItem.getCalculateYaw(t)!=114514){
-                    addYaw+=(attackItem.getCalculateYaw(t));
+                if (attackItem.getCalculateYaw(t,missile.getTime())!=114514){
+                    addYaw+=(attackItem.getCalculateYaw(t,missile.getTime()));
                     count++;
                     if (count>=3){
                         return addYaw;

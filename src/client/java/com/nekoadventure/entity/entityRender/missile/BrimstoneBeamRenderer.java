@@ -40,7 +40,7 @@ public final class BrimstoneBeamRenderer {
                 MissileEntity.class,
                 entity.getBoundingBox().expand(SEARCH_RADIUS),
                 e -> e != entity
-                        && e.getMissileType() == MissileModelType.BRIMSTONE
+                        && e.getMissileModelType() == MissileModelType.BRIMSTONE
                         && e.getFlag() == nextFlag
                         && e.getOwner() == owner
         );

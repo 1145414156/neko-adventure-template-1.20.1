@@ -639,12 +639,11 @@ public class GrandKnightEntity extends HostileEntity implements Monster {
             for (int i=0;i<=9;i++){
                 this.playSound(SoundEvents.BLOCK_DISPENSER_LAUNCH,1.0f,0.5f);
                 MissileEntity bullet=getMissileEntity(this,16,40);
-                bullet.setPosition(this.getEyePos().add(0,-2,0));
                 if (i==9){
                     bullet=getMissileEntity(this,36,40);
-                    bullet.setPosition(this.getEyePos().add(0,-2,0));
                     bullet.setAttackType(new AttackTypes(AttackTypes.AttackType.DELAY));
                 }
+                bullet.setPosition(this.getEyePos().add(0,-2,0));
                 bullet.setYaw(this.getYaw()-40+10*i);
                 bullet.setPitch(0);
                 this.getWorld().spawnEntity(bullet);

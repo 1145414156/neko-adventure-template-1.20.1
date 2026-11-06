@@ -7,9 +7,9 @@ import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.entity.model.SinglePartEntityModel;
 import net.minecraft.client.util.math.MatrixStack;
 
-public class BoomerangEntityModel extends SinglePartEntityModel<MissileEntity> {
+public class BoomerangModel extends SinglePartEntityModel<MissileEntity> {
 	private final ModelPart main;
-	public BoomerangEntityModel(ModelPart root) {
+	public BoomerangModel(ModelPart root) {
 		this.main = root.getChild("main");
 	}
 	public static TexturedModelData getTexturedModelData() {

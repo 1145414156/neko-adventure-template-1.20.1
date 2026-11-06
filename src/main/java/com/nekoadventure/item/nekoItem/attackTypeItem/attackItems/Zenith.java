@@ -47,18 +47,22 @@ public class Zenith extends AbstractNekoAttackItem {
         List<LivingEntity> entities=getEntitiesOnLine(player,player.getEyePos(),horizontalLook,range);
         if (!entities.isEmpty()){
            double distance=entities.size()>1? entities.get(player.getWorld().random.nextInt(entities.size()-1)).
-                   distanceTo(player):entities.get(0).distanceTo(player)-0.5;
+                   distanceTo(player):entities.get(0).distanceTo(player)-0.1;
            range=Math.min(range,distance<=3?range:distance);
         }
         range=Math.min(15,range)+(!entities.isEmpty()?0.0F:player.getWorld().getRandom().nextInt(10)-4);
         MissileEntity missileEntity = getMissileEntity(player, range, damage,player);
         missileEntity.setYaw(yaw+(!entities.isEmpty()?0.0F:player.getWorld().random.nextInt(40)-19));
-        missileEntity.setPitch(0);
+        missileEntity.setPitch(player.getPitch());
         player.getWorld().spawnEntity(missileEntity);
 
         if (player.getOffHandStack().getItem() instanceof NekoPackageItem nekoPackage) {
             if(nekoPackage.isHaveNekoItem(player.getOffHandStack(), ModItems.EXPOSED_WIRE)){
-                specialAttackWithExportWire(player, range, damage,yaw);
+                specialAttackWithMore(player, range, damage,yaw);
+            }
+            ArrayList<AbstractNekoItem> attackItems=NekoPackageItem.getNekoItems(player.getOffHandStack(),true,3);
+            if (attackItems.get(attackItems.size()-2).equals(ModItems.ZENITH)) {
+                specialAttackWithMore(player, range, damage,yaw);
             }
         }
 
@@ -69,7 +73,7 @@ public class Zenith extends AbstractNekoAttackItem {
         player.getItemCooldownManager().set(player.getOffHandStack().getItem(), cooldown);
     }
 
-    private void specialAttackWithExportWire(PlayerEntity player, double range, double damage,float yaw) {
+    private void specialAttackWithMore(PlayerEntity player, double range, double damage, float yaw) {
         for (int i=-1; i<=1; i+=2) {
             Vec3d look = player.getRotationVec(1.0F);
             Vec3d horizontalLook = new Vec3d(look.x, 0, look.z).normalize();
@@ -81,8 +85,8 @@ public class Zenith extends AbstractNekoAttackItem {
             }
             range=Math.min(15,range)+(!entities.isEmpty()?0.0F:player.getWorld().getRandom().nextInt(10)-4);
             MissileEntity missileEntity = getMissileEntity(player, range, damage,player);
-            missileEntity.setYaw(yaw+(!entities.isEmpty()?0.0F:player.getWorld().random.nextInt(40)-19+20*i));
-            missileEntity.setPitch(0);
+            missileEntity.setYaw(yaw+(!entities.isEmpty()?0.0F:player.getWorld().random.nextInt(40)-19+20*i)+30*i);
+            missileEntity.setPitch(player.getPitch());
             player.getWorld().spawnEntity(missileEntity);
         }
     }
@@ -96,16 +100,17 @@ public class Zenith extends AbstractNekoAttackItem {
             damage=nekoPackage.getStrength(player);
             double attackSpeed=-nekoPackage.getAttackSpeed(player)*5/8+20;
             ArrayList<AbstractNekoItem> attackItems=NekoPackageItem.getNekoItems(player.getOffHandStack(),true,3);
-            if (attackItems.get(attackItems.size()-1).equals(ModItems.BRIMSTONE)) return;
             if (attackItems.get(attackItems.size()-1).equals(ModItems.MISSILE)) {
                 if (missile.getAliveDuration()>61) {
                     if (canExecute(player, missile,(int) attackSpeed)) {
                         specialAttackWithMissile(player, missile, range, damage);
                     }
-
                 }
                 return;
             }
+
+            if (attackItems.get(attackItems.size()-1).equals(ModItems.BRIMSTONE)) return;
+            if (attackItems.get(attackItems.size()-1).equals(ModItems.ZENITH)) return;
         }
         if (canExecute(player, missile, 10)) {
             if (Objects.equals(missile.getRealOwner(), player)) {
@@ -114,7 +119,7 @@ public class Zenith extends AbstractNekoAttackItem {
                 List<LivingEntity> entities=getEntitiesOnLine(missile,missile.getEyePos(),horizontalLook,range);
                 if (!entities.isEmpty()){
                     double distance=entities.size()>1? entities.get(missile.getWorld().random.nextInt(entities.size()-1)).
-                            distanceTo(missile):entities.get(0).distanceTo(missile)-0.5;
+                            distanceTo(missile):entities.get(0).distanceTo(missile)-0.1;
                     range=Math.min(range,distance);
                 }
                 range=Math.min(15,range)+(!entities.isEmpty()?0.0F:player.getWorld().getRandom().nextInt(10)-4);

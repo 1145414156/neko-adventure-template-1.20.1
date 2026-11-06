@@ -46,6 +46,13 @@
       "neko-adventure:attack/short_hook_attack3"
     ]
   },
+  "missile_shoot": {
+    "subtitle": "sounds.neko_adventure.missile_shoot",
+    "sounds": [
+      "neko-adventure:attack/missile_shoot"
+    ]
+  },
+
 
   "skeleton_priest_jewel": {
     "subtitle": "sounds.neko_adventure.skeleton_priest_jewel",

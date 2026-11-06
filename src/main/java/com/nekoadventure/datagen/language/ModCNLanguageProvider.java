@@ -78,6 +78,9 @@ public class ModCNLanguageProvider extends FabricLanguageProvider {
         translationBuilder.add(ModItems.PARRY,"弹反!");
         translationBuilder.add(ModItems.SWIRL,"回旋");
         translationBuilder.add(ModItems.TWIST,"扭曲");
+        translationBuilder.add(ModItems.SINGULARITY,"奇点");
+        translationBuilder.add(ModItems.THIRD_ATTACKS,"三倍攻击");
+        translationBuilder.add(ModItems.MISSILE,"导弹");
         translationBuilder.add(ModItems.BOOMERANG,"回旋镖");
         translationBuilder.add(ModItems.ACCELERATION,"加速度");
         translationBuilder.add(ModItems.DECELERATION,"减速度");
@@ -175,6 +178,7 @@ public class ModCNLanguageProvider extends FabricLanguageProvider {
         translationBuilder.add(ModItems.RESET_SOUL,"重置之魂石");
         translationBuilder.add(ModItems.GET_FIRST_POOL_SOUL,"获取首个物品的魂石");
         translationBuilder.add(ModItems.GET_LAST_POOL_SOUL,"获取末尾物品的魂石");
+        translationBuilder.add(ModItems.GET_FORGE_POOL_SOUL,"获取锻造池的魂石");
 
         //药水效果
         translationBuilder.add(ModStatusEffects.MAZE_CURSE,"迷宫诅咒");
@@ -197,6 +201,8 @@ public class ModCNLanguageProvider extends FabricLanguageProvider {
         translationBuilder.add("sounds.neko_adventure.grand_knight_death","大骑士:死亡");
         translationBuilder.add("sounds.neko_adventure.blade_attack","刀片:触发");
         translationBuilder.add("sounds.neko_adventure.skeleton_priest_jewel","祭司宝石:触发");
+        translationBuilder.add("sounds.neko_adventure.missile_shoot","导弹:发射");
+
 
         //生物
         translationBuilder.add(ModEntities.HUGE_SLIME,"史莱姆(巨无霸款)");

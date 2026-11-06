@@ -51,7 +51,7 @@ public class Acceleration extends AbstractNekoFunctionItem {
     }
 
     @Override
-    public float getCalculateYaw(int t) {
+    public float getCalculateYaw(int t,int maxTime) {
         return 0;
     }
 }

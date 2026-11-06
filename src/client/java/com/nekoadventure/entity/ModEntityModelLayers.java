@@ -8,6 +8,8 @@ public class ModEntityModelLayers {
     //missile
     public static final EntityModelLayer BOOMERANG=
             new EntityModelLayer(new Identifier(NekoAdventure.MOD_ID, "boomerang"), "main");
+    public static final EntityModelLayer MISSILE=
+            new EntityModelLayer(new Identifier(NekoAdventure.MOD_ID, "missile"), "main");
 
     //particle
     public static final EntityModelLayer PARTICLE_TEXT=
@@ -28,6 +30,8 @@ public class ModEntityModelLayers {
             new EntityModelLayer( new Identifier(NekoAdventure.MOD_ID,"shooter"),"main");
     public static final EntityModelLayer SCARAB_BEETLE=
             new EntityModelLayer(new Identifier(NekoAdventure.MOD_ID,"scarab_beetle"),"main");
+    public static final EntityModelLayer JAR_GREMLIN=
+            new EntityModelLayer(new Identifier(NekoAdventure.MOD_ID,"gremlin"),"main");
 
 
 

@@ -124,6 +124,9 @@ public class ModENLanguageProvider extends FabricLanguageProvider {
         translationBuilder.add(ModItems.BATTERY,"battery");
         translationBuilder.add(ModItems.BROKEN_CROWN,"broken_crown");
         translationBuilder.add(ModItems.SANDWORM_FANG,"sandworm_fang");
+        translationBuilder.add(ModItems.SINGULARITY,"singularity");
+        translationBuilder.add(ModItems.THIRD_ATTACKS,"third_attacks");
+        translationBuilder.add(ModItems.MISSILE,"missile");
 
         translationBuilder.add(ModItems.INSTANCE_HEALTH_SOUL,"instance_health_soul");
         translationBuilder.add(ModItems.TP_START_ROOM_SOUL,"tp_start_room_soul");
@@ -144,6 +147,7 @@ public class ModENLanguageProvider extends FabricLanguageProvider {
         translationBuilder.add(ModItems.RESET_SOUL,"reset_soul");
         translationBuilder.add(ModItems.GET_FIRST_POOL_SOUL,"get_first_pool_soul");
         translationBuilder.add(ModItems.GET_LAST_POOL_SOUL,"get_last_pool_soul");
+        translationBuilder.add(ModItems.GET_FORGE_POOL_SOUL,"get_forge_soul");
 
         translationBuilder.add("sounds.neko_adventure.electricity_run_through","electricity_run_through");
         translationBuilder.add("sounds.neko_adventure.blade_attack","blade_attack");

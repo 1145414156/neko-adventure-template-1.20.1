@@ -151,7 +151,6 @@ public class ShortHook extends AbstractNekoAttackItem {
         super.appendTooltip(stack, world, tooltip, context);
         Text moreText=Text.of("主攻击：对面前\"射程\"/2(最多8格)的生物造成一次\"力量\"的伤害并且拉向身前");
         Text moreText1=Text.of("次攻击：弹幕会持续对\"射程\"/2(最多4格)范围中最远的生物造成一次\"力量\"/2的伤害并将该生物拉向身前");
-
         if (ShiftKeyHelper.isShiftDown()) {
             tooltip.add(moreText);
             tooltip.add(moreText1);
