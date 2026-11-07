@@ -51,6 +51,8 @@ public class ModEntityRenderer {
         EntityRendererRegistry.register(ModEntities.JAR_GREMLIN, JarGremlinRenderer::new);
         EntityModelLayerRegistry.registerModelLayer(ModEntityModelLayers.JAR_GREMLIN, JarGremlinEntityModel::getTexturedModelData);
 
+        EntityRendererRegistry.register(ModEntities.COBRA, CobraEntityRenderer::new);
+        EntityModelLayerRegistry.registerModelLayer(ModEntityModelLayers.COBRA, CobraEntityModel::getTexturedModelData);
         //boss
         EntityRendererRegistry.register(ModEntities.HUGE_SLIME, HugeSlimeRenderer::new);
         EntityModelLayerRegistry.registerModelLayer(ModEntityModelLayers.HUGE_SLIME_INNER, HugeSlimeEntityModel::getTexturedModelData);

@@ -42,7 +42,7 @@ public class AttackTypes {
 
     private final AttackType type;
     private Vec3d lastOwnerPos = null;
-     private LivingEntity nearest=null;
+     private LivingEntity markedEntity =null;
     public AttackTypes(AttackType type) {
         this.type = type;
     }
@@ -59,7 +59,7 @@ public class AttackTypes {
             case JOYEUSE -> joyeuseMovement(entity,range,speed);
             case DELAY -> delayMovement(entity, range, speed);
             case BOOMERANG -> boomerangMovement(entity,range,speed);
-            case HOMING -> homingMovement(entity,range,speed);
+            case HOMING -> homingMovement(entity);
             case ELLIPSE -> ellipsoidMovement(entity,range);
             case ZENITH -> zenithMovement(entity, range);
             case MISSILE -> missileMovement(entity,range);
@@ -84,7 +84,7 @@ public class AttackTypes {
         lazyMovement(missile);
     }
 
-    private void homingMovement(MissileEntity entity,double range,double speed) {
+    private void homingMovement(MissileEntity entity) {
         LivingEntity nearest = entity.getWorld().getClosestEntity(
                 LivingEntity.class,
                 TargetPredicate.DEFAULT,
@@ -95,15 +95,13 @@ public class AttackTypes {
         if (nearest != null) {
             entity.teleport(nearest.getX(), nearest.getY(), nearest.getZ());
         }
-        delayMovement(entity,range,speed);
+        lazyMovement(entity);
     }
 
     // ==============================================================
     // 从这里开始就是每个特殊实际运动方法了
 
     private void bulletMovement(MissileEntity entity, double speed) {
-        Vec3d direction = Vec3d.fromPolar(entity.getPitch(), entity.getYaw()).normalize();
-        Vec3d desiredVelocity = direction.multiply(speed);
         if (entity.getRealOwner() instanceof PlayerEntity player){
             float initialYaw= entity.getInitialYaw();
             if (player.getOffHandStack().getItem() instanceof NekoPackageItem){
@@ -125,21 +123,21 @@ public class AttackTypes {
 
             }
         }
-        entity.addVelocity(
-                (desiredVelocity.x - entity.getVelocity().x) * 0.5,
-                (desiredVelocity.y - entity.getVelocity().y) * 0.5,
-                (desiredVelocity.z - entity.getVelocity().z) * 0.5
-        );
-
+        Vec3d direction = Vec3d.fromPolar(entity.getPitch(), entity.getYaw()).normalize();
+        Vec3d desiredVelocity = direction.multiply(speed);
+        Vec3d velocityDelta = desiredVelocity.subtract(entity.getVelocity());
+        entity.addVelocity(velocityDelta.x, velocityDelta.y, velocityDelta.z);
     }
 
     private void delayMovement(MissileEntity entity, double range, double speed) {
         lazyMovement(entity);
-        if (entity.getAliveDuration() == entity.getTime() / 2) {
+        int aliveDuration = entity.getAliveDuration();
+        int halfTime = entity.getTime() / 2;
+        if (aliveDuration == halfTime) {
             if (entity.getOwner() != null) {
-                nearest = findNearestTarget(entity, range);
-                if (nearest != null) {
-                    Vec3d direction = nearest.getEyePos().subtract(entity.getPos()).normalize();
+                markedEntity = findNearestTarget(entity, range);
+                if (markedEntity != null) {
+                    Vec3d direction = markedEntity.getEyePos().subtract(entity.getPos()).normalize();
                     double yaw = Math.toDegrees(Math.atan2(-direction.x, direction.z));
                     double pitch = Math.toDegrees(Math.atan2(-direction.y,
                             Math.sqrt(direction.x * direction.x + direction.z * direction.z)));
@@ -151,15 +149,12 @@ public class AttackTypes {
                 }
             }
         }
-        else if (entity.getAliveDuration() == (entity.getTime() / 2) + 1) {
-            if (nearest != null) {
-                Vec3d direction = nearest.getEyePos().subtract(entity.getPos()).normalize();
-                Vec3d desiredVelocity = direction.multiply(speed*5);
-                entity.addVelocity(
-                        (desiredVelocity.x - entity.getVelocity().x) * 0.5,
-                        (desiredVelocity.y - entity.getVelocity().y) * 0.5,
-                        (desiredVelocity.z - entity.getVelocity().z) * 0.5
-                );
+        else if (aliveDuration >= halfTime + 1) {
+            if (markedEntity != null) {
+                Vec3d direction = Vec3d.fromPolar(entity.getPitch(), entity.getYaw()).normalize();
+                Vec3d desiredVelocity = direction.multiply(speed * 2.5);
+                Vec3d velocityDelta = desiredVelocity.subtract(entity.getVelocity());
+                entity.addVelocity(velocityDelta.x, velocityDelta.y, velocityDelta.z);
             }
         }
     }
@@ -243,7 +238,12 @@ public class AttackTypes {
     private void missileMovement(MissileEntity entity, double range) {
         int t = entity.getAliveDuration();
         if (t==0){
-            nearest = findRandomTarget(entity, range);
+            markedEntity = findNearestTarget(entity, range);
+            if (markedEntity != null) {
+                if (markedEntity.distanceTo(entity.getOwner())>=range/2){
+                    markedEntity=findRandomTarget(entity, range);
+                }
+            }
         }
         else if (t <= 40) {
             entity.addVelocity(0,  0.5, 0);
@@ -256,8 +256,8 @@ public class AttackTypes {
             }
         }
         else if (t == 50) {
-            if (nearest != null) {
-                entity.setPosition(nearest.getX(), nearest.getY() + 20.0, nearest.getZ());
+            if (markedEntity != null) {
+                entity.setPosition(markedEntity.getX(), markedEntity.getY() + 20.0, markedEntity.getZ());
                 entity.setVelocity(Vec3d.ZERO);
             }
             else {
@@ -265,8 +265,8 @@ public class AttackTypes {
             }
         }
         else if (t <= 60) {
-            if (nearest != null && nearest.isAlive()) {
-                Vec3d targetPos = new Vec3d(nearest.getX(), nearest.getY()+1, nearest.getZ());
+            if (markedEntity != null && markedEntity.isAlive()) {
+                Vec3d targetPos = new Vec3d(markedEntity.getX(), markedEntity.getY()+1, markedEntity.getZ());
                 Vec3d currentPos = entity.getPos().add(0,-1,0);
                 Vec3d diff = targetPos.subtract(currentPos);
                 double dist = diff.length();

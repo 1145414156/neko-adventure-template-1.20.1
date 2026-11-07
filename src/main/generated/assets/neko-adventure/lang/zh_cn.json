@@ -152,6 +152,7 @@
   "item.neko-adventure.tactical_vest": "战术背心",
   "item.neko-adventure.the_fourth_eye": "突变四眼",
   "item.neko-adventure.the_third_eye": "第三只眼",
+  "item.neko-adventure.third_attacks": "三倍攻击",
   "item.neko-adventure.toast": "吐司",
   "item.neko-adventure.tomato": "番茄",
   "item.neko-adventure.tp_start_room_soul": "重生之魂石",
@@ -186,6 +187,7 @@
   "sounds.neko_adventure.grand_knight_sword_attack": "大骑士:剑击",
   "sounds.neko_adventure.grand_knight_walk": "大骑士:行走",
   "sounds.neko_adventure.lance_attack": "长枪:刺中",
+  "sounds.neko_adventure.missile_shoot": "导弹:发射",
   "sounds.neko_adventure.parry_attack": "格挡:成功",
   "sounds.neko_adventure.short_hook_attack": "短勾:命中",
   "sounds.neko_adventure.skeleton_priest_jewel": "祭司宝石:触发"
