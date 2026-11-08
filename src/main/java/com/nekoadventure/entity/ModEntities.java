@@ -98,6 +98,21 @@ public class ModEntities  {
                     JarGremlinEntity::new)
                     .dimensions(EntityDimensions.fixed(0.5f,1.0f)).build()
     );
+    public static final EntityType<JarGremlinHeadEntity> JAR_GREMLIN_HEAD =
+            Registry.register(Registries.ENTITY_TYPE,
+                    new Identifier(NekoAdventure.MOD_ID, "jar_gremlin_head"),
+                    FabricEntityTypeBuilder.create(SpawnGroup.MONSTER, JarGremlinHeadEntity::new)
+                            .dimensions(EntityDimensions.fixed(0.5f, 0.5f))
+                            .disableSummon()
+                            .build());
+    public static final EntityType<JarGremlinBodyEntity> JAR_GREMLIN_BODY =
+            Registry.register(Registries.ENTITY_TYPE,
+                    new Identifier(NekoAdventure.MOD_ID, "jar_gremlin_body"),
+                    FabricEntityTypeBuilder.create(SpawnGroup.MONSTER, JarGremlinBodyEntity::new)
+                            .dimensions(EntityDimensions.fixed(0.5f, 0.5f))
+                            .disableSummon()
+                            .build());
+
     public static final EntityType<CobraEntity> COBRA =Registry.register(
             Registries.ENTITY_TYPE,
             new Identifier(NekoAdventure.MOD_ID,"cobra"),
@@ -140,6 +155,8 @@ public class ModEntities  {
         FabricDefaultAttributeRegistry.register(ModEntities.SCARAB_BEETLE,ScarabBeetleEntity.createScarabBeetleAttributes());
         FabricDefaultAttributeRegistry.register(ModEntities.JAR_GREMLIN,JarGremlinEntity.createAttributes());
         FabricDefaultAttributeRegistry.register(ModEntities.COBRA,CobraEntity.createAttributes());
+        FabricDefaultAttributeRegistry.register(ModEntities.JAR_GREMLIN_HEAD,JarGremlinHeadEntity.createAttributes());
+        FabricDefaultAttributeRegistry.register(ModEntities.JAR_GREMLIN_BODY,JarGremlinBodyEntity.createAttributes());
 
         FabricDefaultAttributeRegistry.register(ModEntities.HUGE_SLIME,HugeSlimeEntity.createHugeSlimeAttributes());
         FabricDefaultAttributeRegistry.register(ModEntities.PRIEST_SKELETON,PriestSkeletonEntity.createPriestSkeletonAttributes());

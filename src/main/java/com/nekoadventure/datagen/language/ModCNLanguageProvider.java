@@ -220,5 +220,6 @@ public class ModCNLanguageProvider extends FabricLanguageProvider {
         translationBuilder.add("category.neko-adventure","猫的旅途");
         translationBuilder.add("key.neko-adventure.reset_items","立即刷新属性");
         translationBuilder.add("key.neko-adventure.main_attack_type","应用主攻击方式");
+        translationBuilder.add("key.neko-adventure.show_item_pool","查看所属道具池");
     }
 }

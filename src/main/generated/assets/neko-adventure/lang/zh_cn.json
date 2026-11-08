@@ -173,6 +173,7 @@
   "itemgroup.soul_item_group": "猫的旅途：全部魂石",
   "key.neko-adventure.main_attack_type": "应用主攻击方式",
   "key.neko-adventure.reset_items": "立即刷新属性",
+  "key.neko-adventure.show_item_pool": "查看所属道具池",
   "neko-adventure:attack/poker_extract": "扑克牌:抽取",
   "sounds.neko_adventure.blade_attack": "刀片:触发",
   "sounds.neko_adventure.brimstone_attack": "硫磺火:喷射",

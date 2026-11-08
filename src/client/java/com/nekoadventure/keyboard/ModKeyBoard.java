@@ -10,11 +10,13 @@ import net.minecraft.client.util.InputUtil;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.text.Text;
 import org.lwjgl.glfw.GLFW;
 
 public class ModKeyBoard {
     private static KeyBinding RESET_NEKO_ITEMS_KEY;
     private static KeyBinding MAIN_ATTACK_TYPE_KEY;
+    private static KeyBinding SHOW_ITEM_POOL_KEY;
 
     public static void register() {
 
@@ -32,6 +34,13 @@ public class ModKeyBoard {
                 "category.neko-adventure"
         ));
 
+        SHOW_ITEM_POOL_KEY = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+                "key.neko-adventure.show_item_pool",
+                InputUtil.Type.KEYSYM,
+                GLFW.GLFW_KEY_LEFT_ALT,
+                "category.neko-adventure"
+        ));
+
         ClientTickEvents.START_CLIENT_TICK.register(client -> {
             if (RESET_NEKO_ITEMS_KEY.wasPressed()) {
                 resetNekoItems(client);
@@ -40,6 +49,22 @@ public class ModKeyBoard {
                 applyMainAttackType(client);
             }
         });
+    }
+
+    public static boolean isShowItemPoolKeyDown() {
+        MinecraftClient client = MinecraftClient.getInstance();
+        if (client.getWindow() == null) {
+            return false;
+        }
+        InputUtil.Key boundKey = KeyBindingHelper.getBoundKeyOf(SHOW_ITEM_POOL_KEY);
+        if (boundKey.getCategory() == InputUtil.Type.MOUSE) {
+            return GLFW.glfwGetMouseButton(client.getWindow().getHandle(), boundKey.getCode()) == GLFW.GLFW_PRESS;
+        }
+        return InputUtil.isKeyPressed(client.getWindow().getHandle(), boundKey.getCode());
+    }
+
+    public static Text getShowItemPoolKeyName() {
+        return SHOW_ITEM_POOL_KEY.getBoundKeyLocalizedText();
     }
 
     private static void resetNekoItems(MinecraftClient client) {

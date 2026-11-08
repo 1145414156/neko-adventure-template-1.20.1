@@ -273,8 +273,6 @@ public class ModItems {
             new RestoreSoul(new Item.Settings().rarity(Rarity.RARE),3));
     public static final FrenzySoul FRENZY_SOUL=register("frenzy_soul",
             new FrenzySoul(new Item.Settings().rarity(Rarity.RARE),4));
-    public static final GetCentrosymmetrySoul GET_CENTROSYMMETRY_SOUL=register("get_centrosymmetry_soul",
-            new GetCentrosymmetrySoul(new Item.Settings().rarity(Rarity.RARE),2));
     public static final GetForgePoolSoul GET_FORGE_POOL_SOUL=register("get_forge_pool_soul",
             new GetForgePoolSoul(new Item.Settings().rarity(Rarity.RARE),3));
     public static final GetTreasurePoolSoul GET_TREASURE_POOL_SOUL =register("get_treasure_pool_soul",
@@ -283,20 +281,22 @@ public class ModItems {
             new GetFoodPoolSoul(new Item.Settings().rarity(Rarity.RARE),1));
     public static final GetBossPoolSoul GET_BOSS_POOL_SOUL=register("get_boss_pool_soul",
             new GetBossPoolSoul(new Item.Settings().rarity(Rarity.RARE),1));
-    public static final GetFirstPoolSoul GET_FIRST_POOL_SOUL=register("get_first_pool_soul",
-            new GetFirstPoolSoul(new Item.Settings().rarity(Rarity.RARE),1));
-    public static final GetLastPoolSoul GET_LAST_POOL_SOUL=register("get_last_pool_soul",
-            new GetLastPoolSoul(new Item.Settings().rarity(Rarity.RARE),1));
     public static final GetConcealPoolSoul GET_CONCEAL_POOL_SOUL=register("get_conceal_pool_soul",
             new GetConcealPoolSoul(new Item.Settings().rarity(Rarity.RARE),4));
     public static final GetShopPoolSoul GET_SHOP_POOL_SOUL=register("get_shop_pool_soul",
             new GetShopPoolSoul(new Item.Settings().rarity(Rarity.RARE),1));
+    public static final GetFirstPoolSoul GET_FIRST_POOL_SOUL=register("get_first_pool_soul",
+            new GetFirstPoolSoul(new Item.Settings().rarity(Rarity.RARE),1));
+    public static final GetLastPoolSoul GET_LAST_POOL_SOUL=register("get_last_pool_soul",
+            new GetLastPoolSoul(new Item.Settings().rarity(Rarity.RARE),1));
     public static final GetThirdPoolSoul GET_THIRD_POOL_SOUL=register("get_third_pool_soul",
             new GetThirdPoolSoul(new Item.Settings().rarity(Rarity.RARE),3));
     public static final GetApartPoolSoul GET_APART_POOL_SOUL=register("get_apart_pool_soul",
             new GetApartPoolSoul(new Item.Settings().rarity(Rarity.RARE),2));
     public static final GetChaoPoolSoul GET_CHAO_POOL_SOUL=register("get_chao_pool_soul",
             new GetChaoPoolSoul(new Item.Settings().rarity(Rarity.RARE),1));
+    public static final GetCentrosymmetrySoul GET_CENTROSYMMETRY_SOUL=register("get_centrosymmetry_soul",
+            new GetCentrosymmetrySoul(new Item.Settings().rarity(Rarity.RARE),2));
 
 
     //传送物品

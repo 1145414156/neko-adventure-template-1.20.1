@@ -188,5 +188,6 @@ public class ModENLanguageProvider extends FabricLanguageProvider {
         translationBuilder.add(ModEntities.PRIEST_SKELETON,"priest_skeleton");
 
         translationBuilder.add("key.neko-adventure.main_attack_type","Apply Main Attack");
+        translationBuilder.add("key.neko-adventure.show_item_pool","Show Item Pools");
     }
 }

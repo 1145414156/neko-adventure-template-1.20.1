@@ -275,6 +275,41 @@ public class JarGremlinEntity extends HostileEntity implements Monster {
         missile.setPitch((float) pitch);
         world.spawnEntity(missile);
     }
+
+    @Override
+    public void onDeath(DamageSource damageSource) {
+        super.onDeath(damageSource);
+        if (this.getWorld().isClient) {
+            return;
+        }
+        ServerWorld serverWorld = (ServerWorld) this.getWorld();
+
+        JarGremlinBodyEntity body = new JarGremlinBodyEntity(ModEntities.JAR_GREMLIN_BODY, serverWorld);
+        body.refreshPositionAndAngles(this.getX(), this.getY(), this.getZ(), this.getBodyYaw(), 0.0F);
+        serverWorld.spawnEntity(body);
+
+        JarGremlinHeadEntity head = new JarGremlinHeadEntity(ModEntities.JAR_GREMLIN_HEAD, serverWorld);
+        head.refreshPositionAndAngles(this.getX(), this.getY() + 1.0, this.getZ(), this.getYaw(), 0.0F);
+        serverWorld.spawnEntity(head);
+    }
+
+    @Override
+    protected void drop(DamageSource source) {
+    }
+
+    @Override
+    protected SoundEvent getDeathSound() {
+        return null;
+    }
+
+    @Override
+    public void handleStatus(byte status) {
+        if (status == 60) {
+            return;
+        }
+        super.handleStatus(status);
+    }
+
     @Override
     protected SoundEvent getAmbientSound() {
         return SoundEvents.ENTITY_SKELETON_AMBIENT;
@@ -283,11 +318,6 @@ public class JarGremlinEntity extends HostileEntity implements Monster {
     @Override
     protected SoundEvent getHurtSound(DamageSource source) {
         return SoundEvents.ENTITY_SKELETON_HURT;
-    }
-
-    @Override
-    protected SoundEvent getDeathSound() {
-        return SoundEvents.ENTITY_SKELETON_DEATH;
     }
 
     @Override

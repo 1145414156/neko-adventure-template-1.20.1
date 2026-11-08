@@ -51,6 +51,12 @@ public class ModEntityRenderer {
         EntityRendererRegistry.register(ModEntities.JAR_GREMLIN, JarGremlinRenderer::new);
         EntityModelLayerRegistry.registerModelLayer(ModEntityModelLayers.JAR_GREMLIN, JarGremlinEntityModel::getTexturedModelData);
 
+        EntityRendererRegistry.register(ModEntities.JAR_GREMLIN_HEAD, JarGremlinHeadRenderer::new);
+        EntityModelLayerRegistry.registerModelLayer(ModEntityModelLayers.JAR_GREMLIN_HEAD, JarGremlinHeadEntityModel::getTexturedModelData);
+
+        EntityRendererRegistry.register(ModEntities.JAR_GREMLIN_BODY, JarGremlinBodyRenderer::new);
+        EntityModelLayerRegistry.registerModelLayer(ModEntityModelLayers.JAR_GREMLIN_BODY, JarGremlinBodyEntityModel::getTexturedModelData);
+
         EntityRendererRegistry.register(ModEntities.COBRA, CobraEntityRenderer::new);
         EntityModelLayerRegistry.registerModelLayer(ModEntityModelLayers.COBRA, CobraEntityModel::getTexturedModelData);
         //boss

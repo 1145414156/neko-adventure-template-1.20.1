@@ -43,7 +43,7 @@ public abstract class AbstractSoulPoolItem extends AbstractSoulItem {
     public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
         super.appendTooltip(stack, world, tooltip, context);
         if (ShiftKeyHelper.isShiftDown()) {
-            tooltip.add(Text.of("一种特殊的魂石，可以筛选“道具原胚”的道具池，如果使用时按下shift则会反转道具池"));
+            tooltip.add(Text.of("用于筛选物品“道具原胚”储存的道具池的魂石，如果使用时按下shift则会反转筛选条件(如果可以)"));
         }
     }
 }

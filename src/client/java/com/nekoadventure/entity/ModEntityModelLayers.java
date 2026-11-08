@@ -32,6 +32,10 @@ public class ModEntityModelLayers {
             new EntityModelLayer(new Identifier(NekoAdventure.MOD_ID,"scarab_beetle"),"main");
     public static final EntityModelLayer JAR_GREMLIN=
             new EntityModelLayer(new Identifier(NekoAdventure.MOD_ID,"gremlin"),"main");
+    public static final EntityModelLayer JAR_GREMLIN_HEAD=
+            new EntityModelLayer(new Identifier(NekoAdventure.MOD_ID,"gremlin_head"),"main");
+    public static final EntityModelLayer JAR_GREMLIN_BODY=
+            new EntityModelLayer(new Identifier(NekoAdventure.MOD_ID,"gremlin_body"),"main");
     public static final EntityModelLayer COBRA=
             new EntityModelLayer(new Identifier(NekoAdventure.MOD_ID,"cobra"),"main");
 

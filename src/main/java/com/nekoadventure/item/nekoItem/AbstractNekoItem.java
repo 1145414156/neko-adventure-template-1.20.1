@@ -57,11 +57,11 @@ public abstract class AbstractNekoItem extends Item {
     public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
         super.appendTooltip(stack, world, tooltip, context);
         //按住Shift才显示道具描述，没按住时只显示提示
+        //按另外一个键显示道具池的是在client的ModKeyBoard类和Client主类里面
         if (!ShiftKeyHelper.isShiftDown()) {
             tooltip.add(Text.of("按住Shift显示描述").copy().formatted(Formatting.GRAY));
             return;
         }
-        //这里这一块是为了道具描述只显示有意义的数值
         String textHealth = "";
         String textStrength = "";
         String textSpeed = "";
@@ -78,7 +78,6 @@ public abstract class AbstractNekoItem extends Item {
             if (attackRange!=0){if (attackRange>0){textAttackRange=" 射程"+"+"+attackRange;} else {textAttackRange=" 射程"+attackRange;}}
             if (attackMultiplier!=0){if (attackMultiplier>0){textAttackMultiplier=" 攻击乘区"+"+"+attackMultiplier;} else {textAttackMultiplier=" 攻击乘区"+attackMultiplier;}}
             if (attackSpeedMultiplier!=0){if (attackSpeedMultiplier>0){textAttackSpeedMultiplier=" 攻速乘区"+"+"+attackSpeedMultiplier;} else {textAttackSpeedMultiplier=" 攻速乘区"+attackSpeedMultiplier;}}
-
             text=Text.of(textHealth+textSpeed+
                     textStrength+textAttackRange+textAttackSpeed+
                     textAttackMultiplier+textAttackSpeedMultiplier);
