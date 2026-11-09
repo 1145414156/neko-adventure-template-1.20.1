@@ -84,14 +84,14 @@ public class MissileEntityRenderer extends EntityRenderer<MissileEntity> {
             }
             else {
                 Matrix3f baseNormal = new Matrix3f(matrices.peek().getNormalMatrix());
-                int duration=entity.getAliveDuration();
+                int duration=entity.age;
                 int time=entity.getTime();
                 float progress = (float) duration / Math.max(1, time);
                 float eased = (float) Math.pow(progress,10);
                 Vec3d look = entity.getRotationVec(tickDelta);
                 float uMid = 0.999f;
                 float inner = 0.6f * (1.0f - eased);
-                int t= entity.getAliveDuration() %5/2;
+                int t= entity.age %5/2;
                 Identifier texture=new Identifier(NekoAdventure.MOD_ID, "textures/entity/missile/brimstone"+t+".png");
                 if (entity.getFlag()==1){
                    texture  = new Identifier(NekoAdventure.MOD_ID, "textures/entity/missile/brimstone_start"+t+".png");

@@ -125,8 +125,8 @@ public class GrandKnightEntity extends HostileEntity implements Monster {
 
     public static DefaultAttributeContainer.Builder createGrandKnightAttributes() {
         return HostileEntity.createHostileAttributes()
-                .add(EntityAttributes.GENERIC_MAX_HEALTH, 1000.0)
-                .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.26D)
+                .add(EntityAttributes.GENERIC_MAX_HEALTH, 1200.0)
+                .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.35D)
                 .add(EntityAttributes.GENERIC_ARMOR, 10.0D)
                 .add(EntityAttributes.GENERIC_ARMOR_TOUGHNESS, 10.0D)
                 .add(EntityAttributes.GENERIC_ATTACK_DAMAGE, 12.0D)
@@ -171,7 +171,7 @@ public class GrandKnightEntity extends HostileEntity implements Monster {
             }
         }
         if ((skillStage != 0 &&skill!=1&&skill!=4&&skill!=7)||isChangingStage||isSummoning) {
-            this.setVelocity(0,0, 0);
+            this.setVelocity(0,this.getVelocity().y, 0);
         }
         this.applyBulletEffect();
         this.changeStage();
@@ -454,7 +454,7 @@ public class GrandKnightEntity extends HostileEntity implements Monster {
         if (!bullets.isEmpty()){
             for (MissileEntity bullet:bullets){
                 //技能0
-                if (bullet.getFlag()==0&&bullet.getAliveDuration()==bullet.getTime()/2){
+                if (bullet.getFlag()==0&&bullet.age==bullet.getTime()/2){
                         for (int i = 0; i < 2; i++) {
                             MissileEntity missile = getMissileEntity(this, 32, 200);
                             missile.setPitch(0);
@@ -464,7 +464,7 @@ public class GrandKnightEntity extends HostileEntity implements Monster {
                         }
                 }
                 //技能4
-                if (bullet.getFlag()==4&&bullet.getAliveDuration()%5==0){
+                if (bullet.getFlag()==4&&bullet.age%5==0){
                         MissileEntity missile = getMissileEntity(this, 32, 200);
                         missile.setUuid(UUID.randomUUID());
                         if (this.getTarget() != null) {
@@ -477,7 +477,7 @@ public class GrandKnightEntity extends HostileEntity implements Monster {
                         }
                 }
                 //技能5
-                if (bullet.getFlag()==5&&bullet.getAliveDuration()%40==0&&bullet.getAliveDuration()>bullet.getTime()/2){
+                if (bullet.getFlag()==5&&bullet.age%40==0&&bullet.age>bullet.getTime()/2){
                     if (this.getTarget() != null) {
                         for (int i=0;i<8;i++) {
                             MissileEntity missile = getMissileEntity(this, 32, 200);

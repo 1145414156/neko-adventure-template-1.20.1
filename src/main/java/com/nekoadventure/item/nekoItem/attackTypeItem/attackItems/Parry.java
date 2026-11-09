@@ -50,7 +50,7 @@ public class Parry extends AbstractNekoAttackItem {
                 missile.move(MovementType.SELF, missile.getVelocity());
                 missile.setYaw(missile.getYaw() + 180);
                 missile.setPitch(missile.getPitch() * -1);
-                missile.setAliveDuration(0);
+                missile.resetAge();
             }
             player.getWorld().playSound(null, player.getBlockPos(), ModSoundEvents.PARRY_ATTACK,
                     SoundCategory.PLAYERS, 1.0F, 0.9F);
@@ -85,7 +85,7 @@ public class Parry extends AbstractNekoAttackItem {
                 missileEntity.move(MovementType.SELF, missileEntity.getVelocity());
                 missileEntity.setYaw(missileEntity.getYaw() + 180);
                 missileEntity.setPitch(missileEntity.getPitch() * -1);
-                missileEntity.setAliveDuration(0);
+                missileEntity.resetAge();
                 isParried = true;
             }
         if (isParried) {

@@ -43,7 +43,7 @@ public class Joyeuse extends AbstractNekoAttackItem {
                 .getEntitiesByClass(
                         MissileEntity.class,
                         player.getBoundingBox().expand(2.0),
-                        e -> e.getAliveDuration() <= e.getTime() / 2
+                        e -> e.age <= e.getTime() / 2
                                 && e.getOwner() != null
                                 && e.getOwner().equals(player)
                 )

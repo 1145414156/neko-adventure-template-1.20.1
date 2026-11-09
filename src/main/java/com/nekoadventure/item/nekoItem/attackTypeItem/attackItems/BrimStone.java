@@ -109,7 +109,8 @@ public class BrimStone extends AbstractNekoAttackItem {
             ArrayList<AbstractNekoItem> attackItems=NekoPackageItem.getNekoItems(player.getOffHandStack(),true,3);
             if (attackItems.get(attackItems.size()-1).equals(ModItems.BRIMSTONE)) return;
             if (attackItems.get(attackItems.size()-1).equals(ModItems.MISSILE)) {
-                if (missile.getAliveDuration()==62&&brimStones.size()<=12) {
+                // changeOffAttackType 在 tick 前段执行，age 已自增，等价于旧 aliveDuration == 62
+                if (missile.age == 63&&brimStones.size()<=12) {
                     specialAttackWithMissile(player, missile, world, damage);
                 }
                 return;

@@ -1,6 +1,7 @@
 package com.nekoadventure.item.other;
 
 import com.nekoadventure.block.specialroomblock.AbstractRoomBlock;
+import com.nekoadventure.client.ShowItemPoolKeyHelper;
 import com.nekoadventure.client.ShiftKeyHelper;
 import com.nekoadventure.item.nekoItem.AbstractNekoItem;
 import com.nekoadventure.item.soulItem.AbstractSoulPoolItem;
@@ -82,7 +83,6 @@ public class PropPrototypeItem extends Item {
             return TypedActionResult.success(stack);
         }
 
-        // 已储存道具池：副手为魂石池道具时进行过滤（取交集），否则直接抽取
         ItemStack offhand = player.getOffHandStack();
         if (offhand.getItem() instanceof AbstractSoulPoolItem soulPoolItem) {
             List<Item> filtered = filterPoolBySoul(pool, soulPoolItem,player);
@@ -190,7 +190,10 @@ public class PropPrototypeItem extends Item {
         } else {
             tooltip.add(Text.literal("已储存道具池：" + poolSize + " 个道具，副手为空的时候按下右键可随机提取").formatted(Formatting.GOLD));
             if (!ShiftKeyHelper.isShiftDown()) {
-                tooltip.add(Text.literal("按下Shift键了解储存的道具").formatted(Formatting.GRAY));
+                tooltip.add(Text.literal("按下Shift键简单了解储存的道具").formatted(Formatting.GRAY));
+                tooltip.add(Text.literal("按下").formatted(Formatting.GRAY)
+                        .append(ShowItemPoolKeyHelper.getKeyName())
+                        .append(Text.literal("显示完整的道具池").formatted(Formatting.GRAY)));
             }
             else {
                 tooltip.add(Text.literal("尝试将某些特殊魂石放在副手并按下右键来改变道具池吧").formatted(Formatting.YELLOW));

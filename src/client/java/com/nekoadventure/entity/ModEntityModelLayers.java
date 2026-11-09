@@ -38,6 +38,8 @@ public class ModEntityModelLayers {
             new EntityModelLayer(new Identifier(NekoAdventure.MOD_ID,"gremlin_body"),"main");
     public static final EntityModelLayer COBRA=
             new EntityModelLayer(new Identifier(NekoAdventure.MOD_ID,"cobra"),"main");
+    public static final EntityModelLayer CHEST_MIMIC=
+            new EntityModelLayer(new Identifier(NekoAdventure.MOD_ID,"chest_mimic"),"main");
 
 
 

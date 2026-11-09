@@ -89,7 +89,7 @@ public class PriestSkeletonEntity extends HostileEntity implements Monster {
     public static DefaultAttributeContainer.Builder createPriestSkeletonAttributes() {
         return HostileEntity.createHostileAttributes()
                 .add(EntityAttributes.GENERIC_MAX_HEALTH, 200.0D)
-                .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.3D)
+                .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.35D)
                 .add(EntityAttributes.GENERIC_ARMOR, 8.0D)
                 .add(EntityAttributes.GENERIC_ARMOR_TOUGHNESS, 4.0D)
                 .add(EntityAttributes.GENERIC_ATTACK_DAMAGE, 8.0D)

@@ -59,6 +59,11 @@ public class ModEntityRenderer {
 
         EntityRendererRegistry.register(ModEntities.COBRA, CobraEntityRenderer::new);
         EntityModelLayerRegistry.registerModelLayer(ModEntityModelLayers.COBRA, CobraEntityModel::getTexturedModelData);
+
+        EntityRendererRegistry.register(ModEntities.CHEST_MIMIC, ChestMimicEntityRenderer::new);
+        EntityModelLayerRegistry.registerModelLayer(ModEntityModelLayers.CHEST_MIMIC, ChestMimicEntityModel::getTexturedModelData);
+
+        EntityRendererRegistry.register(ModEntities.COIN_MONSTER, CoinMonsterEntityRenderer::new);
         //boss
         EntityRendererRegistry.register(ModEntities.HUGE_SLIME, HugeSlimeRenderer::new);
         EntityModelLayerRegistry.registerModelLayer(ModEntityModelLayers.HUGE_SLIME_INNER, HugeSlimeEntityModel::getTexturedModelData);

@@ -67,7 +67,7 @@ public class Missile extends AbstractNekoAttackItem {
         if (player.getOffHandStack().getItem() instanceof NekoPackageItem){
             ArrayList<AbstractNekoItem> attackItems=NekoPackageItem.getNekoItems(player.getOffHandStack(),true,3);
             if (attackItems.get(attackItems.size()-1).equals(ModItems.SINGULARITY)) {
-                if (missileEntity.getAliveDuration()<missileEntity.getTime()-1)return;
+                if (missileEntity.age < missileEntity.getTime())return;
             }
         }
 
@@ -83,7 +83,8 @@ public class Missile extends AbstractNekoAttackItem {
                 Math.min(4.0F,(float) missileEntity.getDamage()/50),
                 World.ExplosionSourceType.NONE
         );
-        missileEntity.setAliveDuration(missileEntity.getTime()-1);
+        // age 已自增，本 tick 结束即达到寿命上限而死亡
+        missileEntity.age = missileEntity.getTime();
     }
 
 

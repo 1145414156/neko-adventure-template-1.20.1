@@ -6,6 +6,7 @@ import com.nekoadventure.block.blockentity.ItemBaseBlockEntityRenderer;
 import com.nekoadventure.block.blockentity.ModBlockEntityTypes;
 import com.nekoadventure.block.blockentity.RerollFurnaceBlockEntityRenderer;
 import com.nekoadventure.block.blockentity.ResetFurnaceBlockEntityRenderer;
+import com.nekoadventure.client.ShowItemPoolKeyHelper;
 import com.nekoadventure.client.ShiftKeyHelper;
 import com.nekoadventure.entity.ModEntityRenderer;
 import com.nekoadventure.item.nekoItem.AbstractNekoItem;
@@ -22,6 +23,7 @@ import com.nekoadventure.other.itemApart.SpawnRandomNekoItems;
 import com.nekoadventure.particle.ModClientParticle;
 import com.nekoadventure.sound.BossMusicHandler;
 import com.nekoadventure.ui.NekoPackageScreen;
+import com.nekoadventure.ui.PropPrototypePoolScreen;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback;
@@ -65,12 +67,13 @@ public class NekoAdventureClient implements ClientModInitializer {
 		HudRenderCallback.EVENT.register(new NekoPackageScreen());
 
 		ModKeyBoard.register();
+		ShowItemPoolKeyHelper.setKeyNameSupplier(ModKeyBoard::getShowItemPoolKeyName);
 
 		ItemTooltipCallback.EVENT.register((stack, context, lines) -> {
 			if (!(stack.getItem() instanceof AbstractNekoItem)) {
 				return;
 			}
-			if (ModKeyBoard.isShowItemPoolKeyDown()) {
+			if (ModKeyBoard.isShowItemPoolKeyDown() || PropPrototypePoolScreen.isShowing()) {
 				appendItemPoolTooltip(stack, lines);
 			} else {
 				lines.add(Text.literal("按住").formatted(Formatting.DARK_GRAY)

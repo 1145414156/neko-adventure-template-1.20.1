@@ -51,7 +51,7 @@ public final class ZenithSlashRenderer {
         double omega = 2.0 * Math.PI / time;
         // 左右剑共用同一倾斜平面，仅短轴方向镜像，与运动端约定一致
         double lateralSign = entity.getFlag() < 11 ? -1.0 : 1.0;
-        int alive = entity.getAliveDuration();
+        int alive = entity.age;
         double baseYaw = Math.toRadians(entity.getInitialYaw());
         double pitchRad = Math.toRadians(entity.getInitialPitch());
         Vec3d forward = new Vec3d(-Math.sin(baseYaw) * Math.cos(pitchRad), -Math.sin(pitchRad),

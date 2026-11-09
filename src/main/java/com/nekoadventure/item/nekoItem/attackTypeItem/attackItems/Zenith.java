@@ -101,7 +101,8 @@ public class Zenith extends AbstractNekoAttackItem {
             double attackSpeed=-nekoPackage.getAttackSpeed(player)*5/8+20;
             ArrayList<AbstractNekoItem> attackItems=NekoPackageItem.getNekoItems(player.getOffHandStack(),true,3);
             if (attackItems.get(attackItems.size()-1).equals(ModItems.MISSILE)) {
-                if (missile.getAliveDuration()>61) {
+                // 与旧 aliveDuration 对齐：此处 age 已自增
+                if (missile.age > 62) {
                     if (canExecute(player, missile,(int) attackSpeed)) {
                         specialAttackWithMissile(player, missile, range, damage);
                     }

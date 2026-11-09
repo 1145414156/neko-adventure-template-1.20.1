@@ -51,6 +51,8 @@ public class AttackTypes {
         return type;
     }
 
+    // 注意：本方法在 MissileEntity.tick 中于 super.tick 之后调用，此时 age 已自增，
+    // 需要 age - 1 才能与旧的存活时长语义保持一致
     public void executeMovement(MissileEntity entity,double range,double speed) {
         switch (type) {
             case BULLET -> bulletMovement(entity, speed);
@@ -109,10 +111,11 @@ public class AttackTypes {
                         true, 0);
                 int count=0;
                 float addYaw=initialYaw;
+                int alive = entity.age - 1;
                 for(int l=attackItems.size()-1;l>=0;l--){
                     AbstractNekoItem attackItem=attackItems.get(l);
-                    if (attackItem.getCalculateYaw(entity.getAliveDuration(),entity.getTime())!=114514){
-                        addYaw+=(attackItem.getCalculateYaw(entity.getAliveDuration(),entity.getTime()));
+                    if (attackItem.getCalculateYaw(alive,entity.getTime())!=114514){
+                        addYaw+=(attackItem.getCalculateYaw(alive,entity.getTime()));
                         count++;
                         if (count>=3){
                             entity.setYaw(addYaw);
@@ -131,7 +134,7 @@ public class AttackTypes {
 
     private void delayMovement(MissileEntity entity, double range, double speed) {
         lazyMovement(entity);
-        int aliveDuration = entity.getAliveDuration();
+        int aliveDuration = entity.age - 1;
         int halfTime = entity.getTime() / 2;
         if (aliveDuration == halfTime) {
             if (entity.getOwner() != null) {
@@ -165,7 +168,7 @@ public class AttackTypes {
 
     private void joyeuseMovement(MissileEntity entity,double range ,double speed) {
         delayMovement(entity,range,speed);
-        if (entity.getAliveDuration() < entity.getTime() / 2) {
+        if (entity.age - 1 < entity.getTime() / 2) {
             Entity owner = entity.getOwner();
             if (owner == null) return;
             double yawRad = Math.toRadians(owner.getYaw());
@@ -184,7 +187,7 @@ public class AttackTypes {
     }
 
     private void boomerangMovement(MissileEntity entity,double range,double speed) {
-        int aliveDuration = entity.getAliveDuration();
+        int aliveDuration = entity.age - 1;
         int maxDistanceDuration = (int) (range / speed / 2);
         double progress = (double) aliveDuration / maxDistanceDuration;
         double speedMultiplier = 1.0 - progress;
@@ -202,7 +205,7 @@ public class AttackTypes {
 
     private void ellipsoidMovement(MissileEntity entity, double range, float trackPitch) {
         int time =  entity.getTime();
-        int t = entity.getAliveDuration();
+        int t = entity.age - 1;
         double a = range / 2.0;
         double b = 3;
         double omega = 2 * Math.PI / time;
@@ -236,7 +239,7 @@ public class AttackTypes {
     }
 
     private void missileMovement(MissileEntity entity, double range) {
-        int t = entity.getAliveDuration();
+        int t = entity.age - 1;
         if (t==0){
             markedEntity = findNearestTarget(entity, range);
             if (markedEntity != null) {

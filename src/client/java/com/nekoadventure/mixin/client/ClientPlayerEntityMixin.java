@@ -32,7 +32,8 @@ public abstract class ClientPlayerEntityMixin {
             return;
         }
         if (!(player.getOffHandStack().getItem() instanceof NekoPackageItem nekoPackageItem)
-                || !nekoPackageItem.isHaveNekoItem(player.getOffHandStack(), ModItems.CLOUD_BOOTS)) {
+                || !nekoPackageItem.isHaveNekoItem(player.getOffHandStack(), ModItems.CLOUD_BOOTS)
+                || (NekoPackageItem.getIsFinished(player.getOffHandStack())==2)) {
             return;
         }
         nekoDoubleJumped = true;

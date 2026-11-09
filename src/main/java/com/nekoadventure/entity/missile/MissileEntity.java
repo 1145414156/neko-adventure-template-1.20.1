@@ -14,6 +14,7 @@ import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
+import net.minecraft.entity.passive.SheepEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
@@ -39,13 +40,10 @@ public class MissileEntity extends Entity {
             DataTracker.registerData(MissileEntity.class, TrackedDataHandlerRegistry.INTEGER);
     private static final TrackedData<Integer> TIME =
             DataTracker.registerData(MissileEntity.class, TrackedDataHandlerRegistry.INTEGER);
-    private static final TrackedData<Integer> ALIVE_DURATION =
-            DataTracker.registerData(MissileEntity.class, TrackedDataHandlerRegistry.INTEGER);
     private static final TrackedData<Float> RANGE =
             DataTracker.registerData(MissileEntity.class, TrackedDataHandlerRegistry.FLOAT);
     private static final TrackedData<Integer> ATTACK_TYPE =
             DataTracker.registerData(MissileEntity.class, TrackedDataHandlerRegistry.INTEGER);
-    // 初始朝向：需同步给客户端用于重建椭圆轨道
     private static final TrackedData<Float> INITIAL_YAW =
             DataTracker.registerData(MissileEntity.class, TrackedDataHandlerRegistry.FLOAT);
     private static final TrackedData<Float> INITIAL_PITCH =
@@ -57,7 +55,6 @@ public class MissileEntity extends Entity {
     private Entity realOwner;
     private boolean isTreadable;
     private double damage;
-    // 每 tick 至多真正执行一次碰撞检测：movement 内已触发时，tick 中的调用直接复用结果
     private int lastEntityCheckTick = Integer.MIN_VALUE;
     private boolean lastEntityCheckHit;
     private int lastBlockCheckTick = Integer.MIN_VALUE;
@@ -116,8 +113,7 @@ public class MissileEntity extends Entity {
         this.noClip=true;
 
         if (this.getWorld().isClient) {return;}
-
-        if(getAliveDuration()==0) {
+        if (this.age == 1) {
             this.setInitialYaw(this.getYaw());
             this.setInitialPitch(this.getPitch());
         }
@@ -128,13 +124,12 @@ public class MissileEntity extends Entity {
         if (!this.getWorld().isClient&&attackTypes != null) {
             attackTypes.executeMovement(this, this.getRange() , speed);
             this.move(MovementType.SELF, this.getVelocity());
-            this.setAliveDuration(this.getAliveDuration() + 1);
         }
         if (this.getRealOwner()==null) {this.kill();return;}
         if (this.age>2000){this.kill();}
         if (entityCheckCollision() && !this.isTreadable) this.kill();
         blockCheckCollision();
-        if (this.getAliveDuration()>=this.getTime()){this.kill();}
+        if (this.age >= this.getTime()){this.kill();}
     }
 
     public boolean entityCheckCollision() {
@@ -243,7 +238,6 @@ public class MissileEntity extends Entity {
         this.dataTracker.startTracking(REAL_OWNER_UUID, Optional.empty());
         this.dataTracker.startTracking(FLAG, -1);
         this.dataTracker.startTracking(TIME, 1);
-        this.dataTracker.startTracking(ALIVE_DURATION, 0);
         this.dataTracker.startTracking(RANGE, 0.0f);
         this.dataTracker.startTracking(ATTACK_TYPE, -1);
         this.dataTracker.startTracking(INITIAL_YAW, 0.0f);
@@ -258,7 +252,7 @@ public class MissileEntity extends Entity {
     @Override
     protected void writeCustomDataToNbt(NbtCompound nbt) {
         nbt.putInt("time", this.getTime());
-        nbt.putInt("aliveDuration", this.getAliveDuration());
+        nbt.putInt("age", this.age);
         nbt.putDouble("speed", this.speed);
         nbt.putDouble("range", this.getRange());
         nbt.putInt("flag", this.getFlag());
@@ -284,7 +278,7 @@ public class MissileEntity extends Entity {
     @Override
     protected void readCustomDataFromNbt(NbtCompound nbt) {
         this.setTime(nbt.getInt("time"));
-        this.setAliveDuration(nbt.getInt("aliveDuration"));
+        this.age = nbt.getInt("age");
         this.setFlag(nbt.getInt("flag"));
         this.setInitialYaw(nbt.getFloat("initialYaw"));
         this.setInitialPitch(nbt.getFloat("initialPitch"));
@@ -449,9 +443,14 @@ public class MissileEntity extends Entity {
         this.realOwner = realOwner;
         this.dataTracker.set(REAL_OWNER_UUID, realOwner != null ? Optional.of(realOwner.getUuid()) : Optional.empty());
     }
-    public void setAliveDuration(int aliveDuration){this.dataTracker.set(ALIVE_DURATION,aliveDuration);}
     public void setDamage(double damage){this.damage=damage;}
     public double getDamage(){return damage;}
+    // 重置寿命：age 归零后下一 tick 会重新记录初始朝向并重新计时
+    public void resetAge() {
+        this.age = 0;
+        this.lastEntityCheckTick = Integer.MIN_VALUE;
+        this.lastBlockCheckTick = Integer.MIN_VALUE;
+    }
     public double getSpeed(){return speed;}
     @Nullable
     public AttackTypes.AttackType getAttackType(){
@@ -465,7 +464,6 @@ public class MissileEntity extends Entity {
     public MissileModelType getMissileModelType() {return MissileModelType.values()[this.dataTracker.get(MISSILE_MODEL_TYPE)];}
     public int getFlag(){return this.dataTracker.get(FLAG);}
     public void setFlag(int flag){this.dataTracker.set(FLAG,flag);}
-    public int getAliveDuration(){return this.dataTracker.get(ALIVE_DURATION);}
     public double getRange(){return this.dataTracker.get(RANGE);}
     public void setRange(double range){this.dataTracker.set(RANGE,(float) range);}
     public void setAttackType(@Nullable AttackTypes attackType){
