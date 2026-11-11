@@ -4,6 +4,10 @@
     {
       "id": "neko-adventure:dungeon",
       "required": false
+    },
+    {
+      "id": "neko-adventure:desert",
+      "required": false
     }
   ]
 }

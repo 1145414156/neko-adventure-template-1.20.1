@@ -26,5 +26,7 @@ public class ModDimensionTagProvider extends FabricTagProvider<DimensionType> {
         );
 
         getOrCreateTagBuilder(isMazeTag).addOptional(new Identifier("neko-adventure", "dungeon"));
+        getOrCreateTagBuilder(isMazeTag).addOptional(new Identifier("neko-adventure", "desert"));
+
     }
 }

@@ -1,9 +1,7 @@
 package com.nekoadventure.entity;
 
 import com.nekoadventure.NekoAdventure;
-import com.nekoadventure.entity.boss.GrandKnightEntity;
-import com.nekoadventure.entity.boss.HugeSlimeEntity;
-import com.nekoadventure.entity.boss.PriestSkeletonEntity;
+import com.nekoadventure.entity.boss.*;
 import com.nekoadventure.entity.missile.MissileEntity;
 import com.nekoadventure.entity.mob.*;
 import com.nekoadventure.entity.particle.AbstractParticleEntity;
@@ -89,27 +87,27 @@ public class ModEntities  {
             new Identifier(NekoAdventure.MOD_ID,"scarab_beetle"),
             FabricEntityTypeBuilder.create(SpawnGroup.MONSTER,
                     ScarabBeetleEntity::new)
-                    .dimensions(EntityDimensions.fixed(1.0f,0.5f)).build()
+                    .dimensions(EntityDimensions.fixed(0.99f,0.5f)).build()
     );
     public static final EntityType<JarGremlinEntity> JAR_GREMLIN=Registry.register(
             Registries.ENTITY_TYPE,
             new Identifier(NekoAdventure.MOD_ID,"jar_gremlin"),
             FabricEntityTypeBuilder.create(SpawnGroup.MONSTER,
                     JarGremlinEntity::new)
-                    .dimensions(EntityDimensions.fixed(0.5f,1.0f)).build()
+                    .dimensions(EntityDimensions.fixed(0.5f,1.01f)).build()
     );
     public static final EntityType<JarGremlinHeadEntity> JAR_GREMLIN_HEAD =
             Registry.register(Registries.ENTITY_TYPE,
                     new Identifier(NekoAdventure.MOD_ID, "jar_gremlin_head"),
                     FabricEntityTypeBuilder.create(SpawnGroup.MONSTER, JarGremlinHeadEntity::new)
-                            .dimensions(EntityDimensions.fixed(0.5f, 0.5f))
+                            .dimensions(EntityDimensions.fixed(0.51f, 0.49f))
                             .disableSummon()
                             .build());
     public static final EntityType<JarGremlinBodyEntity> JAR_GREMLIN_BODY =
             Registry.register(Registries.ENTITY_TYPE,
                     new Identifier(NekoAdventure.MOD_ID, "jar_gremlin_body"),
                     FabricEntityTypeBuilder.create(SpawnGroup.MONSTER, JarGremlinBodyEntity::new)
-                            .dimensions(EntityDimensions.fixed(0.5f, 0.5f))
+                            .dimensions(EntityDimensions.fixed(0.51f, 0.75f))
                             .disableSummon()
                             .build());
 
@@ -118,14 +116,14 @@ public class ModEntities  {
             new Identifier(NekoAdventure.MOD_ID,"cobra"),
             FabricEntityTypeBuilder.create(SpawnGroup.MONSTER,
                             CobraEntity::new)
-                    .dimensions(EntityDimensions.fixed(1.0f,1.0f)).build()
+                    .dimensions(EntityDimensions.fixed(0.99f,0.99f)).build()
     );
     public static final EntityType<ChestMimicEntity> CHEST_MIMIC=Registry.register(
             Registries.ENTITY_TYPE,
             new Identifier(NekoAdventure.MOD_ID,"chest_mimic"),
             FabricEntityTypeBuilder.create(SpawnGroup.MONSTER,
                     ChestMimicEntity::new)
-                    .dimensions(EntityDimensions.fixed(1.0f,1.0f)).build()
+                    .dimensions(EntityDimensions.fixed(0.99f,0.99f)).build()
     );
     public static final EntityType<CoinMonsterEntity> COIN_MONSTER=Registry.register(
             Registries.ENTITY_TYPE,
@@ -142,14 +140,14 @@ public class ModEntities  {
             new Identifier(NekoAdventure.MOD_ID,"huge_slime"),
             FabricEntityTypeBuilder.create(SpawnGroup.MONSTER,
                             HugeSlimeEntity::new)
-                    .dimensions(EntityDimensions.fixed(4.0f, 4.0f)).build()
+                    .dimensions(EntityDimensions.fixed(3.99f, 3.99f)).build()
     );
     public static final EntityType<PriestSkeletonEntity> PRIEST_SKELETON=Registry.register(
             Registries.ENTITY_TYPE,
             new Identifier(NekoAdventure.MOD_ID,"priest_skeleton"),
             FabricEntityTypeBuilder.create(SpawnGroup.MONSTER,
                             PriestSkeletonEntity::new)
-                    .dimensions(EntityDimensions.fixed(0.9f, 3.0f)).build()
+                    .dimensions(EntityDimensions.fixed(0.9f, 2.99f)).build()
     );
     public static final EntityType<GrandKnightEntity> GRAND_KNIGHT=Registry.register(
             Registries.ENTITY_TYPE,
@@ -157,6 +155,23 @@ public class ModEntities  {
             FabricEntityTypeBuilder.create(SpawnGroup.MONSTER,
                             GrandKnightEntity::new)
                     .dimensions(EntityDimensions.fixed(1.4f, 3.6f)).build()
+    );
+    public static final EntityType<SandWormEntity> SAND_WORM=Registry.register(
+            Registries.ENTITY_TYPE,
+            new Identifier(NekoAdventure.MOD_ID,"sand_worm"),
+            FabricEntityTypeBuilder.create(SpawnGroup.MONSTER,
+                            SandWormEntity::new)
+                    .dimensions(EntityDimensions.fixed(2.79f, 2.99f))
+                    .build()
+    );
+    public static final EntityType<SandWormBodyEntity> SAND_WORM_BODY=Registry.register(
+            Registries.ENTITY_TYPE,
+            new Identifier(NekoAdventure.MOD_ID,"sand_worm_body"),
+            FabricEntityTypeBuilder.create(SpawnGroup.MONSTER,
+                            SandWormBodyEntity::new)
+                    .dimensions(EntityDimensions.fixed(2.99f, 2.49f))
+                    .disableSummon()
+                    .build()
     );
 
     public static void initialize(){
@@ -177,6 +192,7 @@ public class ModEntities  {
         FabricDefaultAttributeRegistry.register(ModEntities.HUGE_SLIME,HugeSlimeEntity.createHugeSlimeAttributes());
         FabricDefaultAttributeRegistry.register(ModEntities.PRIEST_SKELETON,PriestSkeletonEntity.createPriestSkeletonAttributes());
         FabricDefaultAttributeRegistry.register(ModEntities.GRAND_KNIGHT,GrandKnightEntity.createGrandKnightAttributes());
+        FabricDefaultAttributeRegistry.register(ModEntities.SAND_WORM,SandWormEntity.createAttributes());
     }
 
 }

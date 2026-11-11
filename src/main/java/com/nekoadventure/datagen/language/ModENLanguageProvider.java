@@ -132,6 +132,7 @@ public class ModENLanguageProvider extends FabricLanguageProvider {
         translationBuilder.add(ModItems.TP_START_ROOM_SOUL,"tp_start_room_soul");
         translationBuilder.add(ModItems.GET_CONCEAL_POOL_SOUL,"get_conceal_pool_soul");
         translationBuilder.add(ModItems.GET_SHOP_POOL_SOUL,"get_shop_pool_soul");
+        translationBuilder.add(ModItems.GET_SOUL_POOL_SOUL,"get_soul_pool_soul");
         translationBuilder.add(ModItems.GET_THIRD_POOL_SOUL,"get_third_pool_soul");
         translationBuilder.add(ModItems.GET_APART_POOL_SOUL,"get_apart_pool_soul");
         translationBuilder.add(ModItems.GET_CHAO_POOL_SOUL,"get_chao_pool_soul");

@@ -126,7 +126,7 @@ public class GrandKnightEntity extends HostileEntity implements Monster {
     public static DefaultAttributeContainer.Builder createGrandKnightAttributes() {
         return HostileEntity.createHostileAttributes()
                 .add(EntityAttributes.GENERIC_MAX_HEALTH, 1200.0)
-                .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.35D)
+                .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.34D)
                 .add(EntityAttributes.GENERIC_ARMOR, 10.0D)
                 .add(EntityAttributes.GENERIC_ARMOR_TOUGHNESS, 10.0D)
                 .add(EntityAttributes.GENERIC_ATTACK_DAMAGE, 12.0D)
@@ -749,12 +749,12 @@ public class GrandKnightEntity extends HostileEntity implements Monster {
     private void brimstoneSkill() {
         if (this.getTarget() == null) {return;}
         int time=-(skillTick-BRIMSTONE_DURATION);
-        List<PlayerEntity> playerEntities=this.getWorld().getEntitiesByClass(
-                PlayerEntity.class,
-                this.getBoundingBox().expand(12+getStage()*4),
-                e-> true
-        );
         if (time==30){
+            List<PlayerEntity> playerEntities=this.getWorld().getEntitiesByClass(
+                    PlayerEntity.class,
+                    this.getBoundingBox().expand(12+getStage()*4),
+                    e-> true
+            );
             int range=12;
             double spacing = 1.0;
             double cubeSize = 0.5;
@@ -900,6 +900,14 @@ public class GrandKnightEntity extends HostileEntity implements Monster {
         if (time<40){
             this.setVelocity(0,0,0);
         }
+
+        this.getNavigation().stop();
+        Vec3d dir = target.getEyePos().subtract(this.getEyePos());
+        double seeHorizontal = Math.sqrt(dir.x * dir.x + dir.z * dir.z);
+        float yaw = (float) Math.toDegrees(Math.atan2(-dir.x, dir.z));
+        float pitch = (float) Math.toDegrees(Math.atan2(-dir.y, seeHorizontal));
+        this.setYaw(yaw);
+        this.setPitch(pitch);
         if(time>45&&time<50) {
             Vec3d direction = this.getTarget().getPos().subtract(this.getPos()).normalize();
             double speed = 1.5;

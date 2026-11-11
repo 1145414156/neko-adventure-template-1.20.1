@@ -27,8 +27,8 @@ public class NekoBossBarMixin {
             new Identifier(NekoAdventure.MOD_ID, "textures/ui/boss_bar/grand_knight_boss_bar.png"),
             "entity.neko-adventure.priest_skeleton",
             new Identifier(NekoAdventure.MOD_ID, "textures/ui/boss_bar/priest_skeleton_boss_bar.png")
-//            , "entity.neko-adventure.huge_slime"
-//            , new Identifier(NekoAdventure.MOD_ID, "textures/ui/boss_bar/huge_slime_boss_bar.png")
+            , "entity.neko-adventure.huge_slime"
+            , new Identifier(NekoAdventure.MOD_ID, "textures/ui/boss_bar/huge_slime_boss_bar.png")
     );
 
     // 单一个血条：186x48

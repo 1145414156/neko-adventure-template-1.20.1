@@ -163,6 +163,7 @@ public class ModCNLanguageProvider extends FabricLanguageProvider {
         translationBuilder.add(ModItems.TP_START_ROOM_SOUL,"重生之魂石");
         translationBuilder.add(ModItems.GET_CONCEAL_POOL_SOUL,"获取隐藏池的魂石");
         translationBuilder.add(ModItems.GET_SHOP_POOL_SOUL,"获取商店池的魂石");
+        translationBuilder.add(ModItems.GET_SOUL_POOL_SOUL,"获取魂石池的魂石");
         translationBuilder.add(ModItems.GET_THIRD_POOL_SOUL,"三瓣的魂石");
         translationBuilder.add(ModItems.GET_APART_POOL_SOUL,"分裂的魂石");
         translationBuilder.add(ModItems.GET_CHAO_POOL_SOUL,"混乱的魂石");

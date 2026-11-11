@@ -161,6 +161,7 @@ public class ModModelProvider extends FabricModelProvider {
         itemModelGenerator.register(ModItems.GET_FIRST_POOL_SOUL,Models.GENERATED);
         itemModelGenerator.register(ModItems.GET_CONCEAL_POOL_SOUL,Models.GENERATED);
         itemModelGenerator.register(ModItems.GET_SHOP_POOL_SOUL,Models.GENERATED);
+        itemModelGenerator.register(ModItems.GET_SOUL_POOL_SOUL,Models.GENERATED);
         itemModelGenerator.register(ModItems.GET_THIRD_POOL_SOUL,Models.GENERATED);
         itemModelGenerator.register(ModItems.GET_APART_POOL_SOUL,Models.GENERATED);
         itemModelGenerator.register(ModItems.GET_CHAO_POOL_SOUL,Models.GENERATED);

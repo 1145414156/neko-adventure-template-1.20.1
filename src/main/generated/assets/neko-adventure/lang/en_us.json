@@ -82,6 +82,7 @@
   "item.neko-adventure.get_forge_pool_soul": "get_forge_soul",
   "item.neko-adventure.get_last_pool_soul": "get_last_pool_soul",
   "item.neko-adventure.get_shop_pool_soul": "get_shop_pool_soul",
+  "item.neko-adventure.get_soul_pool_soul": "get_soul_pool_soul",
   "item.neko-adventure.get_third_pool_soul": "get_third_pool_soul",
   "item.neko-adventure.get_treasure_pool_soul": "treasure_pool_soul",
   "item.neko-adventure.glove": "glove",

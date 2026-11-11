@@ -54,4 +54,8 @@ public class ModEntityModelLayers {
             new EntityModelLayer(new Identifier(NekoAdventure.MOD_ID,"grand_knight_stage_1"), "main");
     public static final EntityModelLayer GRAND_KNIGHT_2=
             new EntityModelLayer(new Identifier(NekoAdventure.MOD_ID,"grand_knight_stage_2"), "main");
+    public static final EntityModelLayer SAND_WORM=
+            new EntityModelLayer(new Identifier(NekoAdventure.MOD_ID,"sand_worm"),"main");
+    public static final EntityModelLayer SAND_WORM_BODY=
+            new EntityModelLayer(new Identifier(NekoAdventure.MOD_ID,"sand_worm_body"),"main");
 }

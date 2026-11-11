@@ -285,6 +285,8 @@ public class ModItems {
             new GetConcealPoolSoul(new Item.Settings().rarity(Rarity.RARE),4));
     public static final GetShopPoolSoul GET_SHOP_POOL_SOUL=register("get_shop_pool_soul",
             new GetShopPoolSoul(new Item.Settings().rarity(Rarity.RARE),1));
+    public static final GetSoulPoolSoul GET_SOUL_POOL_SOUL=register("get_soul_pool_soul",
+            new GetSoulPoolSoul(new Item.Settings().rarity(Rarity.RARE),3));
     public static final GetFirstPoolSoul GET_FIRST_POOL_SOUL=register("get_first_pool_soul",
             new GetFirstPoolSoul(new Item.Settings().rarity(Rarity.RARE),1));
     public static final GetLastPoolSoul GET_LAST_POOL_SOUL=register("get_last_pool_soul",

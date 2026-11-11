@@ -1,0 +1,18 @@
+{
+  "type": "neko-adventure:desert",
+  "generator": {
+    "type": "minecraft:flat",
+    "settings": {
+      "biome": "neko-adventure:dead_desert",
+      "layers": [
+        { "block": "minecraft:bedrock", "height": 1 },
+        { "block": "minecraft:sand", "height": 16 }
+      ],
+      "features": true,
+      "lakes": false,
+      "structures": {
+        "structures": {}
+      }
+    }
+  }
+}

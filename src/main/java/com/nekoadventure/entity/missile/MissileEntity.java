@@ -1,6 +1,8 @@
 package com.nekoadventure.entity.missile;
 
 
+import com.nekoadventure.entity.boss.SandWormBodyEntity;
+import com.nekoadventure.entity.boss.SandWormEntity;
 import com.nekoadventure.item.nekoItem.AbstractNekoItem;
 import com.nekoadventure.item.nekoItem.attackTypeItem.AbstractNekoSpecificItem;
 import com.nekoadventure.item.other.NekoPackageItem;
@@ -14,7 +16,6 @@ import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
-import net.minecraft.entity.passive.SheepEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
@@ -150,6 +151,7 @@ public class MissileEntity extends Entity {
         double expandY = Math.abs(direction.y) * forwardExpand + 0.1;
         double expandZ = Math.abs(direction.z) * forwardExpand + 0.1;
         Entity realOwner = getRealOwner();
+        boolean isSandWormOwner = realOwner instanceof SandWormEntity;
         DamageSource damageSource = realOwner instanceof LivingEntity livingOwner
                 ? this.getDamageSources().mobProjectile(this, livingOwner)
                 : this.getDamageSources().mobProjectile(this, null);
@@ -159,6 +161,7 @@ public class MissileEntity extends Entity {
                 e -> !(e instanceof MissileEntity)
                         && e != realOwner
                         && (!(e instanceof LivingEntity livingTarget) || canHurt(livingTarget, realOwner, damageSource))
+                        && !(isSandWormOwner && e instanceof SandWormBodyEntity)
         );
 
         if (targets.isEmpty()) {

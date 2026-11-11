@@ -102,7 +102,7 @@ public class PriestSkeletonEntity extends HostileEntity implements Monster {
         this.targetSelector.add(0, new RevengeGoal(this));
         this.targetSelector.add(1, new ActiveTargetGoal<>(this, PlayerEntity.class, 10, false, false,
                 livingEntity -> Math.abs(livingEntity.getY() - this.getY()) <= 8.0));
-        this.targetSelector.add(2, new ActiveTargetGoal<>(this, IronGolemEntity.class, true));
+        this.targetSelector.add(1, new ActiveTargetGoal<>(this, IronGolemEntity.class, true));
 
         this.goalSelector.add(1, new SwimGoal(this));
         this.goalSelector.add(2, new MeleeAttackGoal(this, 1.0, false));

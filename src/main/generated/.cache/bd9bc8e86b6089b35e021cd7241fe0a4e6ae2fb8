@@ -1,4 +1,4 @@
-// 1.20.1	2026-11-07T15:02:03.1002246	Neko Adventure/Model Definitions
+// 1.20.1	2026-11-11T19:50:21.5615303	Neko Adventure/Model Definitions
 bc89db3b4e016bcdac55995d15a2ce55fd9e8c17 assets\neko-adventure\models\item\get_chao_pool_soul.json
 6a4d24dc6662f07e39d054b613c22548e626c92f assets\neko-adventure\blockstates\start_room_block.json
 5aac8668e2f435a47e4471ab040c29fa5037cdb7 assets\neko-adventure\models\item\strength_potion_injector.json
@@ -12,8 +12,8 @@ b0bf5dbe5a61ca2ae2173af1b5ab41ea87027339 assets\neko-adventure\models\item\neko_
 d2cd17b4b1ecb44e5b4c920e847010f396e6f1fa assets\neko-adventure\models\item\conceal_room_block.json
 5b160b229eafaf873959ed0906902e23e117eb29 assets\neko-adventure\models\block\maze_block.json
 b62081d4a276ac54be987bb5ce4ca91a8d7652da assets\neko-adventure\blockstates\boss_room_block.json
-0134cc8ea794cc9605cb0d4dafa2862a7798aef0 assets\neko-adventure\blockstates\conceal_room_block.json
 94129617dabffc9d9f6a3e1295a05950123d5e28 assets\neko-adventure\blockstates\gate_block.json
+0134cc8ea794cc9605cb0d4dafa2862a7798aef0 assets\neko-adventure\blockstates\conceal_room_block.json
 19c8272b5ee6e6f70e1afd41a6ff450b8548e2cb assets\neko-adventure\models\item\undercooked_long_beans.json
 1c06bec3d6ca83d7671a9001faa79f88564fdaa4 assets\neko-adventure\models\item\banana.json
 d016447e8b9a1567c73b2163c52f2ae5d0914626 assets\neko-adventure\models\item\tree_trunk.json
@@ -64,6 +64,7 @@ eb398eda557b0c0242ebafaf28af0961b6bc2f2b assets\neko-adventure\models\item\compr
 d566eed9e2fa73dd8db3491632f89d335702712a assets\neko-adventure\models\item\gamble_room_block.json
 415a243238e7d87310a84d33daf7038ad440f47f assets\neko-adventure\models\item\strength_soul.json
 955d38322904d77875798106aa24d1efde53bb34 assets\neko-adventure\models\block\start_room_block.json
+5bc79f507cf78c194e7d45800f3caad0868ba3d3 assets\neko-adventure\models\item\get_soul_pool_soul.json
 6aefa93f39d013572b783bdb9e268be655ff6b3a assets\neko-adventure\models\item\restock.json
 8655c9531872e9717ba41ae7910d6c456c9685b0 assets\neko-adventure\models\item\instance_health_soul.json
 b0d69e59faea427768c4b287dec74a004312189d assets\neko-adventure\models\item\get_conceal_pool_soul.json

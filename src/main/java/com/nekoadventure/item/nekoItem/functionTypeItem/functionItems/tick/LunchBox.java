@@ -3,6 +3,7 @@ package com.nekoadventure.item.nekoItem.functionTypeItem.functionItems.tick;
 import com.nekoadventure.item.nekoItem.functionTypeItem.functionItems.AbstractNekoFunctionItem;
 import com.nekoadventure.item.other.NekoPackageItem;
 import com.nekoadventure.other.itemApart.NekoPackageDataManager;
+import net.minecraft.block.FireBlock;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.text.Text;

@@ -35,7 +35,7 @@ public class MazeBuilder {
     public boolean placeMaze(ServerWorld world) {
         MazeDataManager data = MazeDataManager.get(world);
         int levelData = getLevelData(world);
-        BlockPos placePos = new BlockPos((levelData - 1) * 10000 - random.nextInt(40) - 20, 1, random.nextInt(40) - 20);
+        BlockPos placePos = new BlockPos((levelData - 1) * 10000 - random.nextInt(40) - 20, 2, random.nextInt(40) - 20);
 
         Identifier poolId = getPoolPath(world);
 
@@ -77,10 +77,11 @@ public class MazeBuilder {
         return true;
     }
 
-    //返回房间中心(标记方块所在位置)：maze_block上方1格就是转换后的maze_structure_block(力大砖飞了属于是)(没招毕竟我的世界原版生成结构随机我找不到具体位置就算要去找也得去改无敌多的代码(起码目前的我是这样))
+    //返回房间中心(标记方块所在位置)：maze_block上方1格就是转换后的maze_structure_block(力大砖飞了属于是)
+    // (没招毕竟我的世界原版生成结构随机我找不到具体位置就算要去找也得去改无敌多的代码(起码目前的我是这样))
     private BlockPos findStartRoomCenter(ServerWorld world, BlockPos placePos, int mazeRange,MazeDataManager data) {
         int horizontal = mazeRange * 2;
-        for (int dy = 48; dy >=0; dy--) {
+        for (int dy = 48; dy >=-3; dy--) {
             for (int dx = -horizontal; dx <= horizontal; dx++) {
                 for (int dz = -horizontal; dz <= horizontal; dz++) {
                     BlockPos checkPos = placePos.add(dx, dy, dz);
@@ -105,7 +106,7 @@ public class MazeBuilder {
         String dimensionPath = worldKey.getValue().getPath();
         Identifier structureId = new Identifier(DATA_NAMESPACE, dimensionPath + "/" + "level/" + "1-2/" + "start_room/" + "start1");
         if (!(world instanceof ServerWorld serverWorld)) {
-            return 8;
+            return 32;
         }
         StructureTemplateManager templateManager = serverWorld.getStructureTemplateManager();
         Optional<StructureTemplate> optional = templateManager.getTemplate(structureId);

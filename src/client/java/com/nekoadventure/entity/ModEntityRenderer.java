@@ -3,18 +3,18 @@ package com.nekoadventure.entity;
 import com.nekoadventure.entity.entityRender.boss.GrandKnightRenderer;
 import com.nekoadventure.entity.entityRender.boss.HugeSlimeRenderer;
 import com.nekoadventure.entity.entityRender.boss.PriestSkeletonRenderer;
+import com.nekoadventure.entity.entityRender.boss.SandWormEntityBodyEntityRenderer;
+import com.nekoadventure.entity.entityRender.boss.SandWormEntityRenderer;
 import com.nekoadventure.entity.entityRender.missile.MissileEntityRenderer;
 import com.nekoadventure.entity.entityRender.mob.*;
-import com.nekoadventure.entity.model.boss.GrandKnightEntityModel;
-import com.nekoadventure.entity.model.boss.GrandKnightLevelTwoEntityModel;
-import com.nekoadventure.entity.model.boss.HugeSlimeEntityModel;
-import com.nekoadventure.entity.model.boss.PriestSkeletonEntityModel;
+import com.nekoadventure.entity.model.boss.*;
 import com.nekoadventure.entity.model.missile.BoomerangModel;
 import com.nekoadventure.entity.model.missile.MissileModel;
 import com.nekoadventure.entity.model.mob.*;
 import com.nekoadventure.entity.model.particle.ParticleTextEntityModel;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
+import net.minecraft.client.render.entity.EntityRendererFactory;
 
 public class ModEntityRenderer {
     public static void register() {
@@ -75,5 +75,12 @@ public class ModEntityRenderer {
         EntityRendererRegistry.register(ModEntities.GRAND_KNIGHT, GrandKnightRenderer::new);
         EntityModelLayerRegistry.registerModelLayer(ModEntityModelLayers.GRAND_KNIGHT_1, GrandKnightEntityModel::getTexturedModelData);
         EntityModelLayerRegistry.registerModelLayer(ModEntityModelLayers.GRAND_KNIGHT_2, GrandKnightLevelTwoEntityModel::getTexturedModelData);
+
+        EntityRendererRegistry.register(ModEntities.SAND_WORM,SandWormEntityRenderer::new);
+        EntityModelLayerRegistry.registerModelLayer(ModEntityModelLayers.SAND_WORM, SandWormEntityModel::getTexturedModelData);
+
+        EntityRendererRegistry.register(ModEntities.SAND_WORM_BODY, SandWormEntityBodyEntityRenderer::new);
+        EntityModelLayerRegistry.registerModelLayer(ModEntityModelLayers.SAND_WORM_BODY, SandWormBodyEntityModel::getTexturedModelData);
+
     }
 }

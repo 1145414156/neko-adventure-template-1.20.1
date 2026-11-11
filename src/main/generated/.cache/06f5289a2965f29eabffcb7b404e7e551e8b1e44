@@ -1,11 +1,11 @@
-// 1.20.1	2026-11-07T15:02:03.0989228	Neko Adventure/Tags for minecraft:item
-1adbc40bb2bb722fead1da739edd206b343200d6 data\neko-adventure\tags\items\conceal_pool.json
-f1facc22bba29307faa653f426c55f029706f902 data\neko-adventure\tags\items\boss_pool.json
-0bab41b6d950e46e6001343e66ef9d9fc5bb8d40 data\neko-adventure\tags\items\forge_pool.json
-9f2181ea40584db40c5806885a102ee1b696a6e3 data\neko-adventure\tags\items\soul_item.json
-6546c83ef39ba4d7e8e9f229459de66cb32b2708 data\neko-adventure\tags\items\shop_pool.json
-bb8ba72303fa59576c052c882677203eb44630e8 data\neko-adventure\tags\items\food_pool.json
-395ef430e95c5189600d23336cf6ecaa0d43d4d5 data\neko-adventure\tags\items\all_item_pool.json
-7bd6404d2eb864c8440b7e06eb76290a5ddddfcc data\neko-adventure\tags\items\gamble_pool.json
-dcd9e832329eb7bcad02d74edcd1129b00c3feeb data\neko-adventure\tags\items\treasure_pool.json
-df105faf1f5426d55d23d03f0ce0bb455463e073 data\neko-adventure\tags\items\soul_pool.json
+// 1.20.1	2026-11-11T19:50:21.5605314	Neko Adventure/Tags for minecraft:item
+e6285dd585e8f3470da36949c69f6a5118f3545e data\neko-adventure\tags\items\conceal_pool.json
+1fb31fb4b03a1e140fcf0848b03e2422b2ce70e1 data\neko-adventure\tags\items\boss_pool.json
+e61c920ba9dac7fda47ff638aa888d89642d4b67 data\neko-adventure\tags\items\forge_pool.json
+23bc9116c17ba9b121a524ed68b2b522cb96cf4b data\neko-adventure\tags\items\soul_item.json
+f84979980f67cd2b3c5a669380bb15cd842a34aa data\neko-adventure\tags\items\shop_pool.json
+ba595b9695e5a5af6d621f987a5803878eeacdf5 data\neko-adventure\tags\items\food_pool.json
+dc656d13fc5724c3aa5bc2e9d31e44a9cb11755a data\neko-adventure\tags\items\all_item_pool.json
+f5164498579ee49576db3081e9f25e5ff367c7bf data\neko-adventure\tags\items\gamble_pool.json
+0dd07f75dd4d1a6c322ecc4988f5b7875ca198ad data\neko-adventure\tags\items\treasure_pool.json
+ee8fe9c27321ecf3ad349ab3430ddfd86d9aa9ac data\neko-adventure\tags\items\soul_pool.json
